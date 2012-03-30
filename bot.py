@@ -41,6 +41,12 @@ if __name__ == "__main__":
 # infinite loop to keep parsing lines
 		while 1:
 			line = s.recv(500)
+
+# respond to ping queries first
+			ping_response_line = line.split()
+			if (ping_response_line[0]  ==  'PING'):
+				s.send('PONG ' + ping_response_line[1] + '\n')
+
 			if line.find('PRIVMSG') !=  -1:
 				if CONNECTED == False:
 					for chan in CHANNELINIT:
@@ -48,13 +54,10 @@ if __name__ == "__main__":
 						CONNECTED = True
 				line_array = line.split()
 
-				ping_response_line = line.split()
-				if (ping_response_line[0]  ==  'PING'):
-					s.send('PONG ' + ping_response_line[1] + '\n')
-					date = str(strftime("%Y-%m-%d %H:%M:%S"))
-					print "responding to ping at " + date
+					#date = str(strftime("%Y-%m-%d %H:%M:%S"))
+					#print "responding to ping at " + date
 
-				elif "PRIVMSG" in line:
+				if "PRIVMSG" in line:
 					user_and_mask = line_array[0]
 					usr = user_and_mask.split("!", 1)[0]
 					usr = usr.split(":", 1)[1]
