@@ -19,7 +19,7 @@ def getbf3stats(message):
 				print "message in bf3stats is: " + message
 				data = api.player(v[0], v[1], "clear,ranking")
 				return formatbf3data(k, data)
-			else
+			else:
 				gt = message.split(None, 2)[2] # grab gamertag off the end
 				print gt
 				
