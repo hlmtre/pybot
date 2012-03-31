@@ -26,7 +26,8 @@ def getbf3stats(message):
 def formatbf3data(player, data):
 	if data.status != "error":
 		return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
-	else return [player + " not found"]
+	else:
+		return [player + " not found"]
 	
 
 class BotBrain:
