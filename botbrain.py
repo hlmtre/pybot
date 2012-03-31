@@ -16,6 +16,7 @@ def getbf3stats(message):
 		global api
 		for k,v in bf3players.iteritems():
 			if k in message:
+				print "message in bf3stats is: " + message
 				data = api.player(v[0], v[1], "clear,ranking")
 				return formatbf3data(k, data)
 				
