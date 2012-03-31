@@ -49,11 +49,17 @@ def processline(line):
 	
 	try:
 				
-		if "PRIVMSG" in line:
+		if "PING" in line:
+			ping_response_line = line.split(":", 1)
+			if (ping_response_line[0]  ==  'PING'):
+				pong(ping_response_line[1])
+
+		elif "PRIVMSG" in line:
 			if CONNECTED == False:
 				for chan in CHANNELINIT:
 					send('JOIN '+chan+'\n')
-					print "#### JOINING " + chan + " ####"
+					if DEBUG:
+						print "#### JOINING " + chan + " ####"
 				CONNECTED = True
 			
 			line_array = line.split()
@@ -66,10 +72,6 @@ def processline(line):
 			#p.start()
 			brain.respond(usr, channel, message)
 			
-		elif "PING" in line:
-			ping_response_line = line.split(":", 1)
-			if (ping_response_line[0]  ==  'PING'):
-				pong(ping_response_line[1])
 	except Exception:
 		print "Unexpected error:", sys.exc_info()[0]
 		traceback.print_exc(file=sys.stdout)
