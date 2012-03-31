@@ -19,6 +19,9 @@ def getbf3stats(message):
 				print "message in bf3stats is: " + message
 				data = api.player(v[0], v[1], "clear,ranking")
 				return formatbf3data(k, data)
+			else
+				gt = message.split(None, 2)[2] # grab gamertag off the end
+				print gt
 				
 def formatbf3data(player, data):
 	return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
@@ -45,7 +48,8 @@ class BotBrain:
 			self.paint(channel, message.split()[1])
 		if "rainbow" in message:
 			self.say(channel, ascii.rainbow())
-		if "bf3" in message and "stats" in message:
+		#if "bf3" in message and "stats" in message:
+		if message.startswith(".bf3") and "stats" in message:
 			stats = getbf3stats(message)
 			for line in stats:
 				self.say(channel, line)

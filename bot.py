@@ -64,7 +64,7 @@ def processline(line):
 			brain.respond(usr, channel, message)
 			
 		elif "PING" in line:
-			ping_response_line = line.split()
+			ping_response_line = line.split(":", 1)
 			if (ping_response_line[0]  ==  'PING'):
 				pong(ping_response_line[1])
 	except Exception:
