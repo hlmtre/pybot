@@ -36,7 +36,6 @@ brain = botbrain.BotBrain(send)
 def pong(response):
 	send('PONG ' + response + '\n')
 	date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
-	print "responding to ping at " + date
 		
 
 def processline(line):
@@ -49,10 +48,9 @@ def processline(line):
 	
 	try:
 				
-		if "PING" in line:
+		if line.startswith("PING"):
 			ping_response_line = line.split(":", 1)
-			if (ping_response_line[0]  ==  'PING'):
-				pong(ping_response_line[1])
+			pong(ping_response_line[1])
 
 		elif "PRIVMSG" in line:
 			if CONNECTED == False:
