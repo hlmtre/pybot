@@ -91,13 +91,20 @@ def getlum(pixel):
 	
 def findcolor(pixel):
 	global irccolors
+	mindistance = 10000
+	bestcol = None
 	for x in range(0, len(irccolors)):
 		col = irccolors[x]
-		if colorDistance(col, pixel) < 70:
-			if getlum(pixel) > getlum(col):
-				return setcolor(1, x)
-			else:
-				return setcolor(0, x)
+		distance = colorDistance(col, pixel)
+		if distance < mindistance:
+			mindistance = distance
+			bestcol = x
+			
+	if getlum(pixel) > getlum(col):
+		return setcolor(1, bestcol)
+	else:
+		return setcolor(0, bestcol)
+			
 	return ""
 	
 def asciify(url):
