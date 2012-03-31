@@ -21,7 +21,7 @@ def getbf3stats(message):
 				return formatbf3data(k, data)
 			else:
 				gt = message.split(None, 2)[2] # grab gamertag off the end
-				print gt
+				data = api.player(gt, '360', "clear,ranking")
 				
 def formatbf3data(player, data):
 	return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
