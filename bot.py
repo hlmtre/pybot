@@ -11,6 +11,7 @@ import traceback
 
 from multiprocessing import Process
 import botbrain
+import logger
 
 DEBUG = False
 OFFLINE = False
@@ -36,6 +37,8 @@ brain = botbrain.BotBrain(send)
 def pong(response):
 	send('PONG ' + response + '\n')
 	date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+	l = logger.Logger()
+	l.write("responding to PING at " + date + '\n')
 		
 
 def processline(line):
@@ -78,7 +81,7 @@ def worker():
 
 	HOST = 'zero9f9.com'
 	PORT = 6667
-	NICK = 'ohai'
+	NICK = 'localohai'
 	IDENT = 'mypy'
 	REALNAME = 's1ash'
 	OWNER = 'hlmtre'

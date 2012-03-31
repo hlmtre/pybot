@@ -1,6 +1,8 @@
 import ascii
 from collections import defaultdict
 import bf3api
+import time
+import logger 
 
 api = bf3api.API()
 
@@ -20,6 +22,10 @@ def getbf3stats(message):
 #				return formatbf3data(k, data)
 		gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
 		data = api.player(gt, '360', "clear,ranking")
+		l = logger.Logger()
+		date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+		string = "getting stats for player " + gt + " at " + date + '\n'
+		l.write(string)
 		return formatbf3data(gt, data)
 				
 def formatbf3data(player, data):
