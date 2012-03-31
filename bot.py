@@ -14,7 +14,7 @@ import botbrain
 
 DEBUG = False
 OFFLINE = False
-CHANNELINIT = ['#bots']
+CHANNELINIT = ['#bots', '#bf3']
 CONNECTED = False
 
 CONF = './.pybotrc'
@@ -44,7 +44,9 @@ def processline(line):
 	global CHANNELINIT
 	global brain
 	
-	print line
+	if DEBUG:
+		print line
+	
 	try:
 				
 		if "PRIVMSG" in line:
@@ -76,7 +78,7 @@ def worker():
 
 	HOST = 'zero9f9.com'
 	PORT = 6667
-	NICK = 'tbot'
+	NICK = 'ohai'
 	IDENT = 'mypy'
 	REALNAME = 's1ash'
 	OWNER = 'hlmtre'
@@ -100,6 +102,15 @@ def worker():
 ## MAIN
 
 if __name__ == "__main__":
-	print os.getpid()
-	p = Process(target=worker)
-	p.start()
+	if os.name == "posix":
+		pid = os.fork()
+		if pid == 0:
+			worker()
+		elif pid > 0:
+			print "forking to background..."
+			os._exit(0)
+
+	else: # since we don't have fork on windows
+		p = Process(target=worker)
+		p.start()
+		print os.getpid()

@@ -18,7 +18,7 @@ def getbf3stats(message):
 #			if k in message:
 #				data = api.player(v[0], v[1], "clear,ranking")
 #				return formatbf3data(k, data)
-		gt = message.split(None, 2)[2].strip() # grab gamertag off the end
+		gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
 		data = api.player(gt, '360', "clear,ranking")
 		return formatbf3data(gt, data)
 				
