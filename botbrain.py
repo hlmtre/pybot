@@ -5,7 +5,7 @@ import bf3api
 api = bf3api.API()
 
 bf3players = {'tarehart': ('tarehart', '360'),
-							'hlmtre': ('hellmitre', '360'),
+							#'hlmtre': ('hellmitre', '360'),
 							'willfro': ('fro4thought', '360'),
 							'BoneKin': ('BoneKin', '360'),
 							'Lucifer7': ('Lucifer7', '360'),

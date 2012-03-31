@@ -7,6 +7,7 @@ import os
 import datetime
 import time
 import select
+import traceback
 
 from multiprocessing import Process
 import botbrain
@@ -69,6 +70,7 @@ def processline(line):
 				pong(ping_response_line[1])
 	except Exception:
 		print "Unexpected error:", sys.exc_info()[0]
+		traceback.print_exc(file=sys.stdout)
 		
 def worker():
 
