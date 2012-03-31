@@ -16,10 +16,7 @@ def getbf3stats(message):
 		global api
 		for k,v in bf3players.iteritems():
 			if k in message:
-				print "message in bf3stats is: " + message
 				data = api.player(v[0], v[1], "clear,ranking")
-				print v[0]
-				print v[1]
 				return formatbf3data(k, data)
 			else:
 				gt = message.split(None, 2)[2] # grab gamertag off the end
@@ -27,7 +24,9 @@ def getbf3stats(message):
 				return formatbf3data(k, data)
 				
 def formatbf3data(player, data):
-	return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
+	if data.status != "error":
+		return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
+	else return [player + " not found"]
 	
 
 class BotBrain:
