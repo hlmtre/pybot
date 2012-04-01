@@ -103,7 +103,7 @@ class BotBrain:
 		else:
 			kcount[usr] += 1
 		if kcount[usr] % 3 == 0:
-			self.say(channel, usr + ">implying you're greentexting")
+			self.say(channel, " " + usr + " >implying you're greentexting")
 			date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
 			l = logger.Logger()
 			l.write("user " + usr + " implying at " + date)
