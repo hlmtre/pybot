@@ -34,7 +34,7 @@ def getbf3stats(message):
 		return formatbf3data(gt, command, data)
 				
 def formatbf3data(player, command, data):
-	if data.status != "error":
+	if data.status == "data":
 		if command == "spm":
 			return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
 		elif command == "kdr":

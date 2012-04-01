@@ -79,9 +79,18 @@ def processline(line):
 		
 def worker():
 
-	HOST = 'zero9f9.com'
+	try:
+		if line in os.uname():
+			HOST = 'localhost'
+			NICK = 'ohai'
+		else:
+			HOST = 'zero9f9.com'
+			NICK = 'localohai'
+	except:
+		HOST = 'zero9f9.com'
+		NICK = 'localohai'
+
 	PORT = 6667
-	NICK = 'localohai'
 	IDENT = 'mypy'
 	REALNAME = 's1ash'
 	OWNER = 'hlmtre'
