@@ -97,6 +97,7 @@ def worker():
 	
 	# infinite loop to keep parsing lines
 	while 1:
+		time.sleep(1)
 		ready = select.select([s],[],[], 1)
 		if ready[0]:
 			line = s.recv(4096)
