@@ -20,17 +20,31 @@ def getbf3stats(message):
 #			if k in message:
 #				data = api.player(v[0], v[1], "clear,ranking")
 #				return formatbf3data(k, data)
+
 		gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
+		command = message.split(None, 2)[1].strip()
+
 		data = api.player(gt, '360', "clear,ranking")
+
 		l = logger.Logger()
 		date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
-		string = "getting stats for player " + gt + " at " + date + '\n'
+		string = "getting " + command + " for player " + gt + " at " + date + '\n'
 		l.write(string)
-		return formatbf3data(gt, data)
+
+		return formatbf3data(gt, command, data)
 				
-def formatbf3data(player, data):
+def formatbf3data(player, command, data):
 	if data.status != "error":
-		return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
+		if command == "spm":
+			return [player + "'s SPM: " + str(data.Stats.Ranking.Spm.v)[:6]]
+		elif command == "kdr":
+			return [player + "'s KDR: " + str(data.Stats.Ranking.Kdr.v)[:6]]
+		elif command == "wlr":
+			return [player + "'s WLR: " + str(data.Stats.Ranking.Wlr.v)[:6]]
+		elif command == "stats":
+			l = [player+"'s stats: ", "KDR: "+str(data.Stats.Ranking.Kdr.v)[:6], "SPM: "+str(data.Stats.Ranking.Spm.v)[:6], "Headshots/kill: "+str(data.Stats.Ranking.Hskillperc.v)[:6], "win/loss: "+str(data.Stats.Ranking.Wlr.v)[:6]]
+			return l
+			
 	elif data.status == "notfound":
 		return [player + " not found "]
 	else:
@@ -48,18 +62,27 @@ class BotBrain:
 	def say(self, channel, thing):
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
+	def _help(self, user):
+		self.microphone('PRIVMSG ' + user + ' :' + "COMMANDS:\n")
+		self.microphone('PRIVMSG ' + user + ' :' + ".bf3 [spm, kdr, wlr, stats],\n")
+		self.microphone('PRIVMSG ' + user + ' :' + ".rainbow,\n")
+		self.microphone('PRIVMSG ' + user + ' :' + "and this help message.\n")
+		self.microphone('PRIVMSG ' + user + ' :' + "More functionality to be added.\n")
+
 	
 	def respond(self, usr, channel, message):
 		if "ohai" in message and "hello" in message:
 			self.say(channel, 'well hello to you too ' + usr)
 		if message.startswith(">"):
 			implying(usr)
-		if message.startswith("paint "):
-			self.paint(channel, message.split()[1])
-		if "rainbow" in message:
+		#if message.startswith("paint "):
+		#	self.paint(channel, message.split()[1])
+		if message.startswith(".rainbow"):
 			self.say(channel, ascii.rainbow())
 		#if "bf3" in message and "stats" in message:
-		if message.startswith(".bf3") and "stats" in message:
+		if message.startswith(".help"):
+			self._help(usr)			
+		if message.startswith(".bf3"):
 			stats = getbf3stats(message)
 			for line in stats:
 				self.say(channel, line)
@@ -78,4 +101,6 @@ class BotBrain:
 			kcount[usr] += 1
 		if kcount[usr] % 3 == 0:
 			self.say(channel, usr + ">implying you're greentexting")
-
+			date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+			l = logger.Logger()
+			l.write("user " + usr + " implying at " + date)
