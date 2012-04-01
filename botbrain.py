@@ -74,7 +74,7 @@ class BotBrain:
 		if "ohai" in message and "hello" in message:
 			self.say(channel, 'well hello to you too ' + usr)
 		if message.startswith(">"):
-			implying(usr)
+			self.implying(usr)
 		#if message.startswith("paint "):
 		#	self.paint(channel, message.split()[1])
 		if message.startswith(".rainbow"):
@@ -84,8 +84,11 @@ class BotBrain:
 			self._help(usr)			
 		if message.startswith(".bf3"):
 			stats = getbf3stats(message)
-			for line in stats:
-				self.say(channel, line)
+			try:
+				for line in stats:
+					self.say(channel, line)
+			except TypeError:
+				self.say(channel, "WOOPS")
 			
 		
 	def paint(self, channel, url):
