@@ -74,7 +74,7 @@ class BotBrain:
 		if "ohai" in message and "hello" in message:
 			self.say(channel, 'well hello to you too ' + usr)
 		if message.startswith(">"):
-			self.implying(usr)
+			self.implying(channel, usr)
 		#if message.startswith("paint "):
 		#	self.paint(channel, message.split()[1])
 		if message.startswith(".rainbow"):
@@ -96,7 +96,7 @@ class BotBrain:
 		for line in arr:
 			self.say(channel, line)
 
-	def implying(self, usr):
+	def implying(self, channel, usr):
 		kcount = self.kcount
 		if usr not in kcount:
 			kcount[usr] = 1
