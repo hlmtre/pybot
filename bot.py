@@ -93,7 +93,7 @@ def worker():
 	s.connect((HOST, PORT))
 	s.send('NICK '+NICK+'\n')
 	s.send('USER '+IDENT+ ' 8 ' + ' bla : '+REALNAME+'\n')
-	s.setblocking(0)
+	s.setblocking(1)
 	
 	# infinite loop to keep parsing lines
 	while 1:
