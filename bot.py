@@ -80,7 +80,7 @@ def processline(line):
 def worker():
 
 	try:
-		if line in os.uname():
+		if "minus22" in socket.gethostname():
 			HOST = 'localhost'
 			NICK = 'ohai'
 		else:
