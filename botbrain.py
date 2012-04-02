@@ -56,11 +56,15 @@ class BotBrain:
 	
 	def __init__(self, microphone):							
 		self.kcount = defaultdict(int)
+		self.starttime = time.time()
 		
 		self.microphone = microphone
 
 	def say(self, channel, thing):
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
+
+	def _uptime(self, channel):
+		self.say(channel,"I've been up " +str((time.time() - self.starttime))[:6] + " seconds")
 
 	def _help(self, user):
 		self.microphone('PRIVMSG ' + user + ' :' + "COMMANDS:\n")
@@ -89,6 +93,8 @@ class BotBrain:
 					self.say(channel, line)
 			except TypeError:
 				self.say(channel, "WOOPS")
+		if message.startswith(".uptime"):
+			self._uptime(channel)
 			
 		
 	def paint(self, channel, url):
