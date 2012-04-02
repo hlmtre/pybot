@@ -3,6 +3,7 @@ from collections import defaultdict
 import bf3api
 import time
 import logger 
+import datetime
 
 api = bf3api.API()
 
@@ -57,6 +58,7 @@ class BotBrain:
 	def __init__(self, microphone):							
 		self.kcount = defaultdict(int)
 		self.starttime = time.time()
+		self.localtime = time.localtime()
 		
 		self.microphone = microphone
 
@@ -64,7 +66,7 @@ class BotBrain:
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
 	def _uptime(self, channel):
-		self.say(channel,"I've been up " +str((time.time() - self.starttime))[:6] + " seconds")
+		self.say(channel,"I've been up " +str(datetime.timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
 	def _help(self, user):
 		self.microphone('PRIVMSG ' + user + ' :' + "COMMANDS:\n")
