@@ -4,8 +4,9 @@ import bf3api
 import time
 import logger 
 import datetime
+import battlelog
 
-api = bf3api.API()
+api = bf3api.API(None, '360')
 
 bf3players = {'tarehart': ('tarehart', '360'),
 							#'hlmtre': ('hellmitre', '360'),
@@ -15,25 +16,25 @@ bf3players = {'tarehart': ('tarehart', '360'),
 							'i7': ('Infinite Se7en', '360')}
 
 def getbf3stats(message):
-		global bf3players
-		global api
+#	global bf3players
+	global api
 #		for k,v in bf3players.iteritems():
 #			if k in message:
 #				data = api.player(v[0], v[1], "clear,ranking")
 #				return formatbf3data(k, data)
 
-		gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
-		command = message.split(None, 2)[1].strip()
+	gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
+	command = message.split(None, 2)[1].strip()
 
-		data = api.player(gt, '360', "clear,ranking")
+	data = api.player(gt, '360', "clear,ranking")
 
-		l = logger.Logger()
-		date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
-		string = "getting " + command + " for player " + gt + " at " + date + '\n'
-		l.write(string)
+	l = logger.Logger()
+	date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+	string = "getting " + command + " for player " + gt + " at " + date + '\n'
+	l.write(string)
 
-		return formatbf3data(gt, command, data)
-				
+	return formatbf3data(gt, command, data)
+		
 def formatbf3data(player, command, data):
 	if data.status == "data":
 		if command == "spm":
@@ -51,7 +52,16 @@ def formatbf3data(player, command, data):
 	else:
 		return ["ERROR"]
 	
+def getbf3last(message):
+	global api
+	
+	command = message.split(None, 2)[1].strip()
+	gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
+	fact = battlelog.getLatestGameFact(api, gt, command)
+	return gt + "'s latest " + command + " is " + str(fact)[:6]
 
+	
+	
 class BotBrain:
 	BRAINDEBUG = False
 	
@@ -95,6 +105,9 @@ class BotBrain:
 					self.say(channel, line)
 			except TypeError:
 				self.say(channel, "WOOPS")
+		if message.startswith(".lastbf3"):
+			last = getbf3last(message)
+			self.say(channel, last)
 		if message.startswith(".uptime"):
 			self._uptime(channel)
 			
