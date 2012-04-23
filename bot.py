@@ -104,13 +104,22 @@ def worker():
 	s.send('USER '+IDENT+ ' 8 ' + ' bla : '+REALNAME+'\n')
 	s.setblocking(1)
 	
+	read = ""
+	
 	# infinite loop to keep parsing lines
 	while 1:
 		time.sleep(1)
 		ready = select.select([s],[],[], 1)
 		if ready[0]:
-			line = s.recv(4096)
-			processline(line)
+			read = read + s.recv(1024)
+			lines = read.split('\n')
+			
+			# Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
+			# line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
+			read = lines.pop() 
+			for line in lines:
+				line = line.rstrip()
+				processline(line)			
 						
 ## MAIN
 
