@@ -81,17 +81,14 @@ class BotBrain:
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
 	def _getyoutubetitle(self, line, channel):
-		print line
 		url = re.search("http://[\S]+", line).group(0)
-		print url
 		video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
 		response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
 		xml_response = parseString(response)
 		titletag = xml_response.getElementsByTagName('title')[0]
 		video_title = titletag.childNodes[0].nodeValue
-		print video_title
 
-		self.say(channel, video_title)
+		self.say(channel, "YouTube: "+video_title)
 
 
 
@@ -111,7 +108,6 @@ class BotBrain:
 		if "ohai" in message and "hello" in message:
 			self.say(channel, 'well hello to you too ' + usr)
 		if "youtube.com" in message:
-			print "youtube in message"
 			self._getyoutubetitle(message, channel)
 		if message.startswith(">"):
 			self.implying(channel, usr)
