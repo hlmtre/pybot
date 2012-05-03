@@ -82,14 +82,14 @@ class BotBrain:
 
 	def _getyoutubetitle(self, line, channel):
 		print line
-		#url = re.search("http://[^\S+]", line).group(0)
-		#print url
-		#video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
-		#response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2")
-		#xml_response = parseString(response)
-		#xml_tags = xml_response.getElementsByTagName('<title>')[0].toxml()
-		#video_title = xml_tags.replace("<title>",'').replace("</title>",'')
-		#print video_title
+		url = re.search("http://[\S]+", line).group(0)
+		print url
+		video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
+		response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
+		xml_response = parseString(response)
+		titletag = xml_response.getElementsByTagName('title')[0]
+		video_title = titletag.childNodes[0].nodeValue
+		print video_title
 
 		self.say(channel, video_title)
 
