@@ -5,6 +5,10 @@ import time
 import logger 
 import datetime
 import battlelog
+import urllib2
+import urlparse
+import re
+from xml.dom.minidom import parseString
 
 api = bf3api.API(None, '360')
 
@@ -52,6 +56,7 @@ def formatbf3data(player, command, data):
 	else:
 		return ["ERROR"]
 	
+
 def getbf3last(message):
 	global api
 	
@@ -75,6 +80,21 @@ class BotBrain:
 	def say(self, channel, thing):
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
+	def _getyoutubetitle(self, line, channel):
+		print line
+		#url = re.search("http://[^\S+]", line).group(0)
+		#print url
+		#video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
+		#response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2")
+		#xml_response = parseString(response)
+		#xml_tags = xml_response.getElementsByTagName('<title>')[0].toxml()
+		#video_title = xml_tags.replace("<title>",'').replace("</title>",'')
+		#print video_title
+
+		self.say(channel, video_title)
+
+
+
 	def _uptime(self, channel):
 		self.say(channel,"I've been up " +str(datetime.timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
@@ -82,6 +102,7 @@ class BotBrain:
 		self.microphone('PRIVMSG ' + user + ' :' + "COMMANDS:\n")
 		self.microphone('PRIVMSG ' + user + ' :' + ".bf3 [spm, kdr, wlr, stats],\n")
 		self.microphone('PRIVMSG ' + user + ' :' + ".rainbow,\n")
+		self.microphone('PRIVMSG ' + user + ' :' + ".uptime,\n")
 		self.microphone('PRIVMSG ' + user + ' :' + "and this help message.\n")
 		self.microphone('PRIVMSG ' + user + ' :' + "More functionality to be added.\n")
 
@@ -89,6 +110,9 @@ class BotBrain:
 	def respond(self, usr, channel, message):
 		if "ohai" in message and "hello" in message:
 			self.say(channel, 'well hello to you too ' + usr)
+		if "youtube.com" in message:
+			print "youtube in message"
+			self._getyoutubetitle(message, channel)
 		if message.startswith(">"):
 			self.implying(channel, usr)
 		#if message.startswith("paint "):

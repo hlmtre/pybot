@@ -15,7 +15,7 @@ import logger
 
 DEBUG = False
 OFFLINE = False
-CHANNELINIT = ['#bots', '#bf3']
+CHANNELINIT = ['#bots']
 CONNECTED = False
 
 CONF = './.pybotrc'
