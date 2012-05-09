@@ -81,7 +81,7 @@ class BotBrain:
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
 	def _getyoutubetitle(self, line, channel):
-		url = re.search("http://[\S]+", line).group(0)
+		url = re.search("youtube.com[\S]+", line).group(0)
 		video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
 		response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
 		xml_response = parseString(response)
@@ -94,6 +94,9 @@ class BotBrain:
 
 	def _uptime(self, channel):
 		self.say(channel,"I've been up " +str(datetime.timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
+
+	def _onstat(self, channel):
+		self.say(channel, "Yep, I'm on. Idiot.")
 
 	def _help(self, user):
 		self.microphone('PRIVMSG ' + user + ' :' + "COMMANDS:\n")
@@ -130,6 +133,8 @@ class BotBrain:
 			self.say(channel, last)
 		if message.startswith(".uptime"):
 			self._uptime(channel)
+		if message.startswith(".onstat"):
+			self._onstat(channel)
 			
 		
 	def paint(self, channel, url):
