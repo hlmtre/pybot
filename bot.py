@@ -12,6 +12,10 @@ import traceback
 from multiprocessing import Process
 import botbrain
 import logger
+import sys
+
+# suppress warnings
+sys.stderr = open("/dev/null","w")
 
 DEBUG = False
 OFFLINE = False
