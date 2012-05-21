@@ -96,6 +96,14 @@ class BotBrain:
 	def _uptime(self, channel):
 		self.say(channel,"I've been up " +str(datetime.timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
+	def _speak(self, user, target, message):
+		if user == "hlmtre":
+			if target.startswith("#"):
+				self.say(target, message)	
+			else:
+				target = "#" + target
+				self.say(target, message)
+
 	def _onstat(self, channel):
 		self.say(channel, "Yep, I'm on. Idiot.")
 
@@ -136,7 +144,11 @@ class BotBrain:
 			self._uptime(channel)
 		if message.startswith(".onstat"):
 			self._onstat(channel)
-			
+		if message.startswith(".speak"):
+			tmp = message.split(" ",2)
+			chnl = tmp[1]
+			msg = tmp[2]
+			self._speak(usr, chnl, msg)
 		
 	def paint(self, channel, url):
 		arr = ascii.asciify(url)
