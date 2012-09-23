@@ -19,7 +19,7 @@ bf3players = {'tarehart': ('tarehart', '360'),
 							'Lucifer7': ('Lucifer7', '360'),
 							'i7': ('Infinite Se7en', '360')}
 
-def getbf3stats(message):
+def getbf3stats(message, platform):
 #	global bf3players
 	global api
 #		for k,v in bf3players.iteritems():
@@ -30,7 +30,7 @@ def getbf3stats(message):
 	gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
 	command = message.split(None, 2)[1].strip()
 
-	data = api.player(gt, '360', "clear,ranking")
+	data = api.player(gt, platform, "clear,ranking")
 
 	l = logger.Logger()
 	date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
@@ -87,9 +87,13 @@ class BotBrain:
 			if video_tag.__len__() > 1:
 				response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
 				xml_response = parseString(response)
+				duration = xml_response.getElementsByTagName('yt:duration')
+				ulength = duration[0].getAttribute("seconds")
+				alength = ulength.encode('ascii', 'ignore')
+				length = str(datetime.timedelta(seconds=int(alength)))
 				titletag = xml_response.getElementsByTagName('title')[0]
 				video_title = titletag.childNodes[0].nodeValue
-				self.say(channel, "YouTube: "+video_title)
+				self.say(channel, "YouTube: "+video_title + " ("+length+")")
 
 
 
@@ -121,8 +125,8 @@ class BotBrain:
 			self.say(channel, 'well hello to you too ' + usr)
 		if "youtube.com" in message:
 			self._getyoutubetitle(message, channel)
-		if message.startswith(">"):
-			self.implying(channel, usr)
+		#if message.startswith(">"):
+			#self.implying(channel, usr)
 		#if message.startswith("paint "):
 		#	self.paint(channel, message.split()[1])
 		if message.startswith(".rainbow"):
@@ -130,8 +134,15 @@ class BotBrain:
 		#if "bf3" in message and "stats" in message:
 		if message.startswith(".help"):
 			self._help(usr)			
-		if message.startswith(".bf3"):
-			stats = getbf3stats(message)
+		if message.startswith(".bf3pc"):
+			stats = getbf3stats(message, 'pc')
+			try:
+				for line in stats:
+					self.say(channel, line)
+			except TypeError:
+				self.say(channel, "WOOPS")
+		elif message.startswith(".bf3"):
+			stats = getbf3stats(message, '360')
 			try:
 				for line in stats:
 					self.say(channel, line)

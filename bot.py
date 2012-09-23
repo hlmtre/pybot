@@ -19,7 +19,7 @@ sys.stderr = open("/dev/null","w")
 
 DEBUG = False
 OFFLINE = False
-CHANNELINIT = ['#bots', '#bf3']
+CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#cslug', '#dayz']
 CONNECTED = False
 
 CONF = './.pybotrc'
@@ -54,12 +54,11 @@ def processline(line):
 		print line
 	
 	try:
-				
 		if line.startswith("PING"):
 			ping_response_line = line.split(":", 1)
 			pong(ping_response_line[1])
 
-		elif "PRIVMSG" in line:
+		else:
 			if CONNECTED == False:
 				for chan in CHANNELINIT:
 					send('JOIN '+chan+'\n')
@@ -71,11 +70,15 @@ def processline(line):
 			user_and_mask = line_array[0][1:]
 			usr = user_and_mask.split("!")[0]
 			channel = line_array[2]
-			message = line.split(":",2)[2]
+			try: 
+				message = line.split(":",2)[2]
+				brain.respond(usr, channel, message)
+			except IndexError:
+				print "index out of range."
+				print line
 			
 			#p = Process(target=botbrain.respond, args=(s, usr, channel, message))
 			#p.start()
-			brain.respond(usr, channel, message)
 			
 	except Exception:
 		print "Unexpected error:", sys.exc_info()[0]
@@ -84,7 +87,7 @@ def processline(line):
 def worker():
 
 	try:
-		if "minus22" in socket.gethostname():
+		if "minus22" in socket.gethostname() or "barge" in socket.gethostname():
 			HOST = 'localhost'
 			NICK = 'ohai'
 		else:
