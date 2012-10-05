@@ -11,6 +11,7 @@ import re
 from xml.dom.minidom import parseString
 
 api = bf3api.API(None, '360')
+yth = dict()
 
 bf3players = {'tarehart': ('tarehart', '360'),
 							#'hlmtre': ('hellmitre', '360'),
@@ -94,8 +95,18 @@ class BotBrain:
 				titletag = xml_response.getElementsByTagName('title')[0]
 				video_title = titletag.childNodes[0].nodeValue
 				self.say(channel, "YouTube: "+video_title + " ("+length+")")
+				yth[video_title] = line
 
 
+	def _ythistory(self, channel):
+		global yth
+		i = 0 
+		for entry in yth:
+			i+=1
+			if i > 5:
+				break
+			else:
+				self.say(channel,yth[entry] + " - " + entry)
 
 	def _uptime(self, channel):
 		self.say(channel,"I've been up " +str(datetime.timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
@@ -129,6 +140,8 @@ class BotBrain:
 			#self.implying(channel, usr)
 		#if message.startswith("paint "):
 		#	self.paint(channel, message.split()[1])
+		if message.startswith(".yth"):
+			self._ythistory(channel)
 		if message.startswith(".rainbow"):
 			self.say(channel, ascii.rainbow())
 		#if "bf3" in message and "stats" in message:

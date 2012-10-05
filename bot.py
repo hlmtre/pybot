@@ -20,7 +20,7 @@ sys.stderr = open("/dev/null","w")
 
 DEBUG = False
 OFFLINE = False
-CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#cslug', '#dayz']
+CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
 CONNECTED = False
 
 CONF = './.pybotrc'
