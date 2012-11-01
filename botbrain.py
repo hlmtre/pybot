@@ -98,15 +98,27 @@ class BotBrain:
 				yth[video_title] = line
 
 
+	def _ctof(self, channel, c_temp):
+		c = float(c_temp)
+		f = (c * 1.8)+32
+		self.say(channel, str(f) + "* F")
+
+	def _ftoc(self, channel, f_temp):
+		f = float(f_temp)
+		c = (f - 32)*(.5555)
+		self.say(channel, str(c) + "* C")
+
 	def _ythistory(self, channel):
 		global yth
 		i = 0 
-		for entry in yth:
+		for entry in reversed(yth):
 			i+=1
 			if i > 5:
 				break
 			else:
 				self.say(channel,yth[entry] + " - " + entry)
+				if len(yth) > 10:
+					yth.clear()
 
 	def _uptime(self, channel):
 		self.say(channel,"I've been up " +str(datetime.timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
@@ -132,6 +144,14 @@ class BotBrain:
 
 	
 	def respond(self, usr, channel, message):
+		if message.startswith(".ctof"):
+			last = message.split()
+			if last[-1] != "":
+				self._ctof(channel, last[-1])
+		if message.startswith(".ftoc"):
+			last = message.split()
+			if last[-1] != "":
+				self._ftoc(channel, last[-1]) 
 		if "ohai" in message and "hello" in message:
 			self.say(channel, 'well hello to you too ' + usr)
 		if "youtube.com" in message:

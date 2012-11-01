@@ -20,6 +20,7 @@ sys.stderr = open("/dev/null","w")
 
 DEBUG = False
 OFFLINE = False
+#CHANNELINIT = ['#bots']
 CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
 CONNECTED = False
 
