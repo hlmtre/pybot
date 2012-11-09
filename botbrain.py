@@ -6,6 +6,7 @@ import logger
 import datetime
 import battlelog
 import urllib2
+import json
 import urlparse
 import re
 from xml.dom.minidom import parseString
@@ -81,6 +82,13 @@ class BotBrain:
 	def say(self, channel, thing):
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
+	def _weather(self, channel, zipcode):
+		url = 'http://api.wunderground.com/api/1fe31b3b4cfdab66/conditions/lang:EN/q/'+zipcode+'.json'
+		response = urllib2.urlopen(url)
+		json_string = response.read()
+		parsed_json = json.loads(json_string)
+		self.say(channel, parsed_json['current_observation']['display_location']['city'] + ", " + parsed_json['current_observation']['display_location']['state'] + ": " + parsed_json['current_observation']['feelslike_string'])
+
 	def _getyoutubetitle(self, line, channel):
 		url = re.search("youtube.com[\S]+", line).group(0)
 		if url:
@@ -144,6 +152,10 @@ class BotBrain:
 
 	
 	def respond(self, usr, channel, message):
+		if message.startswith(".weather"):
+			_z = message.split()
+			if _z[-1] != "":
+				self._weather(channel, _z[-1])
 		if message.startswith(".ctof"):
 			last = message.split()
 			if last[-1] != "":
