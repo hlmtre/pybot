@@ -13,15 +13,15 @@ import traceback
 from multiprocessing import Process
 import botbrain
 import logger
-import sys
+import db
 
 # suppress warnings
 sys.stderr = open("/dev/null","w")
 
 DEBUG = False
 OFFLINE = False
-#CHANNELINIT = ['#bots']
-CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
+CHANNELINIT = ['#bots']
+#CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
 CONNECTED = False
 
 CONF = './.pybotrc'
@@ -66,6 +66,7 @@ def processline(line):
 					send('JOIN '+chan+'\n')
 					if DEBUG:
 						print "#### JOINING " + chan + " ####"
+				brain._initSeen(CHANNELINIT)
 				CONNECTED = True
 			
 			line_array = line.split()

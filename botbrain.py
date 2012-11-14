@@ -10,9 +10,14 @@ import json
 import urlparse
 import re
 from xml.dom.minidom import parseString
+import db
 
 api = bf3api.API(None, '360')
 yth = dict()
+db = db.DB()
+
+chanlist = []
+namelist = []
 
 bf3players = {'tarehart': ('tarehart', '360'),
 							#'hlmtre': ('hellmitre', '360'),
@@ -73,11 +78,22 @@ class BotBrain:
 	BRAINDEBUG = False
 	
 	def __init__(self, microphone):							
+#  store kcount of >implying
 		self.kcount = defaultdict(int)
+# get time for uptime start
 		self.starttime = time.time()
+# get time for current length of uptime
 		self.localtime = time.localtime()
 		
+# get handle on output
 		self.microphone = microphone
+
+# testing just with #bf3
+		db.updateSeen()
+
+	def _initSeen(self, chanlist):
+		self.chanlist = chanlist
+		db.updateSeen(chanlist)
 
 	def say(self, channel, thing):
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
