@@ -105,7 +105,7 @@ def worker():
 	try:
 		if "minus22" in socket.gethostname() or "barge" in socket.gethostname():
 			HOST = 'localhost'
-			NICK = 'ohaitest'
+			NICK = 'ohai'
 		else:
 			HOST = 'zero9f9.com'
 			NICK = 'localohai'
