@@ -11,6 +11,7 @@ import urlparse
 import re
 from xml.dom.minidom import parseString
 import db
+from datetime import datetime
 
 api = bf3api.API(None, '360')
 yth = dict()
@@ -88,12 +89,28 @@ class BotBrain:
 # get handle on output
 		self.microphone = microphone
 
-# testing just with #bf3
-		db.updateSeen()
+	def _seen(self, user, channel):
+		answer = db.getSeen(user)
+		if answer != "None" and answer != "" and answer != None:
+			if answer[3] ==  "JOIN":
+				word = "joining"
+			elif answer[3] == "PART":
+				word = "parting"
+			else:
+				word = "quitting"
+			self.say(channel, user + " was last seen " + word + " channel saying \"" + answer[2] + "\" " + self.__prettyDate(answer[1]))
+		else:
+			self.say(channel, user + " not seen exiting.")
 
-	def _initSeen(self, chanlist):
-		self.chanlist = chanlist
-		db.updateSeen(chanlist)
+	def _updateSeen(self, user, statement, event):
+		db.updateSeen(user, statement, event)
+#	def _initSeen(self, chanlist):
+#		self.chanlist = chanlist
+#		for chan in self.chanlist:
+#			self.__bareSay('NAMES ' + chan + '\n')
+
+	def __bareSay(self, thing):
+		self.microphone(thing + '\n')
 
 	def say(self, channel, thing):
 		self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
@@ -168,6 +185,8 @@ class BotBrain:
 
 	
 	def respond(self, usr, channel, message):
+		if message.startswith(".seen"):
+			self._seen(message.split()[-1], channel)
 		if message.startswith(".weather"):
 			_z = message.split()
 			if _z[-1] != "":
@@ -238,3 +257,40 @@ class BotBrain:
 			date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
 			l = logger.Logger()
 			l.write("user " + usr + " implying at " + date)
+
+	def __prettyDate(self,time):
+		now = datetime.now()
+		if type(time) is int:
+			diff = now - datetime.fromtimestamp(time)
+		elif isinstance(time,datetime):
+			diff = now - time 
+		elif not time:
+			diff = now - now
+		second_diff = diff.seconds
+		day_diff = diff.days
+
+		if day_diff < 0:
+			return ''
+
+		if day_diff == 0:
+			if second_diff < 10:
+				return "just now"
+			if second_diff < 60:
+				return str(second_diff) + " seconds ago"
+			if second_diff < 120:
+				return  "a minute ago"
+			if second_diff < 3600:
+				return str( second_diff / 60 ) + " minutes ago"
+			if second_diff < 7200:
+				return "an hour ago"
+			if second_diff < 86400:
+				return str( second_diff / 3600 ) + " hours ago"
+			if day_diff == 1:
+				return "Yesterday"
+			if day_diff < 7:
+				return str(day_diff) + " days ago"
+			if day_diff < 31:
+				return str(day_diff/7) + " weeks ago"
+			if day_diff < 365:
+				return str(day_diff/30) + " months ago"
+			return str(day_diff/365) + " years ago"

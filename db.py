@@ -7,20 +7,18 @@ class DB:
 		global cur
 		self.cur.execute("""INSERT INTO %s (%s) VALUES (%s)""",(where, which, what)) 
 
-	def updateSeen(self,who,statement):
+	def updateSeen(self,who,statement,event):
 		global cur
-		self.cur.execute("REPLACE INTO seen (user_name, statement) VALUES (%s, %s)", (who, statement))
+		#print "executing REPLACE INTO seen (user_name, statement, event) VALUES ( " + str(who) + " " + str(statement) + " " + str(event) + ")"
+		self.cur.execute("REPLACE INTO seen (user_name, statement, event) VALUES (%s, %s, %s)", (who, statement, event))
 
 	def getSeen(self, who):
 		global cur
-		self.cur.execute("SELECT user_name, statement FROM seen WHERE user_name = %s", who)
-		data = cur.fetchone()
-		return data;
+		if who != "":
+			self.cur.execute("SELECT user_name, date, statement, event FROM seen WHERE user_name = %s", who)
+			data = self.cur.fetchone()
+			return data;
+		else:
+			return None 
 	
-	def updateSeen(self,chanlist):
-		global cur
-		for chan in chanlist:
-			print "got "+chan
-
-
 	

@@ -20,8 +20,8 @@ sys.stderr = open("/dev/null","w")
 
 DEBUG = False
 OFFLINE = False
-CHANNELINIT = ['#bots']
-#CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
+#CHANNELINIT = ['#bots']
+CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
 CONNECTED = False
 
 CONF = './.pybotrc'
@@ -60,13 +60,26 @@ def processline(line):
 			ping_response_line = line.split(":", 1)
 			pong(ping_response_line[1])
 
+# this is SO INCREDIBLY WRONG AND GROSS
 		else:
+# let's update the database because the events besides PRIVMSG never get past here
+			if line.split()[1] == "JOIN" or line.split()[1] ==  "QUIT" or line.split()[1] == "PART":
+				print line
+				if "PART" in line:
+					word = "PART"
+# strip username out of line, lstrip for stripping out :
+					brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
+				elif "JOIN" in line:
+					word = "JOIN"
+					brain._updateSeen(line.split("!",1)[0].lstrip(":"), "immmmmma joinin", word)
+				else:
+					word = "QUIT"
+					brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
 			if CONNECTED == False:
 				for chan in CHANNELINIT:
 					send('JOIN '+chan+'\n')
 					if DEBUG:
 						print "#### JOINING " + chan + " ####"
-				brain._initSeen(CHANNELINIT)
 				CONNECTED = True
 			
 			line_array = line.split()
@@ -92,7 +105,7 @@ def worker():
 	try:
 		if "minus22" in socket.gethostname() or "barge" in socket.gethostname():
 			HOST = 'localhost'
-			NICK = 'ohai'
+			NICK = 'ohaitest'
 		else:
 			HOST = 'zero9f9.com'
 			NICK = 'localohai'
