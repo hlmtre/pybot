@@ -11,7 +11,7 @@ import urlparse
 import re
 from xml.dom.minidom import parseString
 import db
-from datetime import datetime
+from datetime import datetime, timedelta
 
 api = bf3api.API(None, '360')
 yth = dict()
@@ -104,10 +104,6 @@ class BotBrain:
 
 	def _updateSeen(self, user, statement, event):
 		db.updateSeen(user, statement, event)
-#	def _initSeen(self, chanlist):
-#		self.chanlist = chanlist
-#		for chan in self.chanlist:
-#			self.__bareSay('NAMES ' + chan + '\n')
 
 	def __bareSay(self, thing):
 		self.microphone(thing + '\n')
@@ -120,7 +116,8 @@ class BotBrain:
 		response = urllib2.urlopen(url)
 		json_string = response.read()
 		parsed_json = json.loads(json_string)
-		self.say(channel, parsed_json['current_observation']['display_location']['city'] + ", " + parsed_json['current_observation']['display_location']['state'] + ": " + parsed_json['current_observation']['feelslike_string'])
+		self.say(channel, parsed_json['current_observation']['display_location']['city'] + ", " + parsed_json['current_observation']['display_location']['state'] + ": " + parsed_json['current_observation']['weather'] + ", " + parsed_json['current_observation']['feelslike_string'])
+		self.say(channel, "For complete info: http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query="+zipcode)
 
 	def _getyoutubetitle(self, line, channel):
 		url = re.search("youtube.com[\S]+", line).group(0)
@@ -132,7 +129,7 @@ class BotBrain:
 				duration = xml_response.getElementsByTagName('yt:duration')
 				ulength = duration[0].getAttribute("seconds")
 				alength = ulength.encode('ascii', 'ignore')
-				length = str(datetime.timedelta(seconds=int(alength)))
+				length = str(timedelta(seconds=int(alength)))
 				titletag = xml_response.getElementsByTagName('title')[0]
 				video_title = titletag.childNodes[0].nodeValue
 				self.say(channel, "YouTube: "+video_title + " ("+length+")")

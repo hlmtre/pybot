@@ -60,11 +60,12 @@ def processline(line):
 			ping_response_line = line.split(":", 1)
 			pong(ping_response_line[1])
 
+# current hackish solution for seen
 # this is SO INCREDIBLY WRONG AND GROSS
 		else:
 # let's update the database because the events besides PRIVMSG never get past here
 			if line.split()[1] == "JOIN" or line.split()[1] ==  "QUIT" or line.split()[1] == "PART":
-				print line
+		#		print line
 				if "PART" in line:
 					word = "PART"
 # strip username out of line, lstrip for stripping out :
