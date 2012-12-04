@@ -1,5 +1,6 @@
 import ascii
 from collections import defaultdict
+import webwriter
 import bf3api
 import time
 import logger 
@@ -16,6 +17,7 @@ from datetime import datetime, timedelta
 api = bf3api.API(None, '360')
 yth = dict()
 db = db.DB()
+ww = webwriter.WebWriter()
 
 chanlist = []
 namelist = []
@@ -104,6 +106,9 @@ class BotBrain:
 
 	def _updateSeen(self, user, statement, event):
 		db.updateSeen(user, statement, event)
+	
+	def _insertImg(self, user, url):
+		db._insertImg(user, url)
 
 	def __bareSay(self, thing):
 		self.microphone(thing + '\n')
@@ -186,6 +191,12 @@ class BotBrain:
 
 	
 	def respond(self, usr, channel, message):
+		if (".png" or ".gif" or ".jpg" or ".jpeg" in message) and ("http:" in message):
+		 url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
+		 self._insertImg(usr, url)
+		if message.startswith(".imgs"):
+			ww._generate()
+			self.say(channel, "http://pybot.zero9f9.com/img/")
 		if message.startswith(".seen"):
 			self._seen(message.split()[-1], channel)
 		if message.startswith(".weather"):
