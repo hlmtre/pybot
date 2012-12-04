@@ -191,9 +191,10 @@ class BotBrain:
 
 	
 	def respond(self, usr, channel, message):
-		if (".png" or ".gif" or ".jpg" or ".jpeg" in message) and ("http:" in message):
+		if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message):
 		 url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
-		 self._insertImg(usr, url)
+		 if url:
+			 self._insertImg(usr, url)
 		if message.startswith(".imgs"):
 			ww._generate()
 			self.say(channel, "http://pybot.zero9f9.com/img/")

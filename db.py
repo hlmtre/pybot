@@ -11,7 +11,6 @@ class DB:
 		global age
 		now = datetime.now()
 		if now - self.age > timedelta(minutes=5):
-			print "getting new mysql handle"
 			self.cur.close()
 			self.con = mdb.connect("localhost","pybot","1q2w3e4r","pybot")
 			self.cur = self.con.cursor()
