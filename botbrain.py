@@ -191,10 +191,12 @@ class BotBrain:
 
 	
 	def respond(self, usr, channel, message):
+# this bit is not a command
 		if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message):
 		 url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
 		 if url:
 			 self._insertImg(usr, url)
+# this bit is
 		if message.startswith(".imgs"):
 			ww._generate()
 			self.say(channel, "http://pybot.zero9f9.com/img/")
@@ -216,8 +218,8 @@ class BotBrain:
 			self.say(channel, 'well hello to you too ' + usr)
 		if "youtube.com" in message:
 			self._getyoutubetitle(message, channel)
-		#if message.startswith(">"):
-			#self.implying(channel, usr)
+		if message.startswith(">"):
+			self.implying(channel, usr)
 		#if message.startswith("paint "):
 		#	self.paint(channel, message.split()[1])
 		if message.startswith(".yth"):

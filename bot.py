@@ -26,7 +26,7 @@ CONNECTED = False
 
 CONF = './.pybotrc'
 if os.environ.has_key('HOME'):
-	CONF = `os.environ['HOME'] + '.pybotrc'`
+	CONF = `os.environ['HOME'] + '/.pybotrc'`
 
 # this will be the socket
 s = None
