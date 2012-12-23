@@ -58,3 +58,15 @@ class DB:
 			return None
 
 		return data
+
+	def _isAdmin(self, username):
+		self._handle()
+		global cur
+		global con
+		try:
+			self.cur.execute("""SELECT * FROM admins WHERE username = %s""",(username))
+			data = self.cur.fetchall()
+		except:
+			return None
+
+		return data
