@@ -245,7 +245,8 @@ class BotBrain:
 		if "youtube.com" in message:
 			self._getyoutubetitle(message, channel)
 		if message.startswith(">"):
-			self.implying(channel, usr)
+			pass
+			#self.implying(channel, usr)
 		#if message.startswith("paint "):
 		#	self.paint(channel, message.split()[1])
 		if message.startswith(".yth"):
