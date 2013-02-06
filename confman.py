@@ -4,7 +4,10 @@ class ConfManager:
 	def __init__(self):
 		if os.environ.has_key('HOME'):
 			self.conf_path = os.environ['HOME'] + '/.pybotrc'
-			self.conf_file = open(self.conf_path)
+			try:
+				self.conf_file = open(self.conf_path)
+			except IOError:
+				raise ConfError("could not open conf file")
 		else:
 			raise ConfError("conf file not found")
 
@@ -15,3 +18,4 @@ class ConfManager:
 				self.ircpass = line.rstrip().split()[-1] # ircpass = pass
 			elif line.startswith("dbpass"):
 				self.dbpass = line.rstrip().split()[-1] # dbpass = pass
+			else: raise ConfError("conf file incorrect")
