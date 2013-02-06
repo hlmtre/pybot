@@ -13,6 +13,7 @@ import re
 from xml.dom.minidom import parseString
 import db
 from datetime import datetime, timedelta
+import sys
 
 api = bf3api.API(None, '360')
 yth = dict()
@@ -91,6 +92,12 @@ class BotBrain:
 # get handle on output
 		self.microphone = microphone
 
+	def _isAdmin(self, username):
+		if db._isAdmin(username):
+			return True
+		return False
+
+
 	def _seen(self, user, channel):
 		answer = db.getSeen(user)
 		if answer != "None" and answer != "" and answer != None:
@@ -168,7 +175,7 @@ class BotBrain:
 					yth.clear()
 
 	def _uptime(self, channel):
-		self.say(channel,"I've been up " +str(datetime.timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
+		self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
 	def _speak(self, user, target, message):
 		if user == "hlmtre":
@@ -186,8 +193,23 @@ class BotBrain:
 		self.microphone('PRIVMSG ' + user + ' :' + ".bf3 [spm, kdr, wlr, stats],\n")
 		self.microphone('PRIVMSG ' + user + ' :' + ".rainbow,\n")
 		self.microphone('PRIVMSG ' + user + ' :' + ".uptime,\n")
+		self.microphone('PRIVMSG ' + user + ' :' + ".weather [zip code],\n")
+		self.microphone('PRIVMSG ' + user + ' :' + ".imgs,\n")
+		self.microphone('PRIVMSG ' + user + ' :' + ".ctof [celsius],\n")
+		self.microphone('PRIVMSG ' + user + ' :' + ".ftoc [fahrenheit],\n")
 		self.microphone('PRIVMSG ' + user + ' :' + "and this help message.\n")
 		self.microphone('PRIVMSG ' + user + ' :' + "More functionality to be added.\n")
+
+	def _join(self, usr, message):
+		if self._isAdmin(usr):
+			channel = message.split()[-1]
+			self.__bareSay("JOIN " + channel)
+
+	def __quit(self, usr):
+		if self._isAdmin(usr):
+			self.__bareSay("QUIT :quitting")
+			print "quitting as per " + usr
+			sys.exit()
 
 	
 	def respond(self, usr, channel, message):
@@ -197,6 +219,10 @@ class BotBrain:
 		 if url:
 			 self._insertImg(usr, url)
 # this bit is
+		if message.startswith("ohai join"):
+			self._join(usr, message)
+		if message.startswith("ohai quit"):
+			self.__quit(usr)
 		if message.startswith(".imgs"):
 			ww._generate()
 			self.say(channel, "http://pybot.zero9f9.com/img/")
@@ -219,7 +245,8 @@ class BotBrain:
 		if "youtube.com" in message:
 			self._getyoutubetitle(message, channel)
 		if message.startswith(">"):
-			self.implying(channel, usr)
+			pass
+			#self.implying(channel, usr)
 		#if message.startswith("paint "):
 		#	self.paint(channel, message.split()[1])
 		if message.startswith(".yth"):
