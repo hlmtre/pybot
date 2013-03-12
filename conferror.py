@@ -1,6 +1,6 @@
 class ConfError(Exception):
 	def __init__(self, error):
-		self.error = error
+		self.parameter = error
 
 	def __str__(self):
-		return repr(self.error)
+		return repr(self.parameter)

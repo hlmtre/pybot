@@ -14,19 +14,29 @@ from multiprocessing import Process
 import botbrain
 import logger
 import db
+import confman
 
 # suppress warnings
 sys.stderr = open("/dev/null","w")
 
+
 DEBUG = False
 OFFLINE = False
-#CHANNELINIT = ['#bots']
-CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
+CHANNELINIT = ['#bots']
+#CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
 CONNECTED = False
 
-CONF = './.pybotrc'
-if os.environ.has_key('HOME'):
-	CONF = `os.environ['HOME'] + '/.pybotrc'`
+if len(sys.argv) > 1:
+	CONF = sys.argv[1]
+else:
+	if os.environ.has_key('HOME'):
+		CONF = os.environ['HOME'] + '/.pybotrc'
+
+cm = confman.ConfManager(CONF)
+
+CHANNELINIT = cm.getChannels()
+network = cm.getNetwork()
+
 
 # this will be the socket
 s = None
@@ -42,9 +52,9 @@ brain = botbrain.BotBrain(send)
 	
 def pong(response):
 	send('PONG ' + response + '\n')
-	date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
-	l = logger.Logger()
-	l.write("responding to PING at " + date + '\n')
+	#date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+	#l = logger.Logger()
+	#l.write("responding to PING at " + date + '\n')
 		
 
 def processline(line):
@@ -102,30 +112,43 @@ def processline(line):
 		traceback.print_exc(file=sys.stdout)
 		
 def worker():
-
+	global network
+	if network is not None and len(network) > 1:
+		network = network
+	else:
+		network = 'zero9f9.com'
 	try:
 		if "minus22" in socket.gethostname() or "barge" in socket.gethostname():
 			HOST = 'localhost'
 			NICK = 'ohai'
 		else:
-			HOST = 'zero9f9.com'
+			HOST = network
 			NICK = 'localohai'
 	except:
-		HOST = 'zero9f9.com'
+		HOST = network
 		NICK = 'localohai'
 
 	PORT = 6667
 	IDENT = 'mypy'
 	REALNAME = 's1ash'
-	OWNER = 'hlmtre'
+	OWNER = cm.getOwner() 
 	
 	print os.getpid()
 	# connect to server
 	global s
 	s = socket.socket()
-	s.connect((HOST, PORT))
-	s.send('NICK '+NICK+'\n')
-	s.send('USER '+IDENT+ ' 8 ' + ' bla : '+REALNAME+'\n')
+	try:
+		s.connect((HOST, PORT))
+	except Exception, e:
+		alert('something\'s wrong with %s:%d. Exception type is %s' % (address, port, `e`))
+		sys.exit(3)
+
+	try:
+		s.send('NICK '+NICK+'\n')
+		s.send('USER '+IDENT+ ' 8 ' + ' bla : '+REALNAME+'\n')
+	except Exception, e:
+		alert('something\'s wrong with %s:%d. Exception type is %s' % (address, port, `e`))
+		sys.exit(4)
 	s.setblocking(1)
 	
 	read = ""
