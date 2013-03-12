@@ -1,6 +1,12 @@
 #!/usr/bin/env python
+#
+# v0.2
+# TODO: add threading support, one for each network
+#
+#
+#
 
-# test
+
 import sys
 import socket
 import string
@@ -9,6 +15,7 @@ import datetime
 import time
 import select
 import traceback
+import threading
 
 from multiprocessing import Process
 import botbrain
@@ -20,9 +27,10 @@ import confman
 sys.stderr = open("/dev/null","w")
 
 
-DEBUG = False
+network = None
+DEBUG = True
 OFFLINE = False
-CHANNELINIT = ['#bots']
+#CHANNELINIT = ['#bots']
 #CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
 CONNECTED = False
 
@@ -87,6 +95,7 @@ def processline(line):
 					word = "QUIT"
 					brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
 			if CONNECTED == False:
+				time.sleep(1)
 				for chan in CHANNELINIT:
 					send('JOIN '+chan+'\n')
 					if DEBUG:
@@ -101,8 +110,7 @@ def processline(line):
 				message = line.split(":",2)[2]
 				brain.respond(usr, channel, message)
 			except IndexError:
-				print "index out of range."
-				print line
+				print "index out of range.", line
 			
 			#p = Process(target=botbrain.respond, args=(s, usr, channel, message))
 			#p.start()
@@ -113,13 +121,13 @@ def processline(line):
 		
 def worker():
 	global network
-	if network is not None and len(network) > 1:
+	if network is not None:
 		network = network
 	else:
 		network = 'zero9f9.com'
 	try:
 		if "minus22" in socket.gethostname() or "barge" in socket.gethostname():
-			HOST = 'localhost'
+			HOST = network
 			NICK = 'ohai'
 		else:
 			HOST = network
@@ -128,7 +136,9 @@ def worker():
 		HOST = network
 		NICK = 'localohai'
 
-	PORT = 6667
+	# we have to cast it to an int, otherwise the connection fails silently and the entire process dies
+	#PORT = int(cm.getPort())
+	PORT = int(cm.getPort())
 	IDENT = 'mypy'
 	REALNAME = 's1ash'
 	OWNER = cm.getOwner() 
@@ -138,17 +148,17 @@ def worker():
 	global s
 	s = socket.socket()
 	try:
-		s.connect((HOST, PORT))
+		s.connect((HOST, PORT)) # force them into one argument
 	except Exception, e:
-		alert('something\'s wrong with %s:%d. Exception type is %s' % (address, port, `e`))
-		sys.exit(3)
-
+		print Exception, e
 	try:
 		s.send('NICK '+NICK+'\n')
-		s.send('USER '+IDENT+ ' 8 ' + ' bla : '+REALNAME+'\n')
+		s.send('USER '+IDENT+ ' 8 ' + ' bla : '+REALNAME+'\n') # yeah, don't delete this line
+		time.sleep(3) # allow services to catch up
+		s.send('PRIVMSG nickserv identify '+cm.getIRCPass()+'\n')  # we're registered!
 	except Exception, e:
-		alert('something\'s wrong with %s:%d. Exception type is %s' % (address, port, `e`))
-		sys.exit(4)
+		print Exception, e
+
 	s.setblocking(1)
 	
 	read = ""
@@ -168,18 +178,23 @@ def worker():
 				line = line.rstrip()
 				processline(line)			
 						
-## MAIN
+## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
-	if os.name == "posix":
-		pid = os.fork()
-		if pid == 0:
-			worker()
-		elif pid > 0:
-			print "forking to background..."
-			os._exit(0)
+	if DEBUG:
+		worker() # run in foreground for debugging
+	
+	else:
+	
+		if os.name == "posix":
+			pid = os.fork()
+			if pid == 0:
+				worker()
+			elif pid > 0:
+				print "forking to background..."
+				sys.exit(0)
 
-	else: # since we don't have fork on windows
-		p = Process(target=worker)
-		p.start()
-		print os.getpid()
+		else: # since we don't have fork on windows
+			p = Process(target=worker)
+			p.start()
+			print os.getpid()

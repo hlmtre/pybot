@@ -18,7 +18,13 @@ class ConfManager:
 
 		for line in self.conf_file:
 			if line.startswith("network"):
-				self.network = line.rstrip().split()[-1] # network = networkname 
+				if len(line.split("=")[-1].split()) > 1: # more than one entry
+					self.network = line.split("=")[-1].split()
+				else:
+					self.network = line.rstrip().split()[-1]
+
+			elif line.startswith("port"):
+				self.port = line.rstrip().split()[-1] # port = 6667
 
 			elif line.startswith("owner"):
 				self.owner = line.rstrip().split()[-1] # owner = username
@@ -33,7 +39,7 @@ class ConfManager:
 				c = line.rstrip().split("=")[-1]
 				self.channels = c.split()
 
-			else: 
+		if self.network is None or self.port is None or self.channels is None:
 				raise ConfError("conf file incorrect")
 
 	def getOwner(self):
@@ -48,5 +54,17 @@ class ConfManager:
 	def getChannels(self):
 		return self.channels
 
+	def getNetworks(self):
+		return self.networks
+	
+	def getNumNets(self):
+		if type(self.network) is str:
+			return 1
+		else:
+			return len(self.network)
+
 	def getNetwork(self):
 		return self.network
+
+	def getPort(self):
+		return self.port
