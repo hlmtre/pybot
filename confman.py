@@ -8,20 +8,21 @@ class ConfManager:
 					self.conf_path = os.environ['HOME'] + '/.pybotrc'
 					self.conf_file = open(self.conf_path)
 				except IOError:
-					raise ConfError("could not open conf file")
+					raise ConfError("could not open conf file '"+self.conf_path+"'")
 		else: # lines of with os.environ.has_key
+			self.conf_path = os.environ['HOME'] + '/.pybotrc'
 			try:
 				#self.conf_path = os.environ['HOME'] + conf
-				self.conf_file = open(conf)
+				self.conf_file = open(self.conf_path)
 			except IOError:
-				raise ConfError("could not open conf file")
+				raise ConfError("could not open conf file '"+self.conf_path+"'")
 
 		for line in self.conf_file:
 			if line.startswith("network"):
 				if len(line.split("=")[-1].split()) > 1: # more than one entry
-					self.network = line.split("=")[-1].split()
+					self.networks = line.split("=")[-1].split() # create list
 				else:
-					self.network = line.rstrip().split()[-1]
+					self.networks = line.rstrip().split()[-1] # singular network; make this a string
 
 			elif line.startswith("port"):
 				self.port = line.rstrip().split()[-1] # port = 6667
@@ -39,7 +40,7 @@ class ConfManager:
 				c = line.rstrip().split("=")[-1]
 				self.channels = c.split()
 
-		if self.network is None or self.port is None or self.channels is None:
+		if self.networks is None or self.port is None or self.channels is None:
 				raise ConfError("conf file incorrect")
 
 	def getOwner(self):
@@ -58,13 +59,13 @@ class ConfManager:
 		return self.networks
 	
 	def getNumNets(self):
-		if type(self.network) is str:
+		if type(self.networks) is str:
 			return 1
 		else:
-			return len(self.network)
+			return len(self.networks)
 
 	def getNetwork(self):
-		return self.network
+		return self.networks
 
 	def getPort(self):
 		return self.port
