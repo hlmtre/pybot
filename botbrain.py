@@ -165,7 +165,7 @@ class BotBrain:
 	def _ythistory(self, channel):
 		global yth
 		i = 0 
-		for entry in reversed(yth):
+		for entry in yth:
 			i+=1
 			if i > 5:
 				break
