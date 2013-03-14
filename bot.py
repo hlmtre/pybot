@@ -40,15 +40,16 @@ class Bot(threading.Thread):
 		self.CHANNELINIT = conf.getChannels()
 		#self.network = conf.getNetwork()
 # this will be the socket
-		s = None
-		self.brain = botbrain.BotBrain(Bot.send) # if this is unclear: send is a function pointer, to allow the botbrain to send
+		self.s = None # each bot holds its own socket open to the network
+		self.brain = botbrain.BotBrain(self.send) # if this is unclear: send is a function pointer, to allow the botbrain to send
+# TODO FIXME figure out how to scope <blank>.send and <blank>.worker (below, in run()) 
 
 		
 	def send(self, message):
 		if OFFLINE:
 			print message
 		else:
-			s.send(message)
+			self.s.send(message)
 			
 		
 	def pong(self, response):
@@ -166,7 +167,7 @@ class Bot(threading.Thread):
 					self.processline(line)			
 
 	def run(self):
-		Bot.worker(self)
+		bot.Bot.worker(self)
 # end class Bot
 							
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
