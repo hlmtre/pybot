@@ -1,0 +1,7 @@
+port = 6667
+network = zero9f9.com
+owner = hlmtre
+ircpass = <password>
+dbpass = <dbpass>
+channels = #bots #bf3 #cslug #hhorg
+nick = ohai
