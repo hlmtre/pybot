@@ -36,9 +36,14 @@ class ConfManager:
 			elif line.startswith("dbpass"):
 				self.dbpass = line.rstrip().split()[-1] # dbpass = pass
 
+			elif line.startswith("nick"):
+				self.nick = line.rstrip().split()[-1] # dbpass = pass
+
 			elif line.startswith("channels"): # channels = chan1 chan2 chan3
-				c = line.rstrip().split("=")[-1]
-				self.channels = c.split()
+				if len(line.split("=")[-1].split()) > 1: # more than one entry
+					self.channels= line.split("=")[-1].split() # create list
+				else:
+					self.channels= line.rstrip().split()[-1] # singular channel; make this a string
 
 		if self.networks is None or self.port is None or self.channels is None:
 				raise ConfError("conf file incorrect")
@@ -51,6 +56,15 @@ class ConfManager:
 
 	def getDBPass(self):
 		return self.dbpass
+
+	def getNumChannels(self):
+		if type(self.channels) is str:
+			return 1
+		else:
+			return len(self.channels)
+	
+	def getNick(self):
+		return self.nick
 
 	def getChannels(self):
 		return self.channels

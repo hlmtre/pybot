@@ -36,17 +36,17 @@ class Bot(threading.Thread):
 #CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
 		self.CONNECTED = False
 		self.conf = conf
+		self.logger = logger.Logger()
 
 		self.CHANNELINIT = conf.getChannels()
 		#self.network = conf.getNetwork()
 # this will be the socket
-		self.s = None # each bot holds its own socket open to the network
+		self.s = None # each bot thread holds its own socket open to the network
 		self.brain = botbrain.BotBrain(self.send) # if this is unclear: send is a function pointer, to allow the botbrain to send
-# TODO FIXME figure out how to scope <blank>.send and <blank>.worker (below, in run()) 
 
 		
 	def send(self, message):
-		if OFFLINE:
+		if self.OFFLINE:
 			print message
 		else:
 			self.s.send(message)
@@ -60,10 +60,9 @@ class Bot(threading.Thread):
 			
 
 	def processline(self, line):
-		global CONNECTED
-		
+		lines_parsed = 0
 		if DEBUG:
-			print line
+			self.logger.write(line+'\n')
 		
 		try:
 			if line.startswith("PING"):
@@ -86,13 +85,21 @@ class Bot(threading.Thread):
 					else:
 						word = "QUIT"
 						self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
-				if self.CONNECTED == False:
-					time.sleep(1)
-					for chan in self.CHANNELINIT:
-						send('JOIN '+chan+'\n')
-						if DEBUG:
-							print "#### JOINING " + chan + " ####"
-					self.CONNECTED = True
+
+				if self.CONNECTED is False:
+					#self.logger.write("INSIDE SELF.CONNECTED\n")
+
+					self.chan_list = self.conf.getChannels() # do NOT attempt to set chan_list to conf.getNetworks() and expect things to work
+					if self.conf.getNumChannels() > 1:
+						i = 0
+						for c in self.chan_list:
+							self.send('JOIN '+self.chan_list[i]+' \n')
+							i += 1
+						self.CONNECTED = True
+					else:
+						self.send('JOIN '+self.chan_list+' \n')
+						self.logger.write("JOINING "+self.chan_list +'\n')
+						self.CONNECTED = True
 				
 				line_array = line.split()
 				user_and_mask = line_array[0][1:]
@@ -120,7 +127,7 @@ class Bot(threading.Thread):
 				self.NICK = 'ohai'
 			else:
 				self.HOST = self.network
-				self.NICK = 'localohai'
+				self.NICK = self.conf.getNick()
 		except:
 			self.HOST = self.network
 			self.NICK = 'localohai'
@@ -167,42 +174,42 @@ class Bot(threading.Thread):
 					self.processline(line)			
 
 	def run(self):
-		bot.Bot.worker(self)
+		self.worker()
 # end class Bot
 							
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
-	import bot
-	if len(sys.argv) > 1:
-		CONF = sys.argv[1]
-	else: CONF = "~/.pybotrc"
-
-	cm = confman.ConfManager(CONF)
-	net_list = cm.getNetworks()
-	i = 0
-	if cm.getNumNets() > 1:
-		for c in cm.getNetworks():
-			b = bot.Bot(cm, net_list[i])
-			b.start()
-			i += 1
-	else:
-		b = bot.Bot(cm, net_list)
-		b.start()
 	#if DEBUG:
 	#	worker() # run in foreground for debugging
 	#
 	#else:
+	DEBUG = True
 	
 	if os.name == "posix":
 		pid = os.fork()
-		if pid == 0:
-			worker()
-		elif pid > 0:
-			print "forking to background..."
-			sys.exit(0)
+		if pid == 0: # child
+			import bot
+			if len(sys.argv) > 1:
+				CONF = sys.argv[1]
+			else: CONF = "~/.pybotrc"
 
-	else: # since we don't have fork on windows
-		p = Process(target=worker)
-		p.start()
-		print os.getpid()
+			cm = confman.ConfManager(CONF)
+			net_list = cm.getNetworks()
+			i = 0
+			if cm.getNumNets() > 1:
+				for c in cm.getNetworks():
+					b = bot.Bot(cm, net_list[i])
+					b.start()
+					i += 1
+			else:
+				b = bot.Bot(cm, net_list[0])
+				b.start()
+	elif pid > 0:
+		print "forking to background..."
+		sys.exit(0)
+
+#	else: # since we don't have fork on windows
+#		p = Process(target=worker)
+#		p.start()
+#		print os.getpid()
