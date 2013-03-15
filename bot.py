@@ -53,7 +53,7 @@ class Bot(threading.Thread):
 			
 		
 	def pong(self, response):
-		send('PONG ' + response + '\n')
+		self.send('PONG ' + response + '\n')
 		#date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
 		#l = logger.Logger()
 		#l.write("responding to PING at " + date + '\n')
