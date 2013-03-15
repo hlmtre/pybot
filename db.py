@@ -5,7 +5,7 @@ class DB:
 
 	def _open(self):
 		self.con = mdb.connect("localhost","pybot","1q2w3e4r","pybot")
-		self.cur = con.cursor()
+		self.cur = self.con.cursor()
 	
 	def _close(self):
 		self.con = None
