@@ -67,7 +67,7 @@ class Bot(threading.Thread):
 		try:
 			if line.startswith("PING"):
 				ping_response_line = line.split(":", 1)
-				pong(ping_response_line[1])
+				self.pong(ping_response_line[1])
 
 # current hackish solution for seen
 # this is SO INCREDIBLY WRONG AND GROSS
