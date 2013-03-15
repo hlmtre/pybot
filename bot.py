@@ -98,7 +98,6 @@ class Bot(threading.Thread):
 						self.CONNECTED = True
 					else:
 						self.send('JOIN '+self.chan_list+' \n')
-						self.logger.write("JOINING "+self.chan_list +'\n')
 						self.CONNECTED = True
 				
 				line_array = line.split()
