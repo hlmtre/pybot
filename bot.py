@@ -38,7 +38,7 @@ class Bot(threading.Thread):
 		self.conf = conf
 		self.logger = logger.Logger()
 
-		self.CHANNELINIT = conf.getChannels()
+		self.CHANNELINIT = conf.getChannels(self.network)
 		#self.network = conf.getNetwork()
 # this will be the socket
 		self.s = None # each bot thread holds its own socket open to the network
@@ -89,8 +89,8 @@ class Bot(threading.Thread):
 				if self.CONNECTED is False:
 					#self.logger.write("INSIDE SELF.CONNECTED\n")
 
-					self.chan_list = self.conf.getChannels() # do NOT attempt to set chan_list to conf.getNetworks() and expect things to work
-					if self.conf.getNumChannels() > 1:
+					self.chan_list = self.conf.getChannels(self.network) 
+					if self.conf.getNumChannels(self.network) > 1:
 						i = 0
 						for c in self.chan_list:
 							self.send('JOIN '+self.chan_list[i]+' \n')
@@ -118,25 +118,23 @@ class Bot(threading.Thread):
 			traceback.print_exc(file=sys.stdout)
 			
 	def worker(self):
-		if self.network is None:
-			self.network = 'zero9f9.com'
 		try:
 			if "minus22" in socket.gethostname() or "barge" in socket.gethostname():
 				self.HOST = self.network
 				self.NICK = 'ohai'
 			else:
 				self.HOST = self.network
-				self.NICK = self.conf.getNick()
+				self.NICK = self.conf.getNick(self.network)
 		except:
 			self.HOST = self.network
 			self.NICK = 'localohai'
 
 		# we have to cast it to an int, otherwise the connection fails silently and the entire process dies
 		#PORT = int(cm.getPort())
-		self.PORT = int(self.conf.getPort())
+		self.PORT = int(self.conf.getPort(self.network))
 		self.IDENT = 'mypy'
 		self.REALNAME = 's1ash'
-		self.OWNER = self.conf.getOwner() 
+		self.OWNER = self.conf.getOwner(self.network) 
 		
 		print os.getpid()
 		# connect to server

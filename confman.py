@@ -1,6 +1,8 @@
 import os
+import json
 from conferror import ConfError
 class ConfManager:
+
 	def __init__(self,conf=None):
 		if conf is None:
 			if os.environ.has_key('HOME'):
@@ -10,76 +12,51 @@ class ConfManager:
 				except IOError:
 					raise ConfError("could not open conf file '"+self.conf_path+"'")
 		else: # lines of with os.environ.has_key
-			self.conf_path = os.environ['HOME'] + '/.pybotrc'
 			try:
-				#self.conf_path = os.environ['HOME'] + conf
-				self.conf_file = open(self.conf_path)
+				self.conf_file = open('.pybotrc')
 			except IOError:
-				raise ConfError("could not open conf file '"+self.conf_path+"'")
+				self.conf_path = os.environ['HOME'] + '/.pybotrc'
+				try:
+					#self.conf_path = os.environ['HOME'] + conf
+					self.conf_file = open(self.conf_path)
+				except IOError:
+					raise ConfError("could not open conf file '"+self.conf_path+"'")
+		
+		self.parsed = json.load(self.conf_file)
 
-		for line in self.conf_file:
-			if line.startswith("network"):
-				if len(line.split("=")[-1].split()) > 1: # more than one entry
-					self.networks = line.split("=")[-1].split() # create list
-				else:
-					self.networks = line.rstrip().split()[-1] # singular network; make this a string
+	def getOwner(self, net):
+		return self.parsed[net]["owner"]
 
-			elif line.startswith("port"):
-				self.port = line.rstrip().split()[-1] # port = 6667
+	def getIRCPass(self, net):
+		return self.parsed[net]["ircpass"]
 
-			elif line.startswith("owner"):
-				self.owner = line.rstrip().split()[-1] # owner = username
+	def getDBPass(self, net):
+		return self.parsed[net]["dbpass"]
 
-			elif line.startswith("ircpass"):
-				self.ircpass = line.rstrip().split()[-1] # ircpass = pass
+	def getNumChannels(self, net):
+		return len(self.parsed[net]["channels"])
 
-			elif line.startswith("dbpass"):
-				self.dbpass = line.rstrip().split()[-1] # dbpass = pass
+	def getNick(self, net):
+		return self.parsed[net]["nick"]
 
-			elif line.startswith("nick"):
-				self.nick = line.rstrip().split()[-1] # dbpass = pass
-
-			elif line.startswith("channels"): # channels = chan1 chan2 chan3
-				if len(line.split("=")[-1].split()) > 1: # more than one entry
-					self.channels= line.split("=")[-1].split() # create list
-				else:
-					self.channels= line.rstrip().split()[-1] # singular channel; make this a string
-
-		if self.networks is None or self.port is None or self.channels is None:
-				raise ConfError("conf file incorrect")
-
-	def getOwner(self):
-		return self.owner
-
-	def getIRCPass(self):
-		return self.ircpass
-
-	def getDBPass(self):
-		return self.dbpass
-
-	def getNumChannels(self):
-		if type(self.channels) is str:
-			return 1
-		else:
-			return len(self.channels)
-	
-	def getNick(self):
-		return self.nick
-
-	def getChannels(self):
-		return self.channels
+	def getChannels(self, net):
+		return self.parsed[net]["channels"]
 
 	def getNetworks(self):
-		return self.networks
+		l = list()
+		for n in self.parsed.iterkeys():
+			l.append(n)
+		return l
 	
 	def getNumNets(self):
-		if type(self.networks) is str:
-			return 1
-		else:
-			return len(self.networks)
+		i = 0
+		for n in self.parsed.iterkeys():
+			i += 1
+		return i
 
+# deprecated
 	def getNetwork(self):
-		return self.networks
+		pass
 
-	def getPort(self):
-		return self.port
+	def getPort(self,net):
+		return self.parsed[net]["port"]
