@@ -5,8 +5,9 @@
 		], 
 		"port":"6667",
 		"nick": "testohai", 
-		"ircpass": "pyb07",
-		"owner": "hlmtre"
+		"ircpass": "ircpass"
+		"owner": "hlmtre",
+    "dbpass": "dbpass"
 		}, 
 	"zero9f9.com": {
 		"channels": [
@@ -17,7 +18,8 @@
 		], 
 		"port":"6667",
 		"nick": "testohai", 
-		"ircpass": "pyb07",
-		"owner": "hlmtre"
+		"ircpass": "ircpass",
+		"owner": "hlmtre",
+    "dbpass": "dbpass"
 	}
 }
