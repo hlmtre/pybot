@@ -1,0 +1,25 @@
+
+v0.4
+====
+
+  Config now written in JSON. To sum up recent changes in the last week, since there have been a few:
+  * bot is now multithreaded. He joins n-number of specified networks in the config file, and joins channels on a 
+  per-network basis.
+ 
+ Issues:
+ -------
+  * IRC pass and DB pass must be specified in each network block, as each thread is really only concerned with 
+  information relevant to itself; specific to its own network. This is probably not how the bot would be used;
+  it's likely he'd be running on one machine, with one DB password. IRC pass per-network makes sense, though.
+  
+  * Code still very much needs to be cleaned up and restructured. 
+
+  * bot class still passing only PRIVMSGs to botbrain -- for events to be really useful (see Future), JOINS, PARTS,
+  etc would need to get passed as well.
+
+ Future:
+ -------
+  * Events and module handling. For modules to be useful (and usable) they'd have to be able to register, or subscribe,
+  to interesting (or uninteresting, I'm not judging you) 'events' as determined by the botbrain. The bot needs to
+  merely pass lines received into botbrain, where logic is performed. Both events and how to load modules (as well 
+  as module conventions) need to be defined.
