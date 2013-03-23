@@ -1,4 +1,3 @@
-import ascii
 from collections import defaultdict
 import webwriter
 import bf3api
