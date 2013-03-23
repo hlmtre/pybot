@@ -1,22 +1,12 @@
 {
-	"irc.freenode.net": {
-		"channels": [
-		"#bots"
-		], 
-		"port":"6667",
-		"nick": "testohai", 
-		"ircpass": "password"
-		"owner": "hlmtre",
+  "zero9f9.com": {
+    "channels": [
+    "#bots" 
+    ], 
+    "port":"6667",
+    "nick": "testohai", 
+    "ircpass": "password",
+    "owner": "hlmtre",
     "dbpass": "password"
-		}, 
-	"zero9f9.com": {
-		"channels": [
-		"#bots" 
-		], 
-		"port":"6667",
-		"nick": "testohai", 
-		"ircpass": "password",
-		"owner": "hlmtre",
-    "dbpass": "password"
-	}
+  }
 }

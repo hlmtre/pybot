@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#
+# v0.4
 #
 #
 
@@ -20,6 +20,9 @@ import botbrain
 import logger
 import db
 import confman
+from event import Event
+from util import import_all
+from modules import *
 
 
 class Bot(threading.Thread):
@@ -35,6 +38,7 @@ class Bot(threading.Thread):
     self.CONNECTED = False
     self.conf = conf
     self.logger = logger.Logger()
+    self.eventslist = list()
 
     self.CHANNELINIT = conf.getChannels(self.network)
     #self.network = conf.getNetwork()
@@ -61,8 +65,25 @@ class Bot(threading.Thread):
     if DEBUG:
       print self.getName() + ": " + line
       #self.logger.write(line+'\n')
-    
+    joins = Event("__joins__")
+    joins.define("JOIN")
+
+    modules = []
+    library_list = []
+    self.eventslist.append(joins)
+
+    # library_list is a mapping of indices to imported, now anonymized, modules
+    library_list = import_all("modules")
+    for l in library_list:
+      n = getattr(l, "__name__")
+      print n
+
+    from modules import n
+
     try:
+      for e in self.eventslist:
+        if e.matches(line):
+          e.notifySubscribers(line)
       if line.startswith("PING"):
         ping_response_line = line.split(":", 1)
         self.pong(ping_response_line[1])
@@ -174,6 +195,7 @@ class Bot(threading.Thread):
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
+  import bot
   #if DEBUG:
   # worker() # run in foreground for debugging
   #
@@ -187,7 +209,6 @@ if __name__ == "__main__":
     if not DEBUG:
       pid = os.fork()
       if pid == 0: # child
-        import bot
         if len(sys.argv) > 1:
           CONF = sys.argv[1]
         else: CONF = "~/.pybotrc"
