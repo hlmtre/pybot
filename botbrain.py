@@ -1,4 +1,3 @@
-import ascii
 from collections import defaultdict
 import webwriter
 import bf3api
@@ -251,8 +250,8 @@ class BotBrain:
     # self.paint(channel, message.split()[1])
     if message.startswith(".yth"):
       self._ythistory(channel)
-    if message.startswith(".rainbow"):
-      self.say(channel, ascii.rainbow())
+#    if message.startswith(".rainbow"):
+#      self.say(channel, ascii.rainbow())
     #if "bf3" in message and "stats" in message:
     if message.startswith(".help"):
       self._help(usr)     

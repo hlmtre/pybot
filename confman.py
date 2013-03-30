@@ -6,7 +6,7 @@ class ConfManager:
   def __init__(self,conf=None):
     if conf is not None:
       try:
-        self.conf_file = open(conf)
+        self.conf_file = open(os.path.abspath(conf))
       except IOError:
         raise ConfError("could not open conf file '"+conf+"'")
     if conf is None:
