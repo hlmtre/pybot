@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#
+# v0.4
 #
 #
 
@@ -20,21 +20,27 @@ import botbrain
 import logger
 import db
 import confman
+from event import Event
+from util import import_all
+from modules import *
+
+DEBUG = False
 
 
 class Bot(threading.Thread):
   def __init__(self, conf, network):
     threading.Thread.__init__(self)
     global DEBUG
+    self.DEBUG = DEBUG
     self.brain = None
     self.network = network
-    DEBUG = True
     self.OFFLINE = False
 #CHANNELINIT = ['#bots']
 #CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
     self.CONNECTED = False
     self.conf = conf
     self.logger = logger.Logger()
+    self.eventslist = list()
 
     self.CHANNELINIT = conf.getChannels(self.network)
     #self.network = conf.getNetwork()
@@ -58,11 +64,28 @@ class Bot(threading.Thread):
       
 
   def processline(self, line):
-    if DEBUG:
+    if self.DEBUG:
       print self.getName() + ": " + line
       #self.logger.write(line+'\n')
-    
+#    joins = Event("__joins__")
+#    joins.define("JOIN")
+#
+#    modules = []
+#    library_list = []
+#    self.eventslist.append(joins)
+#
+#    # library_list is a mapping of indices to imported, now anonymized, modules
+#    library_list = import_all("modules")
+#    for l in library_list:
+#      n = getattr(l, "__name__")
+#      print n
+#
+#    from modules import n
+#
     try:
+#      for e in self.eventslist:
+#        if e.matches(line):
+#          e.notifySubscribers(line)
       if line.startswith("PING"):
         ping_response_line = line.split(":", 1)
         self.pong(ping_response_line[1])
@@ -105,7 +128,11 @@ class Bot(threading.Thread):
           message = line.split(":",2)[2]
           self.brain.respond(usr, channel, message)
         except IndexError:
-          print "index out of range.", line
+          try:
+            message = line.split(":",2)[1]
+            self.brain.respond(usr, channel, message)
+          except IndexError:
+            print "index out of range.", line
         
         #p = Process(target=botbrain.respond, args=(s, usr, channel, message))
         #p.start()
@@ -174,10 +201,12 @@ class Bot(threading.Thread):
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
+  import bot
   #if DEBUG:
   # worker() # run in foreground for debugging
   #
   #else:
+  global DEBUG
   DEBUG = False
   for i in sys.argv:
     if i == "-d":
@@ -187,7 +216,6 @@ if __name__ == "__main__":
     if not DEBUG:
       pid = os.fork()
       if pid == 0: # child
-        import bot
         if len(sys.argv) > 1:
           CONF = sys.argv[1]
         else: CONF = "~/.pybotrc"
@@ -207,7 +235,6 @@ if __name__ == "__main__":
         print "forking to background..."
         sys.exit(0)
     else: # don't background
-      import bot
       if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
         CONF = sys.argv[1]
         try:
