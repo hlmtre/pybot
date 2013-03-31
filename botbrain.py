@@ -96,6 +96,8 @@ class BotBrain:
       return True
     return False
 
+  def getMicrophone(self):
+    return self.microphone
 
   def _seen(self, user, channel):
     answer = db.getSeen(user)
