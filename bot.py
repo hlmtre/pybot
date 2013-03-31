@@ -244,7 +244,7 @@ if __name__ == "__main__":
             b.start()
             i += 1
         else:
-          b = bot.Bot(cm, net_list[0])
+          b = bot.Bot(cm, net_list[0], DEBUG)
           b.start()
       elif pid > 0:
         print "forking to background..."
@@ -264,7 +264,7 @@ if __name__ == "__main__":
       i = 0
       if cm.getNumNets() > 1:
         for c in cm.getNetworks():
-          b = bot.Bot(cm, net_list[i])
+          b = bot.Bot(cm, net_list[i], DEBUG)
           b.start()
           i += 1
       else:
