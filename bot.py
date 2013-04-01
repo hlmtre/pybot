@@ -52,7 +52,18 @@ class Bot(threading.Thread):
     joins = Event("__joins__")
     joins.define("JOIN")
 
-    self.events_list.append(joins);
+    implying = Event("__implying__")
+    implying.define(">")
+
+    command = Event("__command__")
+    # this is an example of passing in a regular expression to the event definition
+    command.define("fo.bar")
+
+    # add your defined events here
+    self.events_list.append(joins)
+    self.events_list.append(implying)
+    self.events_list.append(command)
+
     self.loaded_modules = list()
 
     modules_dir_list = list()
@@ -60,26 +71,30 @@ class Bot(threading.Thread):
     
     modules_path = 'modules'
 
+    # this is magic.
+
     import inspect
     import os, imp
     dir_list = os.listdir(modules_path)
     mods = {}
+    # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
-      if ext == '.py' and not name == '__init__':
+      if ext == '.py' and not name == '__init__': # ignore compiled python and __init__ files
         f, filename, descr = imp.find_module(name, [modules_path])
         mods[name] = imp.load_module(name, f, filename, descr)
 
     for k,v in mods.iteritems():
       for name in dir(v):
-        obj = getattr(mods[k], name)
+        obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
-          if inspect.isclass(obj):
+          if inspect.isclass(obj): # it's a class definition, initialize it
             a = obj(self.events_list, self.send)
-            if a not in self.loaded_modules:
+            if a not in self.loaded_modules: # don't add in multiple copies
               self.loaded_modules.append(a)
         except TypeError:
           pass
+    # end magic.
     
   def send(self, message):
     if self.OFFLINE:
