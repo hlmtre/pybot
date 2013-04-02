@@ -6,9 +6,9 @@ class ConfManager:
   def __init__(self,conf=None):
     if conf is not None:
       try:
-        self.conf_file = open(conf)
+        self.conf_file = open(os.path.expanduser(conf))
       except IOError:
-        raise ConfError("could not open conf file '"+conf+"'")
+        raise ConfError("could not open conf file '"+os.path.expanduser(conf)+"'")
     if conf is None:
       if os.environ.has_key('HOME'):
         try:

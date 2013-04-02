@@ -19,7 +19,9 @@ class Event:
     return False
 
   def notifySubscribers(self, line):
+    print "DEBUG: notifying subscribers",
+    print self.subscribers
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
-    self.channel = line.rsplit(":"[-1]) # channel user joined is last
+    self.channel = line.rsplit()[-1] # channel user joined is last
     for s in self.subscribers:
       s.handle(self)

@@ -23,3 +23,23 @@ v0.4
   to interesting (or uninteresting, I'm not judging you) 'events' as determined by the botbrain. The bot needs to
   merely pass lines received into botbrain, where logic is performed. Both events and how to load modules (as well 
   as module conventions) need to be defined.
+
+v0.5.1
+======
+
+  Modules and events now work. There are a few miscellaneous unrelated-to-modules-and-events fixes in place, as well;
+  * a more graceful handling of DEBUG. It is now passed into the bot as set by the commandline flag -d.
+  * added message number handling to the bot. this should allow for a much more robust understanding of exactly what the server is sending us.
+  * fix for confman -- there was a bug introduced when I switched to os.path.abspath and how I was passing in the default path to confman. os.path.expanduser fixes it (~ was being prepended to the current absolute path). This now expands ~ out to /home/<username>.
+  
+  * A note to module authors, and tying to events: drop your module in modules/, then define an event in bot.py. In your module, you simple determine what 'type' of event to subscribe to. When that event is triggered, the event will notify all modules that have subscribed to it.
+ Issues:
+ -------
+  * IRC pass and DB pass must be specified in each network block, as each thread is really only concerned with 
+  information relevant to itself; specific to its own network. This is probably not how the bot would be used;
+  it's likely he'd be running on one machine, with one DB password. IRC pass per-network makes sense, though.
+  
+  * Code still very much needs to be cleaned up and restructured. 
+
+  * bot class still passing only PRIVMSGs to botbrain -- for events to be really useful (see Future), JOINS, PARTS,
+  etc would need to get passed as well.

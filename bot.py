@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.4
+# v0.5.1
 #
 #
 
@@ -22,23 +22,22 @@ import db
 import confman
 from event import Event
 from util import import_all
-from modules import *
+
+DEBUG = False
 
 
 class Bot(threading.Thread):
-  def __init__(self, conf, network):
+  def __init__(self, conf, network, d):
     threading.Thread.__init__(self)
-    global DEBUG
+    self.DEBUG = d
     self.brain = None
     self.network = network
-    DEBUG = True
     self.OFFLINE = False
 #CHANNELINIT = ['#bots']
 #CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
     self.CONNECTED = False
     self.conf = conf
     self.logger = logger.Logger()
-    self.eventslist = list()
 
     self.CHANNELINIT = conf.getChannels(self.network)
     #self.network = conf.getNetwork()
@@ -46,14 +45,48 @@ class Bot(threading.Thread):
     self.s = None # each bot thread holds its own socket open to the network
     self.brain = botbrain.BotBrain(self.send) # if this is unclear: send is a function pointer, to allow the botbrain to send
 
+    self.events_list = list()
+
+    # define events here and add them to the events_list
+
+    joins = Event("__joins__")
+    joins.define("JOIN")
+
+    self.events_list.append(joins);
+    self.loaded_modules = list()
+
+    modules_dir_list = list()
+    tmp_list = list()
+    
+    modules_path = 'modules'
+
+    import inspect
+    import os, imp
+    dir_list = os.listdir(modules_path)
+    mods = {}
+    for fname in dir_list:
+      name, ext = os.path.splitext(fname)
+      if ext == '.py' and not name == '__init__':
+        f, filename, descr = imp.find_module(name, [modules_path])
+        mods[name] = imp.load_module(name, f, filename, descr)
+
+    for k,v in mods.iteritems():
+      for name in dir(v):
+        obj = getattr(mods[k], name)
+        try:
+          if inspect.isclass(obj):
+            a = obj(self.events_list, self.send)
+            if a not in self.loaded_modules:
+              self.loaded_modules.append(a)
+        except TypeError:
+          pass
     
   def send(self, message):
     if self.OFFLINE:
       print message
     else:
       self.s.send(message)
-      
-    
+
   def pong(self, response):
     self.send('PONG ' + response + '\n')
     #date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
@@ -62,28 +95,16 @@ class Bot(threading.Thread):
       
 
   def processline(self, line):
-    if DEBUG:
+    if self.DEBUG:
       print self.getName() + ": " + line
-      #self.logger.write(line+'\n')
-    joins = Event("__joins__")
-    joins.define("JOIN")
 
-    modules = []
-    library_list = []
-    self.eventslist.append(joins)
-
-    # library_list is a mapping of indices to imported, now anonymized, modules
-    library_list = import_all("modules")
-    for l in library_list:
-      n = getattr(l, "__name__")
-      print n
-
-    from modules import n
+    message_number = line.split()[1]
 
     try:
-      for e in self.eventslist:
+      for e in self.events_list:
         if e.matches(line):
           e.notifySubscribers(line)
+
       if line.startswith("PING"):
         ping_response_line = line.split(":", 1)
         self.pong(ping_response_line[1])
@@ -105,14 +126,11 @@ class Bot(threading.Thread):
             word = "QUIT"
             self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
 
-        if self.CONNECTED is False:
-          #self.logger.write("INSIDE SELF.CONNECTED\n")
-
+        if self.CONNECTED is False and message_number == "376": # wait until we receive end of MOTD before joining
           self.chan_list = self.conf.getChannels(self.network) 
-          #if self.conf.getNumChannels(self.network) > 1:
-          #  i = 0
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
+            print "JOIN "+c+" \n"
           self.CONNECTED = True
           #else:
           #  self.send('JOIN '+self.chan_list+' \n')
@@ -126,7 +144,11 @@ class Bot(threading.Thread):
           message = line.split(":",2)[2]
           self.brain.respond(usr, channel, message)
         except IndexError:
-          print "index out of range.", line
+          try:
+            message = line.split(":",2)[1]
+            self.brain.respond(usr, channel, message)
+          except IndexError:
+            print "index out of range.", line
         
         #p = Process(target=botbrain.respond, args=(s, usr, channel, message))
         #p.start()
@@ -218,17 +240,16 @@ if __name__ == "__main__":
         i = 0
         if cm.getNumNets() > 1:
           for c in cm.getNetworks():
-            b = bot.Bot(cm, net_list[i])
+            b = bot.Bot(cm, net_list[i], DEBUG)
             b.start()
             i += 1
         else:
-          b = bot.Bot(cm, net_list[0])
+          b = bot.Bot(cm, net_list[0], DEBUG)
           b.start()
       elif pid > 0:
         print "forking to background..."
         sys.exit(0)
     else: # don't background
-      import bot
       if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
         CONF = sys.argv[1]
         try:
@@ -243,11 +264,11 @@ if __name__ == "__main__":
       i = 0
       if cm.getNumNets() > 1:
         for c in cm.getNetworks():
-          b = bot.Bot(cm, net_list[i])
+          b = bot.Bot(cm, net_list[i], DEBUG)
           b.start()
           i += 1
       else:
-        b = bot.Bot(cm, net_list[0])
+        b = bot.Bot(cm, net_list[0], DEBUG)
         b.start()
       
 
