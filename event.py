@@ -2,7 +2,7 @@ import re
 class Event:
   def __init__(self, _type):
     self._type = _type
-    self.subscribers = list()
+    self.subscribers = list() # this is a list of subscribers to notify
     self.user = ""
     self.definition = ""
     self.channel = ""
@@ -19,9 +19,14 @@ class Event:
     return False
 
   def notifySubscribers(self, line):
-    print "DEBUG: notifying subscribers",
+    print "DEBUG: ",
+    print self,
+    print "is notifying subscribers",
     print self.subscribers
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
-    self.channel = line.rsplit()[-1] # channel user joined is last
+    l = line.split()
+    for e in l:
+      if e.startswith("#"):
+        self.channel = e
     for s in self.subscribers:
       s.handle(self)
