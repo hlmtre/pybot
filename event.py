@@ -6,6 +6,7 @@ class Event:
     self.user = ""
     self.definition = ""
     self.channel = ""
+    self.line = ""
     
   def subscribe(self, e):
     self.subscribers.append(e)
@@ -19,6 +20,7 @@ class Event:
     return False
 
   def notifySubscribers(self, line):
+    self.line = line
     print "DEBUG: ",
     print self,
     print "is notifying subscribers",
@@ -28,5 +30,6 @@ class Event:
     for e in l:
       if e.startswith("#"):
         self.channel = e
+        break
     for s in self.subscribers:
       s.handle(self)

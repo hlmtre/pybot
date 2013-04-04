@@ -59,10 +59,14 @@ class Bot(threading.Thread):
     # this is an example of passing in a regular expression to the event definition
     command.define("fo.bar")
 
+    lastfm = Event("__.lastfm__")
+    lastfm.define(".lastfm")
+
     # add your defined events here
     self.events_list.append(joins)
     self.events_list.append(implying)
     self.events_list.append(command)
+    self.events_list.append(lastfm)
 
     self.loaded_modules = list()
 
