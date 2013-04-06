@@ -17,8 +17,11 @@ class LastFM:
     msg = event.line.rsplit(":")[-1]
     if msg.startswith(".lastfm add"):
       lastfm_username = msg.split()[-1]
-      self.bot_handle.db.e("REPLACE INTO lastfm (lastfm_username, nick) VALUES ('" + lastfm_username + "', '" + event.user + "')")
-    else:
+      try:
+        self.bot_handle.db.e("REPLACE INTO lastfm (lastfm_username, nick) VALUES ('" + lastfm_username + "', '" + event.user + "')")
+      except Exception, e:
+        print e
+    elif msg.startswith(".lastfm"):
       try:
         username = self.bot_handle.db.e("SELECT lastfm_username FROM lastfm WHERE nick = '" + event.user + "'")[0][0]
         api_key = "80688df02fc5af99f1ed97b5f667f0c4"

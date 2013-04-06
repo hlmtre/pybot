@@ -46,7 +46,7 @@ class DB:
     try:
       self._open()
       self.cur.execute(sql) 
-      if "INSERT" in sql:
+      if "INSERT" in sql or "REPLACE" in sql:
         self.con.commit()
         self._close()
       elif "SELECT" in sql:
