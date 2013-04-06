@@ -22,6 +22,8 @@ import db
 import confman
 from event import Event
 from util import import_all
+import db
+
 
 DEBUG = False
 
@@ -38,6 +40,7 @@ class Bot(threading.Thread):
     self.CONNECTED = False
     self.conf = conf
     self.logger = logger.Logger()
+    self.db = db.DB()
 
     self.CHANNELINIT = conf.getChannels(self.network)
     #self.network = conf.getNetwork()
@@ -56,16 +59,16 @@ class Bot(threading.Thread):
     implying.define(">")
 
     command = Event("__command__")
-    # this is an example of passing in a regular expression to the event definition
+   # this is an example of passing in a regular expression to the event definition
     command.define("fo.bar")
 
     lastfm = Event("__.lastfm__")
     lastfm.define(".lastfm")
 
     # add your defined events here
-    self.events_list.append(joins)
-    self.events_list.append(implying)
-    self.events_list.append(command)
+#    self.events_list.append(joins)
+#    self.events_list.append(implying)
+#    self.events_list.append(command)
     self.events_list.append(lastfm)
 
     self.loaded_modules = list()
@@ -93,7 +96,7 @@ class Bot(threading.Thread):
         obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
           if inspect.isclass(obj): # it's a class definition, initialize it
-            a = obj(self.events_list, self.send)
+            a = obj(self.events_list, self.send, self) # now we're passing in a reference to the calling bot
             if a not in self.loaded_modules: # don't add in multiple copies
               self.loaded_modules.append(a)
         except TypeError:
