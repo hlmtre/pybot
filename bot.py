@@ -65,11 +65,15 @@ class Bot(threading.Thread):
     lastfm = Event("__.lastfm__")
     lastfm.define(".lastfm")
 
+    dance = Event("__.dance__")
+    dance.define("\.dance")
+
     # add your defined events here
 #    self.events_list.append(joins)
 #    self.events_list.append(implying)
 #    self.events_list.append(command)
     self.events_list.append(lastfm)
+    self.events_list.append(dance)
 
     self.loaded_modules = list()
 
