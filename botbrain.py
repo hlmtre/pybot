@@ -179,12 +179,11 @@ class BotBrain:
     self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
   def _speak(self, user, target, message):
-    if user == "hlmtre":
-      if target.startswith("#"):
-        self.say(target, message) 
-      else:
-        target = "#" + target
-        self.say(target, message)
+    if target.startswith("#"):
+      self.say(target, message) 
+    else:
+      target = "#" + target
+      self.say(target, message)
 
   def _onstat(self, channel):
     self.say(channel, "Yep, I'm on. Idiot.")

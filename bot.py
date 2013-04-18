@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
-# v0.5.1
-#
+# v0.5.2
+# works with python 2.6.x and 2.7.x
 #
 
 
@@ -38,6 +38,7 @@ class Bot(threading.Thread):
 #CHANNELINIT = ['#bots']
 #CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
     self.CONNECTED = False
+    self.JOINED = False
     self.conf = conf
     self.logger = logger.Logger()
     self.db = db.DB()
@@ -152,12 +153,13 @@ class Bot(threading.Thread):
             word = "QUIT"
             self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
 
-        if self.CONNECTED is False and message_number == "376": # wait until we receive end of MOTD before joining
+# if we get disconnected this should be true upon a reconnect attempt.. ideally
+        if self.JOINED is False and message_number == "376": # wait until we receive end of MOTD before joining
           self.chan_list = self.conf.getChannels(self.network) 
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
             print "JOIN "+c+" \n"
-          self.CONNECTED = True
+          self.JOINED = True
           #else:
           #  self.send('JOIN '+self.chan_list+' \n')
           #  self.CONNECTED = True
@@ -207,15 +209,16 @@ class Bot(threading.Thread):
     self.s = socket.socket()
     try:
       self.s.connect((self.HOST, self.PORT)) # force them into one argument
+      self.CONNECTED = True
     except Exception, e:
-      print Exception, e
+      self.CONNECTED = False
     try:
       self.s.send('NICK '+self.NICK+'\n')
       self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
       time.sleep(3) # allow services to catch up
       self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
     except Exception, e:
-      print Exception, e
+      self.CONNECTED = False
 
     self.s.setblocking(1)
     
@@ -223,18 +226,42 @@ class Bot(threading.Thread):
     
     # infinite loop to keep parsing lines
     while 1:
-      time.sleep(1)
-      ready = select.select([self.s],[],[], 1)
-      if ready[0]:
-        read = read + self.s.recv(1024)
-        lines = read.split('\n')
-        
-        # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
-        # line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
-        read = lines.pop() 
-        for line in lines:
-          line = line.rstrip()
-          self.processline(line)      
+      try:
+        time.sleep(1)
+        if self.CONNECTED == False:
+          self.connect()
+        ready = select.select([self.s],[],[], 1)
+        if ready[0]:
+          read = read + self.s.recv(1024)
+          lines = read.split('\n')
+          
+          # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
+          # line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
+          read = lines.pop() 
+          for line in lines:
+            line = line.rstrip()
+            self.processline(line)      
+      except KeyboardInterrupt:
+        sys.exit(1)
+  # end worker
+
+  def connect(self):
+    time.sleep(10) # prevent attempting to reconnect too frequently errors
+    self.s = socket.socket()
+    try:
+      self.s.connect((self.HOST, self.PORT)) # force them into one argument
+    except Exception, e:
+      self.CONNECTED = False
+    try:
+      self.s.send('NICK '+self.NICK+'\n')
+      self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
+      time.sleep(3) # allow services to catch up
+      self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
+    except Exception, e:
+      self.CONNECTED = False
+
+    self.s.setblocking(1)
+    
 
   def run(self):
     self.worker()
