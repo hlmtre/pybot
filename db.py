@@ -100,7 +100,7 @@ class DB:
   def _getImgs(self):
     self._open()
     try:
-      self.cur.execute("""SELECT * FROM img ORDER BY time""")
+      self.cur.execute("""SELECT * FROM img ORDER BY time DESC""")
       data = self.cur.fetchall()
       self._close()
     except:

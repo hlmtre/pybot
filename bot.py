@@ -69,12 +69,16 @@ class Bot(threading.Thread):
     dance = Event("__.dance__")
     dance.define("\.dance")
 
+    pimp = Event("__pimp__")
+    pimp.define("\.pimp")
+
     # add your defined events here
 #    self.events_list.append(joins)
 #    self.events_list.append(implying)
 #    self.events_list.append(command)
     self.events_list.append(lastfm)
     self.events_list.append(dance)
+    self.events_list.append(pimp)
 
     self.loaded_modules = list()
 
@@ -123,7 +127,8 @@ class Bot(threading.Thread):
 
   def processline(self, line):
     if self.DEBUG:
-      print self.getName() + ": " + line
+      import datetime
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
 
     message_number = line.split()[1]
 
