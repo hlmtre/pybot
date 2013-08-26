@@ -242,8 +242,8 @@ class BotBrain:
         self._ftoc(channel, last[-1]) 
     if "ohai" in message and "hello" in message:
       self.say(channel, 'well hello to you too ' + usr)
-    if "youtube.com" in message:
-      self._getyoutubetitle(message, channel)
+   # if "youtube.com" in message:
+   #   self._getyoutubetitle(message, channel)
     if message.startswith(">"):
       pass
       #self.implying(channel, usr)

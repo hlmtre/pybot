@@ -72,6 +72,9 @@ class Bot(threading.Thread):
     pimp = Event("__pimp__")
     pimp.define("\.pimp")
 
+    youtube = Event("__youtubes__")
+    youtube.define("youtube.com[\S]+")
+
     # add your defined events here
 #    self.events_list.append(joins)
 #    self.events_list.append(implying)
@@ -79,6 +82,7 @@ class Bot(threading.Thread):
     self.events_list.append(lastfm)
     self.events_list.append(dance)
     self.events_list.append(pimp)
+    self.events_list.append(youtube)
 
     self.loaded_modules = list()
 
@@ -212,18 +216,19 @@ class Bot(threading.Thread):
     print os.getpid()
     # connect to server
     self.s = socket.socket()
-    try:
-      self.s.connect((self.HOST, self.PORT)) # force them into one argument
-      self.CONNECTED = True
-    except Exception, e:
-      self.CONNECTED = False
-    try:
-      self.s.send('NICK '+self.NICK+'\n')
-      self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
-      time.sleep(3) # allow services to catch up
-      self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
-    except Exception, e:
-      self.CONNECTED = False
+    while self.CONNECTED == False:
+      try:
+        self.s.connect((self.HOST, self.PORT)) # force them into one argument
+        self.CONNECTED = True
+      except Exception, e:
+        self.CONNECTED = False
+      try:
+        self.s.send('NICK '+self.NICK+'\n')
+        self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
+        time.sleep(3) # allow services to catch up
+        self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
+      except Exception, e:
+        self.CONNECTED = False
 
     self.s.setblocking(1)
     
