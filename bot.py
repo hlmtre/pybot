@@ -72,6 +72,9 @@ class Bot(threading.Thread):
     pimp = Event("__pimp__")
     pimp.define("\.pimp")
 
+    bofh = Event("__.bofh__")
+    bofh.define("\.bofh")
+
     youtube = Event("__youtubes__")
     youtube.define("youtube.com[\S]+")
 
@@ -83,6 +86,7 @@ class Bot(threading.Thread):
     self.events_list.append(dance)
     self.events_list.append(pimp)
     self.events_list.append(youtube)
+    self.events_list.append(bofh)
 
     self.loaded_modules = list()
 
