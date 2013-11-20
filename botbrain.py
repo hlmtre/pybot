@@ -214,14 +214,14 @@ class BotBrain:
   
   def respond(self, usr, channel, message):
 # this bit is not a command
-    if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message):
+    if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message) or ("imgur.com" in message and "gallery" in message):
      url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
      if url:
        self._insertImg(usr, url)
 # this bit is
-    if message.startswith("ohai join"):
+    if message.startswith("join"):
       self._join(usr, message)
-    if message.startswith("ohai quit"):
+    if message.startswith("quit"):
       self.__quit(usr)
     if message.startswith(".imgs"):
       ww._generate()
