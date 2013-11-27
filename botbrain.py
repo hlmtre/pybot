@@ -249,8 +249,8 @@ class BotBrain:
       #self.implying(channel, usr)
     #if message.startswith("paint "):
     # self.paint(channel, message.split()[1])
-    if message.startswith(".yth"):
-      self._ythistory(channel)
+    #if message.startswith(".yth"):
+      #self._ythistory(channel)
 #    if message.startswith(".rainbow"):
 #      self.say(channel, ascii.rainbow())
     #if "bf3" in message and "stats" in message:
@@ -300,6 +300,7 @@ class BotBrain:
       l = logger.Logger()
       l.write("user " + usr + " implying at " + date)
 
+# utility function
   def __prettyDate(self,time):
     now = datetime.now()
     if type(time) is int:
