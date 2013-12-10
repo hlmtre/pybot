@@ -134,23 +134,26 @@ class BotBrain:
 
   def _getyoutubetitle(self, line, channel):
     url = re.search("youtube.com[\S]+", line).group(0)
-    if url:
+    try:
+      if url:
 #     video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
-      get_dict = dict(parse_qsl(urlparse(url).query)) # create dictionary of strings, instead of of lists. this fails to handle if there are multiple values for a key in the GET
-      video_tag = get_dict['v']
-      if video_tag.__len__() > 1:
-        response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
-        xml_response = parseString(response)
-        duration = xml_response.getElementsByTagName('yt:duration')
-        ulength = duration[0].getAttribute("seconds")
-        alength = ulength.encode('ascii', 'ignore')
-        length = str(timedelta(seconds=int(alength)))
-        titletag = xml_response.getElementsByTagName('title')[0]
-        video_title = titletag.childNodes[0].nodeValue
-        self.say(channel, "YouTube: "+video_title + " ("+length+")")
-        yth[video_title] = line
-      else:
-        print "error!"
+	get_dict = dict(parse_qsl(urlparse(url).query)) # create dictionary of strings, instead of of lists. this fails to handle if there are multiple values for a key in the GET
+	video_tag = get_dict['v']
+	if video_tag.__len__() > 1:
+	  response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
+	  xml_response = parseString(response)
+	  duration = xml_response.getElementsByTagName('yt:duration')
+	  ulength = duration[0].getAttribute("seconds")
+	  alength = ulength.encode('ascii', 'ignore')
+	  length = str(timedelta(seconds=int(alength)))
+	  titletag = xml_response.getElementsByTagName('title')[0]
+	  video_title = titletag.childNodes[0].nodeValue
+	  self.say(channel, "YouTube: "+video_title + " ("+length+")")
+	  yth[video_title] = line
+	else:
+	  print "error!"
+    except KeyError:
+      pass
 
 
   def _ctof(self, channel, c_temp):
