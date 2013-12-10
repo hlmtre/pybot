@@ -28,7 +28,6 @@ class YoutubeParser:
           length = str(timedelta(seconds=int(alength)))
           titletag = xml_response.getElementsByTagName('title')[0]
           video_title = titletag.childNodes[0].nodeValue
-          print event.channel + " " + video_title
           self.printer("PRIVMSG " + event.channel + " :YouTube: " + video_title + " ("+length+")\n")
         else:
           pass
