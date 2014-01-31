@@ -78,6 +78,9 @@ class Bot(threading.Thread):
     youtube = Event("__youtubes__")
     youtube.define("youtube.com[\S]+")
 
+    weather = Event("__.weather__")
+    weather.define("\.weather")
+
     # add your defined events here
 #    self.events_list.append(joins)
 #    self.events_list.append(implying)
@@ -87,6 +90,7 @@ class Bot(threading.Thread):
     self.events_list.append(pimp)
     self.events_list.append(youtube)
     self.events_list.append(bofh)
+    self.events_list.append(weather)
 
     self.loaded_modules = list()
 

@@ -21,10 +21,6 @@ class Event:
 
   def notifySubscribers(self, line):
     self.line = line
-#    print "DEBUG: ",
-#    print self,
-#    print "is notifying subscribers",
-#    print self.subscribers
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
     l = line.split()
     for e in l:

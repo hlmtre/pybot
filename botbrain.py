@@ -124,13 +124,22 @@ class BotBrain:
   def say(self, channel, thing):
     self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
-  def _weather(self, channel, zipcode):
-    url = 'http://api.wunderground.com/api/1fe31b3b4cfdab66/conditions/lang:EN/q/'+zipcode+'.json'
-    response = urllib2.urlopen(url)
-    json_string = response.read()
-    parsed_json = json.loads(json_string)
-    self.say(channel, parsed_json['current_observation']['display_location']['city'] + ", " + parsed_json['current_observation']['display_location']['state'] + ": " + parsed_json['current_observation']['weather'] + ", " + parsed_json['current_observation']['feelslike_string'])
-    self.say(channel, "For complete info: http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query="+zipcode)
+  #def _weather(self, channel, zipcode):
+  #  try:
+  #    url = 'http://api.wunderground.com/api/1fe31b3b4cfdab66/conditions/lang:EN/q/'+zipcode+'.json'
+  #    try:
+  #      response = urllib2.urlopen(url)
+  #    # catch timeouts
+  #    except urllib2.HTTPError:
+  #      self.say(channel, "Wunderground appears down. Sorry")
+  #      return
+
+  #    json_string = response.read()
+  #    parsed_json = json.loads(json_string)
+  #    self.say(channel, parsed_json['current_observation']['display_location']['city'] + ", " + parsed_json['current_observation']['display_location']['state'] + ": " + parsed_json['current_observation']['weather'] + ", " + parsed_json['current_observation']['feelslike_string'])
+  #    self.say(channel, "For complete info: http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query="+zipcode)
+  #  except KeyError:
+  #    pass
 
   def _getyoutubetitle(self, line, channel):
     url = re.search("youtube.com[\S]+", line).group(0)
@@ -231,10 +240,10 @@ class BotBrain:
       self.say(channel, "http://pybot.zero9f9.com/img/")
     if message.startswith(".seen"):
       self._seen(message.split()[-1], channel)
-    if message.startswith(".weather"):
-      _z = message.split()
-      if _z[-1] != "":
-        self._weather(channel, _z[-1])
+   # if message.startswith(".weather"):
+   #   _z = message.split()
+   #   if _z[-1] != "":
+   #     self._weather(channel, _z[-1])
     if message.startswith(".ctof"):
       last = message.split()
       if last[-1] != "":
