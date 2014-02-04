@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.5.2
+# v0.5.3
 # works with python 2.6.x and 2.7.x
 #
 
@@ -35,6 +35,7 @@ class Bot(threading.Thread):
     self.brain = None
     self.network = network
     self.OFFLINE = False
+# now pulled from config manager
 #CHANNELINIT = ['#bots']
 #CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
     self.CONNECTED = False
@@ -44,7 +45,6 @@ class Bot(threading.Thread):
     self.db = db.DB()
 
     self.CHANNELINIT = conf.getChannels(self.network)
-    #self.network = conf.getNetwork()
 # this will be the socket
     self.s = None # each bot thread holds its own socket open to the network
     self.brain = botbrain.BotBrain(self.send) # if this is unclear: send is a function pointer, to allow the botbrain to send
@@ -82,9 +82,6 @@ class Bot(threading.Thread):
     weather.define("\.weather")
 
     # add your defined events here
-#    self.events_list.append(joins)
-#    self.events_list.append(implying)
-#    self.events_list.append(command)
     self.events_list.append(lastfm)
     self.events_list.append(dance)
     self.events_list.append(pimp)
@@ -132,10 +129,6 @@ class Bot(threading.Thread):
 
   def pong(self, response):
     self.send('PONG ' + response + '\n')
-    #date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
-    #l = logger.Logger()
-    #l.write("responding to PING at " + date + '\n')
-      
 
   def processline(self, line):
     if self.DEBUG:
@@ -149,33 +142,34 @@ class Bot(threading.Thread):
         if e.matches(line):
           e.notifySubscribers(line)
 
+  # don't bother going any further if it's a PING/PONG request
       if line.startswith("PING"):
         ping_response_line = line.split(":", 1)
         self.pong(ping_response_line[1])
 
+# very broken
 # current hackish solution for seen
-# this is SO INCREDIBLY WRONG AND GROSS
       else:
 # let's update the database because the events besides PRIVMSG never get past here
-        if line.split()[1] == "JOIN" or line.split()[1] ==  "QUIT" or line.split()[1] == "PART":
-      #   print line
-          if "PART" in line:
-            word = "PART"
-# strip username out of line, lstrip for stripping out :
-            self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
-          elif "JOIN" in line:
-            word = "JOIN"
-            self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), "immmmmma joinin", word)
-          else:
-            word = "QUIT"
-            self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
+       # if line.split()[1] == "JOIN" or line.split()[1] ==  "QUIT" or line.split()[1] == "PART":
+      ##   print line
+       #   if "PART" in line:
+       #     word = "PART"
+# strip# username out of line, lstrip for stripping out :
+       #     self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
+       #   elif "JOIN" in line:
+       #     word = "JOIN"
+       #     self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), "immmmmma joinin", word)
+       #   else:
+       #     word = "QUIT"
+       #     self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
 
 # if we get disconnected this should be true upon a reconnect attempt.. ideally
         if self.JOINED is False and message_number == "376": # wait until we receive end of MOTD before joining
           self.chan_list = self.conf.getChannels(self.network) 
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
-            print "JOIN "+c+" \n"
+            #print "JOIN "+c+" \n"
           self.JOINED = True
           #else:
           #  self.send('JOIN '+self.chan_list+' \n')
@@ -195,27 +189,20 @@ class Bot(threading.Thread):
           except IndexError:
             print "index out of range.", line
         
-        #p = Process(target=botbrain.respond, args=(s, usr, channel, message))
-        #p.start()
-        
     except Exception:
       print "Unexpected error:", sys.exc_info()[0]
       traceback.print_exc(file=sys.stdout)
+
       
   def worker(self):
     try:
-      if "minus22" in socket.gethostname() or "barge" in socket.gethostname():
-        self.HOST = self.network
-        self.NICK = 'ohai'
-      else:
-        self.HOST = self.network
-        self.NICK = self.conf.getNick(self.network)
+      self.HOST = self.network
+      self.NICK = self.conf.getNick(self.network)
     except:
       self.HOST = self.network
       self.NICK = 'localohai'
 
     # we have to cast it to an int, otherwise the connection fails silently and the entire process dies
-    #PORT = int(cm.getPort())
     self.PORT = int(self.conf.getPort(self.network))
     self.IDENT = 'mypy'
     self.REALNAME = 's1ash'
@@ -243,7 +230,7 @@ class Bot(threading.Thread):
     read = ""
     
     # infinite loop to keep parsing lines
-    while 1:
+    while True:
       try:
         time.sleep(1)
         if self.CONNECTED == False:
@@ -260,7 +247,8 @@ class Bot(threading.Thread):
             line = line.rstrip()
             self.processline(line)      
       except KeyboardInterrupt:
-        sys.exit(1)
+        print "keyboard interrupt caught"
+        raise
   # end worker
 
   def connect(self):
@@ -342,8 +330,3 @@ if __name__ == "__main__":
         b = bot.Bot(cm, net_list[0], DEBUG)
         b.start()
       
-
-# else: # since we don't have fork on windows
-#   p = Process(target=worker)
-#   p.start()
-#   print os.getpid()

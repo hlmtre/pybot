@@ -32,10 +32,6 @@ bf3players = {'tarehart': ('tarehart', '360'),
 def getbf3stats(message, platform):
 # global bf3players
   global api
-#   for k,v in bf3players.iteritems():
-#     if k in message:
-#       data = api.player(v[0], v[1], "clear,ranking")
-#       return formatbf3data(k, data)
 
   gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators
   command = message.split(None, 2)[1].strip()
@@ -124,6 +120,7 @@ class BotBrain:
   def say(self, channel, thing):
     self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
+  # now implemented as a module
   #def _weather(self, channel, zipcode):
   #  try:
   #    url = 'http://api.wunderground.com/api/1fe31b3b4cfdab66/conditions/lang:EN/q/'+zipcode+'.json'
@@ -141,28 +138,28 @@ class BotBrain:
   #  except KeyError:
   #    pass
 
-  def _getyoutubetitle(self, line, channel):
-    url = re.search("youtube.com[\S]+", line).group(0)
-    try:
-      if url:
-#     video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
-	get_dict = dict(parse_qsl(urlparse(url).query)) # create dictionary of strings, instead of of lists. this fails to handle if there are multiple values for a key in the GET
-	video_tag = get_dict['v']
-	if video_tag.__len__() > 1:
-	  response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
-	  xml_response = parseString(response)
-	  duration = xml_response.getElementsByTagName('yt:duration')
-	  ulength = duration[0].getAttribute("seconds")
-	  alength = ulength.encode('ascii', 'ignore')
-	  length = str(timedelta(seconds=int(alength)))
-	  titletag = xml_response.getElementsByTagName('title')[0]
-	  video_title = titletag.childNodes[0].nodeValue
-	  self.say(channel, "YouTube: "+video_title + " ("+length+")")
-	  yth[video_title] = line
-	else:
-	  print "error!"
-    except KeyError:
-      pass
+ # def _getyoutubetitle(self, line, channel):
+ #   url = re.search("youtube.com[\S]+", line).group(0)
+ #   try:
+ #     if url:
+##     video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
+ # get_dict = dict(parse_qsl(urlparse(url).query)) # create dictionary of strings, instead of of lists. this fails to handle if there are multiple values for a key in the GET
+ # video_tag = get_dict['v']
+ # if video_tag.__len__() > 1:
+ #   response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
+ #   xml_response = parseString(response)
+ #   duration = xml_response.getElementsByTagName('yt:duration')
+ #   ulength = duration[0].getAttribute("seconds")
+ #   alength = ulength.encode('ascii', 'ignore')
+ #   length = str(timedelta(seconds=int(alength)))
+ #   titletag = xml_response.getElementsByTagName('title')[0]
+ #   video_title = titletag.childNodes[0].nodeValue
+ #   self.say(channel, "YouTube: "+video_title + " ("+length+")")
+ #   yth[video_title] = line
+ # else:
+ #   print "error!"
+ #   except KeyError:
+ #     pass
 
 
   def _ctof(self, channel, c_temp):
@@ -214,8 +211,14 @@ class BotBrain:
 
   def _join(self, usr, message):
     if self._isAdmin(usr):
-      channel = message.split()[-1]
-      self.__bareSay("JOIN " + channel)
+      if len(message.split()) is 3:
+        channel = message.split()[1]
+        extraArg = message.split()[-1]
+        self.__bareSay("JOIN " + channel + " " + extraArg)
+      else:
+        channel = message.split()[-1] # second word (join #channel password)
+        self.__bareSay("JOIN " + channel)
+
 
   def __quit(self, usr):
     if self._isAdmin(usr):
@@ -254,10 +257,11 @@ class BotBrain:
         self._ftoc(channel, last[-1]) 
     if "ohai" in message and "hello" in message:
       self.say(channel, 'well hello to you too ' + usr)
+   # this is done in bot (with events) and modules/youtube.py
    # if "youtube.com" in message:
    #   self._getyoutubetitle(message, channel)
-    if message.startswith(">"):
-      pass
+   # if message.startswith(">"):
+   #   pass
       #self.implying(channel, usr)
     #if message.startswith("paint "):
     # self.paint(channel, message.split()[1])
@@ -300,17 +304,17 @@ class BotBrain:
     for line in arr:
       self.say(channel, line)
 
-  def implying(self, channel, usr):
-    kcount = self.kcount
-    if usr not in kcount:
-      kcount[usr] = 1
-    else:
-      kcount[usr] += 1
-    if kcount[usr] % 3 == 0:
-      self.say(channel, " " + usr + " >implying you're greentexting")
-      date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
-      l = logger.Logger()
-      l.write("user " + usr + " implying at " + date)
+ # def implying(self, channel, usr):
+ #   kcount = self.kcount
+ #   if usr not in kcount:
+ #     kcount[usr] = 1
+ #   else:
+ #     kcount[usr] += 1
+ #   if kcount[usr] % 3 == 0:
+ #     self.say(channel, " " + usr + " >implying you're greentexting")
+ #     date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
+ #     l = logger.Logger()
+ #     l.write("user " + usr + " implying at " + date)
 
 # utility function
   def __prettyDate(self,time):
