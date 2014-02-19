@@ -29,7 +29,11 @@ class Steam:
 
     if msg.startswith(".steam list"):
       for entry, key in self.bot.mem_store["steam"].items():
-        self.printer("PRIVMSG " +event.channel + " :" + entry + " -- " + key + "\n")
+        try:
+          self.printer("PRIVMSG " +event.channel + " :" + entry + " -- " + key + "\n")
+        except TypeError:
+          self.printer("PRIVMSG " +event.channel + " :" + entry.name + " -- " + key.name + "\n")
+          
       return
 
     if msg.startswith(".steam del"):
