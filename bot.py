@@ -15,13 +15,13 @@ import select
 import traceback
 import threading
 
-from multiprocessing import Process
+#from multiprocessing import Process
 import botbrain
 import logger
 import db
 import confman
 from event import Event
-from util import import_all
+#from util import import_all
 import db
 
 
@@ -43,6 +43,10 @@ class Bot(threading.Thread):
     self.conf = conf
     self.logger = logger.Logger()
     self.db = db.DB()
+
+    # arbitrary key/value store for modules
+    # they should be 'namespaced' like bot.mem_store.module_name
+    self.mem_store = dict()
 
     self.CHANNELINIT = conf.getChannels(self.network)
 # this will be the socket
@@ -81,6 +85,9 @@ class Bot(threading.Thread):
     weather = Event("__.weather__")
     weather.define("\.weather")
 
+    steam = Event("__.steam__")
+    steam.define("\.steam")
+
     # add your defined events here
     self.events_list.append(lastfm)
     self.events_list.append(dance)
@@ -88,6 +95,7 @@ class Bot(threading.Thread):
     self.events_list.append(youtube)
     self.events_list.append(bofh)
     self.events_list.append(weather)
+    self.events_list.append(steam)
 
     self.loaded_modules = list()
 
@@ -268,6 +276,8 @@ class Bot(threading.Thread):
 
     self.s.setblocking(1)
     
+  def debug_print(self):
+    print self.getName()
 
   def run(self):
     self.worker()
@@ -287,6 +297,7 @@ if __name__ == "__main__":
       DEBUG = True
   
   if os.name == "posix":
+    botslist = list()
     if not DEBUG:
       pid = os.fork()
       if pid == 0: # child
@@ -325,8 +336,13 @@ if __name__ == "__main__":
         for c in cm.getNetworks():
           b = bot.Bot(cm, net_list[i], DEBUG)
           b.start()
+          botslist.append(b)
           i += 1
       else:
         b = bot.Bot(cm, net_list[0], DEBUG)
         b.start()
-      
+        botslist.append(b)
+
+  for _bot in botslist:
+    b.join()
+    _b.debug_print()
