@@ -50,14 +50,13 @@ class Steam:
       try:
         user = steamapi.user.SteamUser(self.bot.mem_store["steam"][msg.split()[2]])
       except KeyError:
-        print "keyerror"
         self.printer("PRIVMSG " +event.channel + " :No entry for " + msg.split()[2] + "\n")
+        return
       except IndexError:
-        print "indexerror"
         self.printer("PRIVMSG " +event.channel + " :Need steam username to print friends for. " + "\n")
+        return
 
       self.bot.mem_store["steam"][user] = user.friends
-      #print self.bot.mem_store["steam"][user]
       counter = 0
       line = ""
       players = list()
