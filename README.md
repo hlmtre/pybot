@@ -17,3 +17,6 @@ Add a mysql user for pybot with permissions to update, insert, and delete from t
 Set his dbpass in the config file to the password you've given him. 
 Copy that config file to the home folder of whatever user will be running the bot.
 As that user, `./bot.py.`
+
+
+This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration.
