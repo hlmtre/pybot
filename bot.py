@@ -133,7 +133,7 @@ class Bot(threading.Thread):
     if self.OFFLINE:
       print message
     else:
-      self.s.send(message)
+      self.s.send(message.encode('utf-8'))
 
   def pong(self, response):
     self.send('PONG ' + response + '\n')
