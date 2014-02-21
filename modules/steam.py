@@ -21,7 +21,7 @@ class Steam:
 
     if msg.startswith(".steam set"):
       try: 
-        self.bot.mem_store["steam"][msg.split()[2]] = msg.split()[3]
+        self.bot.mem_store["steam"][msg.split()[2].lower()] = msg.split()[3]
         pickle.dump(self.bot.mem_store["steam"], open("steamdict.p","w+b"))
       except IndexError:
         self.printer("PRIVMSG " +event.channel + " :Error! Need username to save under and steam ID number. \n")
@@ -29,16 +29,19 @@ class Steam:
 
     if msg.startswith(".steam list"):
       for entry, key in self.bot.mem_store["steam"].items():
+        # this try/except should get cleaned up; be more specific with your datatypes!
         try:
           self.printer("PRIVMSG " +event.channel + " :" + entry + " -- " + key + "\n")
         except TypeError:
           self.printer("PRIVMSG " +event.channel + " :" + entry.name + " -- " + key.name + "\n")
+        except AttributeError:
+          self.printer("PRIVMSG " +event.channel + " :" + entry + " -- " + key.name + "\n")
           
       return
 
     if msg.startswith(".steam del"):
       try:
-        del self.bot.mem_store["steam"][msg.split()[2]]
+        del self.bot.mem_store["steam"][msg.split()[2].lower()]
         return
       except KeyError:
         self.printer("PRIVMSG " +event.channel + " :No entry for " + msg.split()[2] + "\n")
@@ -48,11 +51,12 @@ class Steam:
       self.printer("PRIVMSG " +event.channel + " :Set steam name to steamid with "  + "\n")
       self.printer("PRIVMSG " +event.channel + " :- .steam set <steamname> <steamid>"  + "\n")
       self.printer("PRIVMSG " +event.channel + " :Get friends with "  + "\n")
-      self.printer("PRIVMSG " +event.channel + " :- .steam <username> friends"  + "\n")
+      self.printer("PRIVMSG " +event.channel + " :- .steam friends <username>" + "\n")
+      return
       
     if msg.startswith(".steam friends"):
       try:
-        user = steamapi.user.SteamUser(self.bot.mem_store["steam"][msg.split()[2]])
+        user = steamapi.user.SteamUser(self.bot.mem_store["steam"][msg.split()[2].lower()])
       except KeyError:
         self.printer("PRIVMSG " +event.channel + " :No entry for " + msg.split()[2] + "\n")
         return
@@ -60,11 +64,11 @@ class Steam:
         self.printer("PRIVMSG " +event.channel + " :Need steam username to print friends for. " + "\n")
         return
 
-      self.bot.mem_store["steam"][user] = user.friends
+      self.bot.mem_store["steam"][user.name.lower()] = user.friends
       counter = 0
       line = ""
       players = list()
-      for su in self.bot.mem_store["steam"][user]:
+      for su in self.bot.mem_store["steam"][user.name.lower()]:
         if su.currently_playing is not None:
           players.append(su.name + " -- " + su.currently_playing.name)
           counter = counter + 1
@@ -72,6 +76,8 @@ class Steam:
         self.printer("PRIVMSG " +event.channel + " :No friends in game."  + "\n")
       elif counter > 0:
         self.printer("PRIVMSG " +event.channel + " :" + ", ".join(players) + "\n")
+
+      return
  
   def _importpickle(self):
     try:
