@@ -88,6 +88,9 @@ class Bot(threading.Thread):
     steam = Event("__.steam__")
     steam.define("\.steam")
 
+    part = Event("__.part__")
+    part.define("part")
+
     # add your defined events here
     self.events_list.append(lastfm)
     self.events_list.append(dance)
@@ -96,6 +99,7 @@ class Bot(threading.Thread):
     self.events_list.append(bofh)
     self.events_list.append(weather)
     self.events_list.append(steam)
+    self.events_list.append(part)
 
     self.loaded_modules = list()
 
