@@ -1,5 +1,7 @@
 pybot is a python irc bot. he is a project.
 
+he is modular, extensible, multi-threaded, and configurable.
+
 
 10-second TL;DR:
 ================
@@ -14,8 +16,8 @@ pybot requires mysqldb. It's probably in your package manager.
 Run the included mysql_dump file (as root, `mysql -p < mysql_dump`).
 Add a mysql user for pybot with permissions to update, insert, and delete from the created tables.
 
-Set his dbpass in the config file to the password you've given him. 
-Copy that config file to the home folder of whatever user will be running the bot.
+Set his dbpass in the config file (pybotrc) to the password you've given him. 
+Copy that config file to the home folder of whatever user will be running the bot. (~user/.pybotrc)
 As that user, `./bot.py.`
 
 
