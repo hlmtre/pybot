@@ -7,6 +7,7 @@ class Event:
     self.definition = ""
     self.channel = ""
     self.line = ""
+    self.msg = ""
     
   def subscribe(self, e):
     self.subscribers.append(e)
@@ -22,6 +23,7 @@ class Event:
   def notifySubscribers(self, line):
     self.line = line
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
+    self.msg = line.split(":",2)[2]
     l = line.split()
     for e in l:
       if e.startswith("#"):

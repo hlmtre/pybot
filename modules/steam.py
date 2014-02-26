@@ -35,7 +35,10 @@ class Steam:
         except TypeError:
           self.printer("PRIVMSG " +event.channel + " :" + entry.name + " -- " + key.name + "\n")
         except AttributeError:
-          self.printer("PRIVMSG " +event.channel + " :" + entry + " -- " + key.name + "\n")
+          try:
+            self.printer("PRIVMSG " +event.channel + " :" + entry + " -- " + key.name + "\n")
+          except AttributeError:
+            self.printer("PRIVMSG " +event.channel + " :" + entry.name + " -- " + key + "\n")
           
       return
 

@@ -91,6 +91,9 @@ class Bot(threading.Thread):
     part = Event("__.part__")
     part.define("part")
 
+    tell = Event("__privmsg__")
+    tell.define("PRIVMSG")
+
     # add your defined events here
     self.events_list.append(lastfm)
     self.events_list.append(dance)
@@ -100,6 +103,7 @@ class Bot(threading.Thread):
     self.events_list.append(weather)
     self.events_list.append(steam)
     self.events_list.append(part)
+    self.events_list.append(tell)
 
     self.loaded_modules = list()
 

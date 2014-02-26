@@ -28,6 +28,6 @@ class Weather:
         json_string = response.read()
         parsed_json = json.loads(json_string)
         self.printer("PRIVMSG " + event.channel + " :" + parsed_json['current_observation']['display_location']['city'] + ", " + parsed_json['current_observation']['display_location']['state'] + ": " + parsed_json['current_observation']['weather'] + ", " + parsed_json['current_observation']['feelslike_string'] + '\n')
-        self.printer("PRIVMSG " + event.channel + " :For complete info: http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query="+zipcode + '\n')
+        #self.printer("PRIVMSG " + event.channel + " :For complete info: http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query="+zipcode + '\n')
       except KeyError:
         pass
