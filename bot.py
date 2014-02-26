@@ -94,6 +94,9 @@ class Bot(threading.Thread):
     tell = Event("__privmsg__")
     tell.define("PRIVMSG")
 
+    unload = Event("__module__")
+    unload.define("\.module")
+
     # add your defined events here
     self.events_list.append(lastfm)
     self.events_list.append(dance)
@@ -104,6 +107,16 @@ class Bot(threading.Thread):
     self.events_list.append(steam)
     self.events_list.append(part)
     self.events_list.append(tell)
+    self.events_list.append(unload)
+
+    #self.loaded_modules = list()
+
+    self.load_modules()
+
+  # utility function for loading modules; can be called by modules themselves
+  def load_modules(self, specific=None):
+    nonspecific = False
+    found = False
 
     self.loaded_modules = list()
 
@@ -121,9 +134,16 @@ class Bot(threading.Thread):
     # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
-      if ext == '.py' and not name == '__init__': # ignore compiled python and __init__ files
-        f, filename, descr = imp.find_module(name, [modules_path])
-        mods[name] = imp.load_module(name, f, filename, descr)
+      if specific is None:
+        nonspecific = True
+        if ext == '.py' and not name == '__init__': # ignore compiled python and __init__ files
+          f, filename, descr = imp.find_module(name, [modules_path])
+          mods[name] = imp.load_module(name, f, filename, descr)
+      else:
+        if name == specific: # we're reloading only one module
+          f, filename, descr = imp.find_module(name, [modules_path])
+          mods[name] = imp.load_module(name, f, filename, descr)
+          found = True
 
     for k,v in mods.iteritems():
       for name in dir(v):
@@ -135,6 +155,10 @@ class Bot(threading.Thread):
               self.loaded_modules.append(a)
         except TypeError:
           pass
+
+    if nonspecific is True or found is True:
+      return 0
+    else: return 1
     # end magic.
     
   def send(self, message):

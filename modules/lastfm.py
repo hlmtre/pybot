@@ -9,8 +9,8 @@ class LastFM:
     self.interests = ['__.lastfm__']
     for event in events:
       if event._type in self.interests:
-        print "DEBUG: registering to ",
-        print event
+#        print "DEBUG: registering to ",
+#        print event
         event.subscribe(self)
 
   def handle(self, event):
