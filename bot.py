@@ -97,6 +97,9 @@ class Bot(threading.Thread):
     unload = Event("__module__")
     unload.define("\.module")
 
+    links = Event("__urls__")
+    links.define("https?://*")
+
     # add your defined events here
     self.events_list.append(lastfm)
     self.events_list.append(dance)
@@ -108,6 +111,7 @@ class Bot(threading.Thread):
     self.events_list.append(part)
     self.events_list.append(tell)
     self.events_list.append(unload)
+    self.events_list.append(links)
 
     #self.loaded_modules = list()
 

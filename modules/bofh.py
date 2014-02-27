@@ -1,5 +1,5 @@
 import urllib2
-class Example:
+class Bofh:
   def __init__(self, events=None, printer_handle=None, bot=None):
     self.events = events
     self.printer = printer_handle
@@ -15,6 +15,6 @@ class Example:
       text = response.read()
       bofhquote = text.splitlines()[2]
       self.printer("PRIVMSG " + event.channel + " :BOFH: " + bofhquote + '\n')
-    except TypeError:
+    except:
       pass
 
