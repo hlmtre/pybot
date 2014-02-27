@@ -30,6 +30,7 @@ class Module:
         for s in m.subscribers:
           if event.msg.split()[2].lower() == s.__class__.__name__.lower():
             self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
+            # the events themselves hold onto the subscribing modules, so just remove that one.
             m.subscribers.remove(s)
       return
 
