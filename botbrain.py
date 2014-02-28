@@ -198,16 +198,11 @@ class BotBrain:
     self.say(channel, "Yep, I'm on. Idiot.")
 
   def _help(self, user):
-    self.microphone('PRIVMSG ' + user + ' :' + "COMMANDS:\n")
     self.microphone('PRIVMSG ' + user + ' :' + ".bf3 [spm, kdr, wlr, stats],\n")
-    self.microphone('PRIVMSG ' + user + ' :' + ".rainbow,\n")
     self.microphone('PRIVMSG ' + user + ' :' + ".uptime,\n")
-    self.microphone('PRIVMSG ' + user + ' :' + ".weather [zip code],\n")
     self.microphone('PRIVMSG ' + user + ' :' + ".imgs,\n")
     self.microphone('PRIVMSG ' + user + ' :' + ".ctof [celsius],\n")
     self.microphone('PRIVMSG ' + user + ' :' + ".ftoc [fahrenheit],\n")
-    self.microphone('PRIVMSG ' + user + ' :' + "and this help message.\n")
-    self.microphone('PRIVMSG ' + user + ' :' + "More functionality to be added.\n")
 
   def _join(self, usr, message):
     if self._isAdmin(usr):

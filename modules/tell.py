@@ -11,6 +11,10 @@ class Tell:
     self.printer = printer_handle
     self.bot = bot
     self.interests = ['__privmsg__']
+
+    self.cmd = ".tell"
+    self.help = ".tell <nick> <thing to tell when they're back>"
+
     for event in events:
       if event._type in self.interests:
         event.subscribe(self)
@@ -27,6 +31,7 @@ class Tell:
 
         # add it to the list of things to tell people
         self.bot.mem_store["tell"].append(n)
+        self.printer("PRIVMSG " + event.channel + " :I'll let " + n.obj + " know when they're back. \n")
         
       else:
         if "tell" in self.bot.mem_store:

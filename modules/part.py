@@ -4,6 +4,10 @@ class Part:
     self.printer = printer_handle
     self.interests = ['__.part__']
     self.bot = bot
+
+    self.cmd = None
+    self.help = None
+
     for event in events:
       if event._type in self.interests:
         event.subscribe(self)

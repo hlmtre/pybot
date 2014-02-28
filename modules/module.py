@@ -4,6 +4,10 @@ class Module:
     self.printer = printer_handle
     self.bot = bot
     self.interests = ['__module__']
+
+    self.cmd = None
+    self.help = None
+
     for event in events:
       if event._type in self.interests:
         event.subscribe(self)

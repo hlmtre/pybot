@@ -117,6 +117,17 @@ class Bot(threading.Thread):
 
     self.load_modules()
 
+ #   self.queue_event(ready=True)
+
+ # def queue_event(self, event=None, ready=False):
+ #   if event is not None:
+ #     if "eventqueue" not in self.mem_store:
+ #       self.mem_store["eventqueue"] = list()
+ #     self.mem_store["eventqueue"].append(event)
+
+ #   if ready and "eventqueue" in self.mem_store:
+ #     self.events_list += self.mem_store["eventqueue"]
+
   # utility function for loading modules; can be called by modules themselves
   def load_modules(self, specific=None):
     nonspecific = False

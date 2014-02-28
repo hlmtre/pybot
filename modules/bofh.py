@@ -4,6 +4,10 @@ class Bofh:
     self.events = events
     self.printer = printer_handle
     self.interests = ['__.bofh__']
+    self.bot = bot
+
+    self.help = ".bofh"
+
     for event in events:
       if event._type in self.interests:
 	      event.subscribe(self)
@@ -17,4 +21,3 @@ class Bofh:
       self.printer("PRIVMSG " + event.channel + " :BOFH: " + bofhquote + '\n')
     except:
       pass
-

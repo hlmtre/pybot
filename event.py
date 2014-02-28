@@ -23,7 +23,12 @@ class Event:
   def notifySubscribers(self, line):
     self.line = line
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
-    self.msg = line.split(":",2)[2]
+    # we're on a function line - JOIN, PART, etc
+    try:
+      self.msg = line.split(":",2)[2]
+    except IndexError:
+      self.msg = ""
+
     l = line.split()
     for e in l:
       if e.startswith("#"):

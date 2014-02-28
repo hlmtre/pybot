@@ -3,6 +3,10 @@ class Example:
     self.events = events
     self.printer = printer_handle
     self.interests = ['__joins__']
+    self.bot = bot
+
+    self.help = None
+
     for event in events:
       if event._type in self.interests:
        # print "DEBUG: registering to ",

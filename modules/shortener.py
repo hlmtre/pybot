@@ -6,6 +6,10 @@ class Shortener:
     self.printer = printer_handle
     self.interests = ['__urls__']
     self.bot = bot
+
+    self.cmd = None
+    self.help = "url shortening utility function"
+
     for event in events:
       if event._type in self.interests:
        # print "DEBUG: registering to ",

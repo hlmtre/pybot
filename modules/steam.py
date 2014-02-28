@@ -8,6 +8,8 @@ class Steam:
     self.interests = ['__.steam__']
     self.bot = bot
     self.api_key = "4FE154D08A234F786A64D05E78B4280D"
+
+    self.cmd = ".steam set <username> <steamid>, .steam friends <username>"
     for event in events:
       if event._type in self.interests:
         event.subscribe(self)

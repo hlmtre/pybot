@@ -3,6 +3,10 @@ class Pimp:
     self.events = events
     self.printer = printer_handle
     self.interests = ['__pimp__']
+
+    self.cmd = ".pimp"
+    self.help = None
+
     for event in events:
       if event._type in self.interests:
         event.subscribe(self)

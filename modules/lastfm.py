@@ -6,7 +6,11 @@ class LastFM:
     self.bot_handle = bot
     self.events = events
     self.printer = printer_handle
+    self.bot = bot
     self.interests = ['__.lastfm__']
+
+    self.help = ".lastfm add <lastfm username>, .lastfm"
+
     for event in events:
       if event._type in self.interests:
 #        print "DEBUG: registering to ",
