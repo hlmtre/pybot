@@ -40,10 +40,10 @@ class LastFM:
           if "@attr" in j["recenttracks"]["track"][0]:
             if j["recenttracks"]["track"][0]["@attr"]["nowplaying"] == "true":
               output = j["recenttracks"]["track"][0]['artist']['#text'] + " - " + j["recenttracks"]["track"][0]['name'] 
-              self.printer("PRIVMSG " + event.channel + " :" + event.user + " is now playing: " + output.encode('utf-8') + '\n')
+              self.printer("PRIVMSG " + event.channel + " :" + event.user + " is now playing: " + output + '\n')
           else:
             output = j["recenttracks"]["track"][0]['artist']['#text'] + " - " + j["recenttracks"]["track"][0]['name'] 
-            self.printer("PRIVMSG " + event.channel + " :" + event.user + " recently played: " + output.encode('utf-8') + '\n')
+            self.printer("PRIVMSG " + event.channel + " :" + event.user + " recently played: " + output + '\n')
 
         except Exception, e:
           print e
