@@ -119,11 +119,9 @@ class Bot(threading.Thread):
     for e in self.events_list:
       if e.definition == event.definition and e._type == event._type:
         # if our event is already in the listing, don't add it again, just have our module subscribe
-        print "subscribing event"
         e.subscribe(module)
         return
 
-    print "adding to events list"
     self.events_list.append(event)
     return
 

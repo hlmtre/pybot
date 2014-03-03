@@ -13,6 +13,8 @@ class RedditInfo:
     self.interests = ['__reddit__']
     self.bot = bot
 
+    self.user_agent = 'pybot 0.5.4 by /u/hlmtre'
+
     self.help = None
 
     reddit = Event("__reddit__")
@@ -25,4 +27,22 @@ class RedditInfo:
   def handle(self, event):
     print "caught reddit"
     url = re.search("https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+", event.line).group(0)
-    print url
+    me = praw.Reddit(self.user_agent)
+    s = me.get_submission(url)
+    message = '[REDDIT] ' + s.title
+    if s.is_self:
+        message = message + ' (self.' + s.subreddit.display_name + ')'
+    else:
+        message = message + ' (' + s.url + ')' + ' to r/' + s.subreddit.display_name
+    if s.over_18:
+        message = message + ' 05[NSFW]'
+        #TODO implement per-channel settings db, and make this able to kick
+    if s.author:
+        author = s.author.name
+    else:
+        author = '[deleted]'
+    message = (message + ' | ' + str(s.ups - s.downs) + ' points (03'
+               + str(s.ups) + '|05' + str(s.downs) + ') | ' +
+               str(s.num_comments) + ' comments | Posted by ' + author)
+    #TODO add creation time with s.created
+    self.printer("PRIVMSG " + event.channel + " :" + message + "\n")
