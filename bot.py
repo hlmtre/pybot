@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.5.3
+# v0.5.4
 # works with python 2.6.x and 2.7.x
 #
 
@@ -35,9 +35,6 @@ class Bot(threading.Thread):
     self.brain = None
     self.network = network
     self.OFFLINE = False
-# now pulled from config manager
-#CHANNELINIT = ['#bots']
-#CHANNELINIT = ['#bots', '#bf3', '#hhorg', '#dayz', '#cslug']
     self.CONNECTED = False
     self.JOINED = False
     self.conf = conf
@@ -117,16 +114,18 @@ class Bot(threading.Thread):
 
     self.load_modules()
 
- #   self.queue_event(ready=True)
+  # conditionally subscribe to events list or add event to listing
+  def register_event(self, event, module):
+    for e in self.events_list:
+      if e.definition == event.definition and e._type == event._type:
+        # if our event is already in the listing, don't add it again, just have our module subscribe
+        print "subscribing event"
+        e.subscribe(module)
+        return
 
- # def queue_event(self, event=None, ready=False):
- #   if event is not None:
- #     if "eventqueue" not in self.mem_store:
- #       self.mem_store["eventqueue"] = list()
- #     self.mem_store["eventqueue"].append(event)
-
- #   if ready and "eventqueue" in self.mem_store:
- #     self.events_list += self.mem_store["eventqueue"]
+    print "adding to events list"
+    self.events_list.append(event)
+    return
 
   # utility function for loading modules; can be called by modules themselves
   def load_modules(self, specific=None):
