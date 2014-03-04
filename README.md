@@ -13,7 +13,7 @@ he is modular, extensible, multi-threaded, and configurable.
 Longer explanation:
 pybot requires mysqldb. It's probably in your package manager.
 
-Run the included mysql_dump file (as root, `mysql -p < mysql_dump`).
+Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
 Add a mysql user for pybot with permissions to update, insert, and delete from the created tables.
 
 Set his dbpass in the config file (pybotrc) to the password you've given him. 
