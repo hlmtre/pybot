@@ -12,6 +12,7 @@ he is modular, extensible, multi-threaded, and configurable.
 
 Longer explanation:
 pybot requires mysqldb. It's probably in your package manager.
+It _will_ run without it, it'll just throw lots of exceptions. SQLite integration and no-db (pickle) support are in the works.
 
 Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
 Add a mysql user for pybot with permissions to update, insert, and delete from the created tables.
