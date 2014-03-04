@@ -15,6 +15,7 @@ pybot requires mysqldb. It's probably in your package manager.
 
 Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
 Add a mysql user for pybot with permissions to update, insert, and delete from the created tables.
+Logged into mysql: `grant all on <dbname>.\* to '<username>' identified by '<password>';`
 
 Set his dbpass in the config file (pybotrc) to the password you've given him. 
 Copy that config file to the home folder of whatever user will be running the bot. (~user/.pybotrc)
