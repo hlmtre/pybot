@@ -48,7 +48,7 @@ class Bot(threading.Thread):
     self.CHANNELINIT = conf.getChannels(self.network)
 # this will be the socket
     self.s = None # each bot thread holds its own socket open to the network
-    self.brain = botbrain.BotBrain(self.send) # if this is unclear: send is a function pointer, to allow the botbrain to send
+    self.brain = botbrain.BotBrain(self.send, self) 
 
     self.events_list = list()
 

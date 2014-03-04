@@ -3,8 +3,16 @@ from datetime import datetime,timedelta
 class DB:
   age = datetime.now()
 
+  def __init__(self, bot=None):
+    self.bot = bot
+    
   def _open(self):
-    self.con = mdb.connect("localhost","pybot","1q2w3e4r","pybot")
+    if self.bot is not None:
+      password = self.bot.conf.getDBPass(self.bot.network)
+    else:
+      password = "1q2w3e4r"
+
+    self.con = mdb.connect("localhost","pybot",password,"pybot")
     self.cur = self.con.cursor()
   
   def _close(self):

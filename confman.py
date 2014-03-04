@@ -38,6 +38,9 @@ class ConfManager:
   def getDBPass(self, net):
     return self.parsed[net]["dbpass"]
 
+  def getDBName(self, net):
+    return self.parsed[net]["dbname"]
+
   def getNumChannels(self, net):
     return len(self.parsed[net]["channels"])
 

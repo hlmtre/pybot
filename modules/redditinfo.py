@@ -15,7 +15,7 @@ if successful_import is True:
       self.interests = ['__reddit__']
       self.bot = bot
 
-      self.user_agent = 'pybot 0.5.4 by /u/hlmtre'
+      self.user_agent = 'pybot 0.5.4 by /u/hlmtre; http://bits.zero9f9.com/pybot'
 
       self.help = None
 

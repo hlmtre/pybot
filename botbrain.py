@@ -13,14 +13,9 @@ from xml.dom.minidom import parseString
 import db
 from datetime import datetime, timedelta
 import sys
+import os
 
 api = bf3api.API(None, '360')
-yth = dict()
-db = db.DB()
-ww = webwriter.WebWriter()
-
-chanlist = []
-namelist = []
 
 bf3players = {'tarehart': ('tarehart', '360'),
               #'hlmtre': ('hellmitre', '360'),
@@ -76,43 +71,32 @@ def getbf3last(message):
 class BotBrain:
   BRAINDEBUG = False
   
-  def __init__(self, microphone):             
-#  store kcount of >implying
-    self.kcount = defaultdict(int)
+  def __init__(self, microphone, bot=None):             
 # get time for uptime start
     self.starttime = time.time()
 # get time for current length of uptime
     self.localtime = time.localtime()
-    
 # get handle on output
+
     self.microphone = microphone
+    self.bot = bot
+    yth = dict()
+    self.db = db.DB(self.bot)
+    self.ww = webwriter.WebWriter()
 
   def _isAdmin(self, username):
-    if db._isAdmin(username):
+    if self.db._isAdmin(username):
       return True
     return False
 
   def getMicrophone(self):
     return self.microphone
 
-  def _seen(self, user, channel):
-    answer = db.getSeen(user)
-    if answer != "None" and answer != "" and answer != None:
-      if answer[3] ==  "JOIN":
-        word = "joining"
-      elif answer[3] == "PART":
-        word = "parting"
-      else:
-        word = "quitting"
-      self.say(channel, user + " was last seen " + word + " channel saying \"" + answer[2] + "\" " + self.__prettyDate(answer[1]))
-    else:
-      self.say(channel, user + " not seen exiting.")
-
   def _updateSeen(self, user, statement, event):
-    db.updateSeen(user, statement, event)
+    self.db.updateSeen(user, statement, event)
   
   def _insertImg(self, user, url):
-    db._insertImg(user, url)
+    self.db._insertImg(user, url)
 
   def __bareSay(self, thing):
     self.microphone(thing + '\n')
@@ -122,45 +106,9 @@ class BotBrain:
 
   # now implemented as a module
   #def _weather(self, channel, zipcode):
-  #  try:
-  #    url = 'http://api.wunderground.com/api/1fe31b3b4cfdab66/conditions/lang:EN/q/'+zipcode+'.json'
-  #    try:
-  #      response = urllib2.urlopen(url)
-  #    # catch timeouts
-  #    except urllib2.HTTPError:
-  #      self.say(channel, "Wunderground appears down. Sorry")
-  #      return
 
-  #    json_string = response.read()
-  #    parsed_json = json.loads(json_string)
-  #    self.say(channel, parsed_json['current_observation']['display_location']['city'] + ", " + parsed_json['current_observation']['display_location']['state'] + ": " + parsed_json['current_observation']['weather'] + ", " + parsed_json['current_observation']['feelslike_string'])
-  #    self.say(channel, "For complete info: http://www.wunderground.com/cgi-bin/findweather/hdfForecast?query="+zipcode)
-  #  except KeyError:
-  #    pass
-
+  # now implemented as a module
  # def _getyoutubetitle(self, line, channel):
- #   url = re.search("youtube.com[\S]+", line).group(0)
- #   try:
- #     if url:
-##     video_tag = urlparse.urlparse(url).query.split("=")[1].split("&")[0]
- # get_dict = dict(parse_qsl(urlparse(url).query)) # create dictionary of strings, instead of of lists. this fails to handle if there are multiple values for a key in the GET
- # video_tag = get_dict['v']
- # if video_tag.__len__() > 1:
- #   response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
- #   xml_response = parseString(response)
- #   duration = xml_response.getElementsByTagName('yt:duration')
- #   ulength = duration[0].getAttribute("seconds")
- #   alength = ulength.encode('ascii', 'ignore')
- #   length = str(timedelta(seconds=int(alength)))
- #   titletag = xml_response.getElementsByTagName('title')[0]
- #   video_title = titletag.childNodes[0].nodeValue
- #   self.say(channel, "YouTube: "+video_title + " ("+length+")")
- #   yth[video_title] = line
- # else:
- #   print "error!"
- #   except KeyError:
- #     pass
-
 
   def _ctof(self, channel, c_temp):
     c = float(c_temp)
@@ -171,18 +119,6 @@ class BotBrain:
     f = float(f_temp)
     c = (f - 32)*(.5555)
     self.say(channel, str(c) + "* C")
-
-  def _ythistory(self, channel):
-    global yth
-    i = 0 
-    for entry in yth:
-      i+=1
-      if i > 5:
-        break
-      else:
-        self.say(channel,yth[entry] + " - " + entry)
-        if len(yth) > 10:
-          yth.clear()
 
   def _uptime(self, channel):
     self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
@@ -234,14 +170,14 @@ class BotBrain:
     if message.startswith("quit"):
       self.__quit(usr)
     if message.startswith(".imgs"):
-      ww._generate()
-      self.say(channel, "http://pybot.zero9f9.com/img/")
+      self.ww._generate(self.db._getImgs())
+      # hackish TODO
+      if os.getenv('USER') == 'pybot':
+        self.say(channel, "http://pybot.zero9f9.com/img/")
+      else:
+        self.say(channel, "http://zero9f9.com/~"+os.getenv('USER')+"/img/")
     if message.startswith(".seen"):
       self._seen(message.split()[-1], channel)
-   # if message.startswith(".weather"):
-   #   _z = message.split()
-   #   if _z[-1] != "":
-   #     self._weather(channel, _z[-1])
     if message.startswith(".ctof"):
       last = message.split()
       if last[-1] != "":
@@ -250,21 +186,6 @@ class BotBrain:
       last = message.split()
       if last[-1] != "":
         self._ftoc(channel, last[-1]) 
-    if "ohai" in message and "hello" in message:
-      self.say(channel, 'well hello to you too ' + usr)
-   # this is done in bot (with events) and modules/youtube.py
-   # if "youtube.com" in message:
-   #   self._getyoutubetitle(message, channel)
-   # if message.startswith(">"):
-   #   pass
-      #self.implying(channel, usr)
-    #if message.startswith("paint "):
-    # self.paint(channel, message.split()[1])
-    #if message.startswith(".yth"):
-      #self._ythistory(channel)
-#    if message.startswith(".rainbow"):
-#      self.say(channel, ascii.rainbow())
-    #if "bf3" in message and "stats" in message:
     if message.startswith(".help"):
       self._help(usr)     
     if message.startswith(".bf3pc"):
@@ -293,23 +214,6 @@ class BotBrain:
       chnl = tmp[1]
       msg = tmp[2]
       self._speak(usr, chnl, msg)
-    
-  def paint(self, channel, url):
-    arr = ascii.asciify(url)
-    for line in arr:
-      self.say(channel, line)
-
- # def implying(self, channel, usr):
- #   kcount = self.kcount
- #   if usr not in kcount:
- #     kcount[usr] = 1
- #   else:
- #     kcount[usr] += 1
- #   if kcount[usr] % 3 == 0:
- #     self.say(channel, " " + usr + " >implying you're greentexting")
- #     date = str(time.strftime("%Y-%m-%d %H:%M:%S"))
- #     l = logger.Logger()
- #     l.write("user " + usr + " implying at " + date)
 
 # utility function
   def __prettyDate(self,time):
