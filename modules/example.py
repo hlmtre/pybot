@@ -1,3 +1,4 @@
+from event import Event
 class Example:
   def __init__(self, events=None, printer_handle=None, bot=None):
     self.events = events
@@ -5,12 +6,19 @@ class Example:
     self.interests = ['__joins__']
     self.bot = bot
 
+
+    custom = Event("__cusom__")
+    custom.define("some_regex_here")
+    custom.subscribe(self)
+
+    # register ourself to our new custom event
+    self.bot.register_event(custom, self)
+
     self.help = None
 
+    # register ourself for any events that we're interested in that exist already
     for event in events:
       if event._type in self.interests:
-       # print "DEBUG: registering to ",
-       # print event
         event.subscribe(self)
 
   def handle(self, event):

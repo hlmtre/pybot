@@ -175,8 +175,11 @@ class Bot(threading.Thread):
     
   def send(self, message):
     if self.OFFLINE:
-      print message
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
     else:
+      if self.DEBUG is True:
+        print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
+
       self.s.send(message.encode('utf-8'))
 
   def pong(self, response):
@@ -247,12 +250,8 @@ class Bot(threading.Thread):
 
       
   def worker(self):
-    try:
-      self.HOST = self.network
-      self.NICK = self.conf.getNick(self.network)
-    except:
-      self.HOST = self.network
-      self.NICK = 'localohai'
+    self.HOST = self.network
+    self.NICK = self.conf.getNick(self.network)
 
     # we have to cast it to an int, otherwise the connection fails silently and the entire process dies
     self.PORT = int(self.conf.getPort(self.network))
@@ -264,18 +263,13 @@ class Bot(threading.Thread):
     # connect to server
     self.s = socket.socket()
     while self.CONNECTED == False:
-      try:
-        self.s.connect((self.HOST, self.PORT)) # force them into one argument
-        self.CONNECTED = True
-      except Exception, e:
-        self.CONNECTED = False
-      try:
-        self.s.send('NICK '+self.NICK+'\n')
-        self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
-        time.sleep(3) # allow services to catch up
-        self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
-      except Exception, e:
-        self.CONNECTED = False
+      self.s.connect((self.HOST, self.PORT)) # force them into one argument
+      self.CONNECTED = True
+
+      self.s.send('NICK '+self.NICK+'\n')
+      self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
+      time.sleep(3) # allow services to catch up
+      self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
 
     self.s.setblocking(1)
     
