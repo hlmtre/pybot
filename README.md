@@ -22,4 +22,4 @@ Copy that config file to the home folder of whatever user will be running the bo
 As that user, `./bot.py.`
 
 
-This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration.
+This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration, and [PRAW (python reddit API wrapper)](https://praw.readthedocs.org/en/latest/) for the redditinfo module.
