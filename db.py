@@ -8,13 +8,15 @@ class DB:
     
   def _open(self):
     if self.bot is not None:
+      dbusername = self.bot.conf.getDBUsername(self.bot.network)
       password = self.bot.conf.getDBPass(self.bot.network)
       dbname = self.bot.conf.getDBName(self.bot.network)
     else:
+      dbusername = "pybot"
       password = "1q2w3e4r"
       dbname = "pybot"
 
-    self.con = mdb.connect("localhost","pybot",password,dbname)
+    self.con = mdb.connect("localhost",dbusername,password,dbname)
     self.cur = self.con.cursor()
   
   def _close(self):
