@@ -7,8 +7,9 @@ he is modular, extensible, multi-threaded, and configurable.
 ================
 
 1. modify pybotrc with your channels and passwords.
-2. `./bot.py pybotrc`
-3. rejoice.
+2. Run ./setup.sh. It will check for dependencies and create a mysql_init file.
+3. `./bot.py pybotrc`
+4. rejoice.
 
 Longer explanation:
 pybot requires mysqldb. It's probably in your package manager.
