@@ -15,10 +15,16 @@ Longer explanation:
 pybot requires mysqldb. It's probably in your package manager.
 It _will_ run without it, it'll just throw lots of exceptions. SQLite integration and no-db (pickle) support are in the works.
 
+Automagic
+---------
 Run `./setup.sh` and follow the prompts. It will create a mysql_init file, which you can then run against mysql with `mysql -p < mysql_init`. This will create your database and add a user with full privileges on that database. Your bot will run as this user.
 Put that information into the pybotrc.
+If you do not run `./setup.sh` you will have to perform the step below.
 
 Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
+
+Manual
+------
 Add a mysql user for pybot with permissions to update, insert, and delete from the created tables.
 Logged into mysql: `grant all on <dbname>.* to '<username>' identified by '<password>';`
 
