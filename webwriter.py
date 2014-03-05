@@ -8,7 +8,7 @@ class WebWriter:
       return
 
     if not os.path.exists(os.path.expanduser(self.path)):
-      os.mkdirs(os.path.expanduser(self.path))
+      os.makedirs(os.path.expanduser(self.path))
 
     with open(os.path.expanduser('~/public_html/img/index.html'),'w+') as f:
       f.write("<html><body>\n")
