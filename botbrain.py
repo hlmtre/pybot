@@ -95,8 +95,8 @@ class BotBrain:
   def _updateSeen(self, user, statement, event):
     self.db.updateSeen(user, statement, event)
   
-  def _insertImg(self, user, url):
-    self.db._insertImg(user, url)
+  def _insertImg(self, user, url, channel):
+    self.db._insertImg(user, url, channel)
 
   def __bareSay(self, thing):
     self.microphone(thing + '\n')
@@ -163,7 +163,7 @@ class BotBrain:
     if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message) or ("imgur.com" in message and "gallery" in message):
      url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
      if url:
-       self._insertImg(usr, url)
+       self._insertImg(usr, url, channel)
 # this bit is
     if message.startswith("join"):
       self._join(usr, message)

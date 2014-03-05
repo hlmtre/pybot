@@ -34,7 +34,7 @@ if successful_import is True:
       if s.is_self:
           message = message + ' (self.' + s.subreddit.display_name + ')'
       else:
-          message = message + ' (' + s.url + ')' + ' to r/' + s.subreddit.display_name
+          message = message + ' to r/' + s.subreddit.display_name
       if s.over_18:
           message = message + ' 05[NSFW]'
           #TODO implement per-channel settings db, and make this able to kick
@@ -43,7 +43,6 @@ if successful_import is True:
       else:
           author = '[deleted]'
       message = (message + ' | ' + str(s.ups - s.downs) + ' points (03'
-                 + str(s.ups) + '|05' + str(s.downs) + ') | ' +
-                 str(s.num_comments) + ' comments | Posted by ' + author)
+                 + str(s.ups) + '|05' + str(s.downs) + ') | ' + author)
       #TODO add creation time with s.created
       self.printer("PRIVMSG " + event.channel + " :" + message + "\n")

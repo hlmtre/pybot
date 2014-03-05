@@ -97,12 +97,12 @@ class DB:
       self._close()
       return None 
 
-  def _insertImg(self, user, url):
+  def _insertImg(self, user, url, channel):
     self._open()
     if user == "" or user == None:
       user = "nobody"
     try:
-      self.cur.execute("""INSERT INTO img (user, url) VALUES (%s, %s)""", (user, url))
+      self.cur.execute("""INSERT INTO img (user, url, channel) VALUES (%s, %s, %s)""", (user, url, channel))
       self.con.commit()
     except:
       self.con.rollback()
