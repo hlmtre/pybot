@@ -5,6 +5,7 @@ class Event:
     self.subscribers = list() # this is a list of subscribers to notify
     self.user = ""
     self.definition = ""
+    self.msg_definition = ""
     self.channel = ""
     self.line = ""
     self.msg = ""
@@ -12,12 +13,26 @@ class Event:
   def subscribe(self, e):
     self.subscribers.append(e)
 
-  def define(self, string):
-    self.definition = string
+  def define(self, definition=None, msg_definition=None):
+    if definition is not None:
+      self.definition = definition
+    if msg_definition is not None:
+      self.msg_definition = msg_definition
 
   def matches(self, line):
-    if re.search(self.definition, line):
-      return True
+    try:
+      msg = line.split(":",2)[2]
+    except IndexError:
+      msg = ""
+
+    if len(self.msg_definition) > 0:
+      if re.search(self.msg_definition, msg):
+        return True
+
+    if len(self.definition) > 0:
+      if re.search(self.definition, line):
+        return True
+
     return False
 
   def notifySubscribers(self, line):

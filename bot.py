@@ -97,6 +97,10 @@ class Bot(threading.Thread):
     links = Event("__urls__")
     links.define("https?://*")
 
+  # example
+  #  test = Event("__test__")
+  #  test.define(msg_definition="^\.test")
+
     # add your defined events here
     self.events_list.append(lastfm)
     self.events_list.append(dance)
@@ -109,6 +113,8 @@ class Bot(threading.Thread):
     self.events_list.append(tell)
     self.events_list.append(unload)
     self.events_list.append(links)
+  # example
+  #  self.events_list.append(test)
 
     #self.loaded_modules = list()
 
