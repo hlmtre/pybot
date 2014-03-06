@@ -4,11 +4,11 @@
     "#bots" 
     ], 
     "port":"6667",
-    "nick": "testohai", 
-    "ircpass": "password",
-    "owner": "hlmtre",
+    "nick": "pybonk", 
+    "ircpass": "",
+    "owner": "BoneKin",
     "dbusername": "pybot",
-    "dbpass": "password",
+    "dbpass": "1q2w3e4r",
     "dbname": "pybot"
   }
 }
