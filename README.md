@@ -20,14 +20,14 @@ Automagic
 Run `./setup.sh` and follow the prompts. It will create a mysql_init file, which you can then run against mysql with `mysql -p < mysql_init`. This will create your database and add a user with full privileges on that database. Your bot will run as this user.
 Put that information into the pybotrc.
 If you do not run `./setup.sh` you will have to perform the step below.
-
-Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
-
+___
 Manual
 ------
 Add a mysql user for pybot with permissions to update, insert, and delete from the created tables.
 Logged into mysql: `grant all on <dbname>.* to '<username>' identified by '<password>';`
+___
 
+Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
 Set his dbpass in the config file (pybotrc) to the password you've given him. 
 Copy that config file to the home folder of whatever user will be running the bot. (~user/.pybotrc)
 As that user, `./bot.py.`
