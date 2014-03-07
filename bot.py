@@ -15,22 +15,24 @@ import select
 import traceback
 import threading
 
-#from multiprocessing import Process
 import botbrain
-import logger
+from logger import Logger
 import db
 import confman
 from event import Event
-#from util import import_all
 import db
 
-
 DEBUG = False
-
 
 class Bot(threading.Thread):
   def __init__(self, conf, network, d):
     threading.Thread.__init__(self)
+
+    self.logger = Logger()
+
+    self.logger.write(Logger.INFO, "\n")
+    self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()))
+
     self.DEBUG = d
     self.brain = None
     self.network = network
@@ -38,7 +40,6 @@ class Bot(threading.Thread):
     self.CONNECTED = False
     self.JOINED = False
     self.conf = conf
-    self.logger = logger.Logger()
     self.db = db.DB()
 
     # arbitrary key/value store for modules
@@ -104,6 +105,7 @@ class Bot(threading.Thread):
   #  test.define(msg_definition="^\.test")
 
     # add your defined events here
+    # tell your friends
     self.events_list.append(lastfm)
     self.events_list.append(dance)
     self.events_list.append(pimp)
@@ -119,9 +121,8 @@ class Bot(threading.Thread):
   # example
   #  self.events_list.append(test)
 
-    #self.loaded_modules = list()
-
     self.load_modules()
+    self.logger.write(Logger.INFO, "bot initialized.")
 
   # conditionally subscribe to events list or add event to listing
   def register_event(self, event, module):
@@ -160,6 +161,7 @@ class Bot(threading.Thread):
         if ext == '.py' and not name == '__init__': # ignore compiled python and __init__ files
           f, filename, descr = imp.find_module(name, [modules_path])
           mods[name] = imp.load_module(name, f, filename, descr)
+          self.logger.write(Logger.INFO, " loaded " + name)
       else:
         if name == specific: # we're reloading only one module
           f, filename, descr = imp.find_module(name, [modules_path])
@@ -187,6 +189,8 @@ class Bot(threading.Thread):
       print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
     else:
       if self.DEBUG is True:
+        self.logger(Logger.INFO, "\n DEBUGGING OUTPUT")
+        self.logger(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8'))
         print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
 
       self.s.send(message.encode('utf-8'))
@@ -211,22 +215,8 @@ class Bot(threading.Thread):
         ping_response_line = line.split(":", 1)
         self.pong(ping_response_line[1])
 
-# very broken
-# current hackish solution for seen
+      # pings we respond to directly. everything else...
       else:
-# let's update the database because the events besides PRIVMSG never get past here
-       # if line.split()[1] == "JOIN" or line.split()[1] ==  "QUIT" or line.split()[1] == "PART":
-      ##   print line
-       #   if "PART" in line:
-       #     word = "PART"
-# strip# username out of line, lstrip for stripping out :
-       #     self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
-       #   elif "JOIN" in line:
-       #     word = "JOIN"
-       #     self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), "immmmmma joinin", word)
-       #   else:
-       #     word = "QUIT"
-       #     self.brain._updateSeen(line.split("!",1)[0].lstrip(":"), line.rsplit(":",1)[-1], word)
 
 # if we get disconnected this should be true upon a reconnect attempt.. ideally
         if self.JOINED is False and message_number == "376": # wait until we receive end of MOTD before joining
@@ -235,9 +225,6 @@ class Bot(threading.Thread):
             self.send('JOIN '+c+' \n')
             #print "JOIN "+c+" \n"
           self.JOINED = True
-          #else:
-          #  self.send('JOIN '+self.chan_list+' \n')
-          #  self.CONNECTED = True
         
         line_array = line.split()
         user_and_mask = line_array[0][1:]
@@ -334,10 +321,6 @@ class Bot(threading.Thread):
 
 if __name__ == "__main__":
   import bot
-  #if DEBUG:
-  # worker() # run in foreground for debugging
-  #
-  #else:
   DEBUG = False
   for i in sys.argv:
     if i == "-d":
@@ -392,4 +375,3 @@ if __name__ == "__main__":
 
   for _bot in botslist:
     b.join()
-    _b.debug_print()
