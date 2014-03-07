@@ -24,12 +24,19 @@ class Forecast:
         key = "AIzaSyA95TSuDZMUySAeijsNuIiqX7cJFbXKUSw" 
         parameters = {'address': address, 'sensor': 'false', 'key': key}
         try:
-            geocode = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=parameters).json()
-        except:
-            return None 
-        latitude = geocode['results'][0]['geometry']['location']['lat']
-        longitude = geocode['results'][0]['geometry']['location']['lng']
-        location_name = geocode['results'][0]['formatted_address']
+            raw = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=parameters)
+            raw.raise_for_status()
+            geocode = raw.json()
+        except ValueError:
+            return ['Error: Cannot form json object']
+        except requests.exceptions.HTTPError:
+            return ['Trouble retrieving data from Google API']
+        try:
+            latitude = geocode['results'][0]['geometry']['location']['lat']
+            longitude = geocode['results'][0]['geometry']['location']['lng']
+            location_name = geocode['results'][0]['formatted_address']
+        except (IndexError, KeyError):
+            return ['Location not found']
         return [location_name, str(latitude), str(longitude)]
 
     def get_forecast(self, latitude="", longitude=""):
@@ -78,11 +85,12 @@ class Forecast:
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
         if _z[1] != '':
-            #cur = _z[-1]
+            cur = ''
             loc = self.get_location(_z[1])
-            cur = self.current(self.get_forecast(loc[1], loc[2])['currently'])
+            if len(loc) == 3:
+                cur = ': ' + self.current(self.get_forecast(loc[1], loc[2])['currently'])
             try:
-                self.printer("PRIVMSG " + event.channel + ' :' + loc[0] + ': ' +  cur + '\n')
+                self.printer("PRIVMSG " + event.channel + ' :' + loc[0] + cur + '\n')
             except TypeError:
                 print "DEBUG: TypeError: ",
                 print event.channel,
