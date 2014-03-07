@@ -17,7 +17,7 @@ class Forecast:
                 event.subscribe(self)
 
     def get_location(self, location_search):
-        """Returns a list of 3 items. A formatted location, a its latitude, and its longitude"""
+        """Returns a list of 3 strings. A formatted location, its latitude, and its longitude"""
         if location_search == '':
             return None
         address = location_search.replace(' ', '+')
@@ -57,7 +57,9 @@ class Forecast:
         conditions = ''
         if current_data == {}:
             return "No data on current weather conditions."
-        conditions += str(round(current_data['temperature'])) + u'\u00B0.'
+        #Add the data on current temperature. We round the data, cast as int, add into the string
+        conditions += str(int(round(current_data['temperature']))) + u'\u00B0.'
+        #Add data on cloud cover. Should alway be available. Descriptions taken from forecast.io api docs
         if current_data['cloudCover'] >= 0 and current_data['cloudCover'] < 0.4:
             conditions += " Clear skies."
         elif current_data['cloudCover'] >= 0.4 and current_data['cloudCover'] < 0.75:
@@ -67,6 +69,7 @@ class Forecast:
         else:
             conditions += " Overcast."
 
+        #If there is any precipitation data, get the intensity and type of precipitation added into the description
         try:
             if current_data['precipIntensity'] > 0:
                 if current_data['precipIntensity'] > 0 and current_data['precipIntensity'] <= 0.017:
@@ -87,7 +90,7 @@ class Forecast:
         if _z[1] != '':
             cur = ''
             loc = self.get_location(_z[1])
-            if len(loc) == 3:
+            if len(loc) == 3: #if there are 3 items, valid data retrieved. if not, it didn't work
                 cur = ': ' + self.current(self.get_forecast(loc[1], loc[2])['currently'])
             try:
                 self.printer("PRIVMSG " + event.channel + ' :' + loc[0] + cur + '\n')
