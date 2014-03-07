@@ -97,6 +97,8 @@ class Bot(threading.Thread):
     links = Event("__urls__")
     links.define("https?://*")
 
+    forecast = Event("__.forecast__")
+    forecast.define("\.forecast")
   # example
   #  test = Event("__test__")
   #  test.define(msg_definition="^\.test")
@@ -113,6 +115,7 @@ class Bot(threading.Thread):
     self.events_list.append(tell)
     self.events_list.append(unload)
     self.events_list.append(links)
+    self.events_list.append(forecast)
   # example
   #  self.events_list.append(test)
 
