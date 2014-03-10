@@ -1,3 +1,4 @@
+from logger import Logger
 class Module:
   def __init__(self, events=None, printer_handle=None, bot=None):
     self.events = events
@@ -17,11 +18,14 @@ class Module:
       return
 
     if event.msg.startswith(".module load"):
+      self.bot.logger.write(Logger.INFO, " loading " + event.msg.split()[2] + "...")
       retval = self.load(event.msg.split()[2])
       if retval == 0:
-        self.printer("NOTICE " + event.channel + " :loaded " + event.msg.split()[2] + '\n')
+        self.bot.logger.write(Logger.INFO, " loaded " + event.msg.split()[2])
+        self.bot.brain.notice(event.channel, "loaded " + event.msg.split()[2])
       else:
-        self.printer("NOTICE " + event.channel + " :failed to load " + event.msg.split()[2] + '\n')
+        self.bot.logger.write(Logger.WARNING, " failed to load " + event.msg.split()[2])
+        self.bot.brain.notice(event.channel, "failed to load " + event.msg.split()[2])
 
     if event.msg.startswith(".module list"):
       for m in self.bot.events_list:

@@ -104,6 +104,9 @@ class BotBrain:
   def say(self, channel, thing):
     self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
 
+  def notice(self, channel, thing):
+    self.microphone('NOTICE ' + channel + ' :' + str(thing) + '\n')
+
   # now implemented as a module
   #def _weather(self, channel, zipcode):
 

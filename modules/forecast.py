@@ -21,7 +21,8 @@ class Forecast:
         if location_search == '':
             return None
         address = location_search.replace(' ', '+')
-        key = "AIzaSyA95TSuDZMUySAeijsNuIiqX7cJFbXKUSw" 
+        key = 'AIzaSyBr4KECytQxPN8PDZhWczIvyK7voqjdN3c'
+        #key = "AIzaSyA95TSuDZMUySAeijsNuIiqX7cJFbXKUSw" 
         parameters = {'address': address, 'sensor': 'false', 'key': key}
         try:
             raw = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=parameters)
@@ -35,7 +36,7 @@ class Forecast:
             latitude = geocode['results'][0]['geometry']['location']['lat']
             longitude = geocode['results'][0]['geometry']['location']['lng']
             location_name = geocode['results'][0]['formatted_address']
-        except (IndexError, KeyError):
+        except (IndexError, KeyError), e:
             return ['Location not found']
         return [location_name, str(latitude), str(longitude)]
 

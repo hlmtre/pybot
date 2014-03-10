@@ -1,5 +1,11 @@
+import datetime
+import time
+import inspect
+import sys
 class Logger:
-	def write(self, line):
-		self.line = line
-		f = open('logfile.txt', "a")
-		f.write(self.line)
+  CRITICAL, WARNING, INFO = range(3)
+  levels = ['CRITICAL', 'WARNING', 'INFO']
+
+  def write(self, level, line):
+    f = open('pylog-'+str(time.strftime("%d-%m-%Y"))+'.log', "a")
+    f.write(str(datetime.datetime.now())+ " (" + inspect.stack()[1][3] + ") " + str(Logger.levels[level]) + ": " + line + '\n')
