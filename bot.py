@@ -99,7 +99,8 @@ class Bot(threading.Thread):
     links.define("https?://*")
 
     forecast = Event("__.forecast__")
-    forecast.define("\.forecast")
+    forecast.define(msg_definition="^\.forecast")
+
   # example
   #  test = Event("__test__")
   #  test.define(msg_definition="^\.test")
@@ -164,9 +165,10 @@ class Bot(threading.Thread):
           self.logger.write(Logger.INFO, " loaded " + name)
       else:
         if name == specific: # we're reloading only one module
-          f, filename, descr = imp.find_module(name, [modules_path])
-          mods[name] = imp.load_module(name, f, filename, descr)
-          found = True
+          if ext != '.pyc': # ignore compiled 
+            f, filename, descr = imp.find_module(name, [modules_path])
+            mods[name] = imp.load_module(name, f, filename, descr)
+            found = True
 
     for k,v in mods.iteritems():
       for name in dir(v):
