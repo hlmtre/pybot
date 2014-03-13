@@ -9,12 +9,12 @@ class Forecast:
         self.interests = ['__.forecast__']
         self.bot = bot
 
-        self.help = ".forecast <location>" 
+	forecast = Event("__.forecast__")
+	forecast.define(msg_definition="^\.forecast")
+        forecast.subscribe(self)
+	self.bot.register_event(forecast, self)
 
-        # register ourself for any events that we're interested in that exist already
-        for event in events:
-            if event._type in self.interests:
-                event.subscribe(self)
+        self.help = ".forecast <location>" 
 
     def get_location(self, location_search):
         """Returns a list of 3 strings. A formatted location, its latitude, and its longitude"""
@@ -88,6 +88,7 @@ class Forecast:
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
+	#print "Debugging: Reached stage 1 of handle()"
         if _z[1] != '':
             cur = ''
             loc = self.get_location(_z[1])
