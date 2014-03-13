@@ -165,9 +165,10 @@ class Bot(threading.Thread):
           self.logger.write(Logger.INFO, " loaded " + name)
       else:
         if name == specific: # we're reloading only one module
-          f, filename, descr = imp.find_module(name, [modules_path])
-          mods[name] = imp.load_module(name, f, filename, descr)
-          found = True
+          if ext != '.pyc': # ignore compiled 
+            f, filename, descr = imp.find_module(name, [modules_path])
+            mods[name] = imp.load_module(name, f, filename, descr)
+            found = True
 
     for k,v in mods.iteritems():
       for name in dir(v):
