@@ -6,6 +6,11 @@ class Example:
     self.interests = ['__joins__']
     self.bot = bot
 
+    # IMPORTANT: you must subscribe to events before you add your own below, or you'll subscribe twice.
+    # register ourself for any events that we're interested in that exist already
+    for event in events:
+      if event._type in self.interests:
+        event.subscribe(self)
 
     custom = Event("__cusom__")
     custom.define("some_regex_here")
@@ -15,11 +20,6 @@ class Example:
     self.bot.register_event(custom, self)
 
     self.help = None
-
-    # register ourself for any events that we're interested in that exist already
-    for event in events:
-      if event._type in self.interests:
-        event.subscribe(self)
 
   def handle(self, event):
     try:

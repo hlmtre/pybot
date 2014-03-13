@@ -1,0 +1,4 @@
+Modules are loaded dynamically from this directory by the bot's load_modules function. Each module must define an __init__ function with the following signature: (self, events=None, printer_handle=None, bot=None), as well as a handle function, with the following signature:  (self, event). 
+
+Any more is gravy. Inside the init function, either subscribe to an existing event, or create your own, and ask the bot to register it.
+An excellent example is in modules/example.py.
