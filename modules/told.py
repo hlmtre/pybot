@@ -10,13 +10,10 @@ class Told:
 
 	told = Event("__.told__")
 	told.define(msg_definition="^\.told")
+        told.subscribe(self)
 	self.bot.register_event(told, self)
 
         self.help = ".told <nick>" 
-
-        for event in events:
-            if event._type in self.interests:
-                event.subscribe(self)
 
     def get_told_status(self):
         """Randomly selects and returns a string with a "told" status."""
