@@ -58,18 +58,20 @@ class Told:
 		  "YE TOLDE PUB",
 		  "TOLDEN CAULFIELD",
 		  "THE TOLD MAN AND THE SEA",
-		  "TOLD MEDAL WINNER IN THE WINTER OLYMPICS"
+		  "TOLD MEDAL WINNER IN THE WINTER OLYMPICS",
+                  "POT OF TOLD AT THE END OF THE RAINBOW"
 		  ]
 	return "[X] " + random.choice(status)
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
 	#print "Debugging: Reached stage 1 of handle()"
-        if _z[1] != '':
-            told_status = self.get_told_status()
-            try:
-		    self.printer("PRIVMSG " + event.channel + ' :' + _z[1] + '\'s told status: ' + told_status + '\n')
-            except TypeError:
-                print "DEBUG: TypeError: ",
-                print event.channel,
-                print event.user
+        told_status = self.get_told_status()
+        try:
+	    self.printer("PRIVMSG " + event.channel + ' :' + _z[1] + '\'s told status: ' + told_status + '\n')
+        except IndexError:
+            self.printer("PRIVMSG " + event.channel + ' : You didn\'t say who got told. Your told status: ' + told_status + '\n') 
+        except TypeError:
+            print "DEBUG: TypeError: ",
+            print event.channel,
+            print event.user
