@@ -191,8 +191,8 @@ class Bot(threading.Thread):
       print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
     else:
       if self.DEBUG is True:
-        self.logger(Logger.INFO, "\n DEBUGGING OUTPUT")
-        self.logger(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8'))
+        self.logger.write(Logger.INFO, "\n DEBUGGING OUTPUT")
+        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8'))
         print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
 
       self.s.send(message.encode('utf-8'))
