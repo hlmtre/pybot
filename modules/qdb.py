@@ -93,8 +93,8 @@ class QDB:
         return submission
 
     def submit(self, qdb_submission):
-        """This will eventually submit the string qdb_submission to the qdb. For testing, we'll just
-        print it out.
+        """Given a string, qdb_submission, this function will upload the string to hlmtre's qdb
+        server. Returns True if successful, returns False if an HTTPError is encountered.
         """
         url = 'http://qdb.zero9f9.com/api.php'
         payload = {'q':'new', 'quote': qdb_submission.rstrip('\n')}

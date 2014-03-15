@@ -67,7 +67,7 @@ class Told:
         try:
 	    self.printer("PRIVMSG " + event.channel + ' :' + _z[1] + '\'s told status: ' + told_status + '\n')
         except IndexError:
-            self.printer("PRIVMSG " + event.channel + ' : You didn\'t say who got told. Your told status: ' + told_status + '\n') 
+            self.printer("PRIVMSG " + event.channel + ' :You didn\'t say who got told. Your told status: ' + told_status + '\n') 
         except TypeError:
             print "DEBUG: TypeError: ",
             print event.channel,
