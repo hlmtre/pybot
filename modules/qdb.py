@@ -9,8 +9,8 @@ class QDB:
         self.bot = bot
         self.bot.mem_store['qdb'] = {} 
 
-	qdb = Event("__.qdb__")
-	qdb.define(msg_definition=".*")
+        qdb = Event("__.qdb__")
+        qdb.define(msg_definition=".*")
         qdb.subscribe(self)
 
         #qdb_buff = Event("__qdb_buff__")
@@ -80,7 +80,7 @@ class QDB:
         if end_msg == '':
             for line in self.bot.mem_store['qdb'][channel]:
                 #self.bot.mem_store['qdb'][channel][i] will contain a dict with only one key:value pair
-                if start_msg in line.values()[0]:
+                if start_msg.lower() in line.values()[0].lower():
                     return self.format_line(line)
             #making sure we get out of the function if no matching strings were found
             #don't want to search for a nonexistent second string later
@@ -91,9 +91,9 @@ class QDB:
         #goes through all lines in buffer
         #not really a bug, but if the same string is found multiple times, it will choose the oldest one
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
-            if start_msg in line.values()[0]:
+            if start_msg.lower() in line.values()[0].lower():
                 start_index = index
-            if end_msg in line.values()[0]:
+            if end_msg.lower() in line.values()[0].lower():
                 end_index = index
         #check to see if index values are positive. if not, string was not found and we're done
         if start_index == -1 or end_index == -1 or start_index < end_index:
