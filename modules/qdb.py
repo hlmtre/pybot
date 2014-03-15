@@ -21,7 +21,7 @@ class QDB:
         #self.bot.register_event(qdb_buff, self)
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
-        self.MAX_BUFFER_SIZE = 30
+        self.MAX_BUFFER_SIZE = 100 
 
     def add_buffer(self, event=None): 
         """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
@@ -53,7 +53,15 @@ class QDB:
         if len(line) != 1:
             return "\n"
         try:
-            return '<' + line.keys()[0].lstrip() + '> ' + line.values()[0] + '\n'
+            nick = line.keys()[0].strip()
+            msg = line.values()[0]
+            #special formatting for ACTION strings
+            if msg.startswith('\001ACTION'): 
+                #strip out the word ACTION from the msg
+                msg = msg[7:]
+                return ' * %s %s\n' % (nick, msg)
+            else:
+                return '<%s > %s\n' % (nick, msg)
         except KeyError:
             print "QDB format_line() error. Couldn't find dictionary keys."
         except IndexError:
@@ -65,20 +73,30 @@ class QDB:
         to search for the last desired line in the submission. This function returns a string ready
         for submission to the QDB if it finds the desired selection. If not, it returns None.
         """
-        if len(start_msg) == 0 or len(end_msg) == 0 or not channel:
+        #must have at least one msg to search for and channel to look it up in
+        if len(start_msg) == 0 or not channel:
             return None
-        #search for a matching start string and get the buffer index for the start and end message
+        #first, check to see if we are doing a single string submission.
+        if end_msg == '':
+            for line in self.bot.mem_store['qdb'][channel]:
+                #self.bot.mem_store['qdb'][channel][i] will contain a dict with only one key:value pair
+                if start_msg in line.values()[0]:
+                    return self.format_line(line)
+            #making sure we get out of the function if no matching strings were found
+            #don't want to search for a nonexistent second string later
+            return None
+        #search for a matching start and end string and get the buffer index for the start and end message
         start_index = -1
         end_index = -1
+        #goes through all lines in buffer
+        #not really a bug, but if the same string is found multiple times, it will choose the oldest one
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
             if start_msg in line.values()[0]:
-                #print 'Start msg: ' + start_msg + ' found at index ' + str(index)
                 start_index = index
             if end_msg in line.values()[0]:
-                #print 'End msg: ' + end_msg + ' found at index ' + str(index)
                 end_index = index
         #check to see if index values are positive. if not, string was not found and we're done
-        if start_index == -1 or end_index == -1:
+        if start_index == -1 or end_index == -1 or start_index < end_index:
             return None
         #now we generate the string to be returned for submission
         submission = ''
@@ -94,30 +112,49 @@ class QDB:
 
     def submit(self, qdb_submission):
         """Given a string, qdb_submission, this function will upload the string to hlmtre's qdb
-        server. Returns True if successful, returns False if an HTTPError is encountered.
-        """
+        server. Returns a string with status of submission. If it worked, includes a link to new quote. 
+        """ 
+        #accessing hlmtre's qdb api
         url = 'http://qdb.zero9f9.com/api.php'
         payload = {'q':'new', 'quote': qdb_submission.rstrip('\n')}
         qdb = requests.post(url, payload)
+        #check for any HTTP errors and return False if there were any
         try:
             qdb.raise_for_status()
         except requests.exceptions.HTTPError:
-            return False
-        return True
+            return "HTTPError encountered when submitting to QDB"
+        try:
+            q_url = qdb.json()
+            return "QDB submission successful! http://qdb.zero9f9.com/quote.php?id=" + str(q_url['id'])
+        except (KeyError, UnicodeDecodeError):
+            return "Error getting status of quote submission." 
+        return "That was probably successful since no errors came up, but no status available."
 
     def handle(self, event):
         #first we see if we're going to generate a qdb submission, or just add the line to the buffer
         if event.msg.startswith(".qdb "):
-            try:
-                string_token = event.msg[5:].split('|', 1)
-                start_msg = string_token[0].rstrip()
-                end_msg = string_token[1].lstrip()
-            except IndexError:
-                self.printer("PRIVMSG " + event.channel + ' :You must provide two strings to search for separated by a |\n')
+            #split the msg with '.qdb ' stripped off beginning and divide into 1 or 2 search strings
+            string_token = event.msg[5:].split('|', 1)
+            start_msg = string_token[0].rstrip()
+            #see if we only have a one line submission
+            if len(string_token) == 1:
+                #s is the string to submit
+                s = self.get_qdb_submission(event.channel, start_msg)
+                if not s:
+                    self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested string.\n')
+                    return
+                #Print the link to the newly submitted quote
+                self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s) + '\n')
                 return
-            if self.submit(self.get_qdb_submission(event.channel, start_msg, end_msg)):
-                self.printer("PRIVMSG " + event.channel + ' :Submission to QDB completed successfully\n')
-                self.printer("PRIVMSG " + event.channel + ' :http://qdb.zero9f9.com\n')
+            #We should only get here if there are two items in string_token
+            end_msg = string_token[1].lstrip()
+            s = self.get_qdb_submission(event.channel, start_msg, end_msg)
+            #if there's nothing found for the submission, then we alert the channel and gtfo
+            if not s: 
+                self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested quotes.\n')
+                return
+            #print the link to the new submission
+            self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s) + '\n')
             return
         #we only want lines that are PRIVMSGs
         if "PRIVMSG" in event.line:
