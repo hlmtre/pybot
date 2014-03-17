@@ -317,6 +317,9 @@ class Bot(threading.Thread):
 
   def run(self):
     self.worker()
+
+  def say(self, channel, thing):
+    self.botbrain.say(channel, thing)
 # end class Bot
               
 ## MAIN ## ACTUAL EXECUTION STARTS HERE

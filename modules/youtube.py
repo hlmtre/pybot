@@ -3,7 +3,7 @@ import urllib2
 from urlparse import urlparse, parse_qsl
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
-class YoutubeParser:
+class Youtube:
   def __init__(self, events=None, printer_handle=None, bot=None):
     self.events = events
     self.printer = printer_handle
