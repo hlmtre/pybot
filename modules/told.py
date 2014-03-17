@@ -2,16 +2,17 @@ from event import Event
 import random 
 
 class Told:
-    def __init__(self, events=None, printer_handle=None, bot=None):
+    def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
         self.interests = ['__.told__']
         self.bot = bot
+        self.say = say
 
-	told = Event("__.told__")
-	told.define(msg_definition="^\.told")
+        told = Event("__.told__")
+        told.define(msg_definition="^\.told")
         told.subscribe(self)
-	self.bot.register_event(told, self)
+        self.bot.register_event(told, self)
 
         self.help = ".told <nick>" 
 

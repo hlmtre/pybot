@@ -1,2 +1,4 @@
 *.swp
 *.pyc
+logfile.txt
+pylog*

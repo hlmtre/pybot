@@ -23,10 +23,6 @@ class Example:
     self.help = None
 
   def handle(self, event):
-    try:
-      self.printer("PRIVMSG " + event.channel + " :welcome, " + event.user + '\n')
-    except TypeError:
-      print "DEBUG: TypeError: ",
-      print event.channel,
-      print event.user
+    self.say(event.channel, "welcome, " + event.user)
+    #self.printer("PRIVMSG " + event.channel + " :welcome, " + event.user + '\n')
 
