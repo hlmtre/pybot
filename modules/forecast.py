@@ -3,16 +3,16 @@ import json
 import requests
 
 class Forecast:
-    def __init__(self, events=None, printer_handle=None, bot=None):
+    def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
         self.interests = ['__.forecast__']
         self.bot = bot
 
-	forecast = Event("__.forecast__")
-	forecast.define(msg_definition="^\.forecast")
+        forecast = Event("__.forecast__")
+        forecast.define(msg_definition="^\.forecast")
         forecast.subscribe(self)
-	self.bot.register_event(forecast, self)
+        self.bot.register_event(forecast, self)
 
         self.help = ".forecast <location>" 
 

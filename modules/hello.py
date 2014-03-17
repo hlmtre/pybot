@@ -1,7 +1,7 @@
 from event import Event
 from random import choice
 class Hello:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.interests = []

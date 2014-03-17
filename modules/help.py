@@ -1,7 +1,7 @@
 from time import sleep
 from event import Event
 class Help:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.interests = ['__.help__']

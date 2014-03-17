@@ -1,10 +1,11 @@
 from event import Event
 class Example:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
-    self.interests = ['__joins__']
+    self.interests = ['__custom__']
     self.bot = bot
+    self.say = say
 
     # IMPORTANT: you must subscribe to events before you add your own below, or you'll subscribe twice.
     # register ourself for any events that we're interested in that exist already
@@ -12,7 +13,7 @@ class Example:
       if event._type in self.interests:
         event.subscribe(self)
 
-    custom = Event("__cusom__")
+    custom = Event("__custom__")
     custom.define("some_regex_here")
     custom.subscribe(self)
 

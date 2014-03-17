@@ -2,7 +2,7 @@ import sys
 import urllib2
 import json
 class LastFM:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.bot_handle = bot
     self.events = events
     self.printer = printer_handle
