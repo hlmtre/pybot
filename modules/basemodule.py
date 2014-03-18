@@ -1,9 +1,9 @@
 from event import Event
-class Example:
+class BaseModule(object):
   def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
-    self.interests = ['__custom__']
+    self.interests = []
     self.bot = bot
     self.say = say
 
@@ -13,16 +13,12 @@ class Example:
       if event._type in self.interests:
         event.subscribe(self)
 
-    custom = Event("__custom__")
-    custom.define("some_regex_here")
-    custom.subscribe(self)
-
-    # register ourself to our new custom event
-    self.bot.register_event(custom, self)
-
     self.help = None
 
-  def handle(self, event):
-    self.say(event.channel, "welcome, " + event.user)
-    #self.printer("PRIVMSG " + event.channel + " :welcome, " + event.user + '\n')
+    self.post_init()
 
+  def handle(self, event):
+    pass
+
+  def post_init(self):
+    pass

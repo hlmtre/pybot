@@ -55,3 +55,11 @@ v0.6
   Bugs fixed:
     DB respects username and password and db name from configuration file.
 
+v0.6.1
+======
+  ** This version is incompatible with previous versions, due to an additional argument being passed to modules (a convenience 'say' function). **
+  
+v0.6.2
+======
+  Features:
+    * BaseModule, allowing modules to inherit from it and have it do all the boilerplate on the default __init__, and doing any additional work they need in a post_init function.

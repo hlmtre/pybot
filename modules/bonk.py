@@ -2,11 +2,12 @@ from event import Event
 import random 
 
 class Bonk:
-    def __init__(self, events=None, printer_handle=None, bot=None):
+    def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
         self.interests = ['__.bonk__']
         self.bot = bot
+        self.say = say
 
         bonk = Event("__.bonk__")
         bonk.define(msg_definition="^\.bonk")

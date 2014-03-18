@@ -1,8 +1,10 @@
 class Pimp:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.interests = ['__pimp__']
+    self.bot = bot
+    self.say = say
 
     self.cmd = ".pimp"
     self.help = None
@@ -12,11 +14,4 @@ class Pimp:
         event.subscribe(self)
 
   def handle(self, event):
-    try:
-      self.printer("PRIVMSG " + event.channel + " : http://bits.zero9f9.com/pybot" + '\n')
-    except TypeError:
-      print "DEBUG: TypeError: ",
-      print event.channel,
-      print event.user
-    except:
-      print "AIIIYEEEE"
+    self.say(event.channel, "http://bits.zero9f9.com/pybot")

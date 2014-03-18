@@ -2,11 +2,12 @@ from event import Event
 import random 
 
 class Told:
-    def __init__(self, events=None, printer_handle=None, bot=None):
+    def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
         self.interests = ['__.told__']
         self.bot = bot
+        self.say = say
 
         told = Event("__.told__")
         told.define(msg_definition="^\.told")
@@ -62,7 +63,6 @@ class Told:
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
-        #print "Debugging: Reached stage 1 of handle()"
         told_status = self.get_told_status()
         try:
             self.printer("PRIVMSG " + event.channel + ' :' + _z[1] + '\'s told status: ' + told_status + '\n')

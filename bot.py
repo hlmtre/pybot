@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.5.4
+# v0.6.1
 # works with python 2.6.x and 2.7.x
 #
 
@@ -175,7 +175,7 @@ class Bot(threading.Thread):
         obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
           if inspect.isclass(obj): # it's a class definition, initialize it
-            a = obj(self.events_list, self.send, self) # now we're passing in a reference to the calling bot
+            a = obj(self.events_list, self.send, self, self.say) # now we're passing in a reference to the calling bot
             if a not in self.loaded_modules: # don't add in multiple copies
               self.loaded_modules.append(a)
         except TypeError:
@@ -317,6 +317,9 @@ class Bot(threading.Thread):
 
   def run(self):
     self.worker()
+
+  def say(self, channel, thing):
+    self.brain.say(channel, thing)
 # end class Bot
               
 ## MAIN ## ACTUAL EXECUTION STARTS HERE

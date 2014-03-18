@@ -9,11 +9,12 @@ if successful_import is True:
   import re
   from event import Event
   class RedditInfo:
-    def __init__(self, events=None, printer_handle=None, bot=None):
+    def __init__(self, events=None, printer_handle=None, bot=None, say=None):
       self.events = events
       self.printer = printer_handle
       self.interests = ['__reddit__']
       self.bot = bot
+      self.say = say
 
       self.user_agent = 'pybot 0.5.4 by /u/hlmtre; http://bits.zero9f9.com/pybot'
 
