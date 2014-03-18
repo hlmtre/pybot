@@ -77,8 +77,8 @@ class Bot(threading.Thread):
     bofh = Event("__.bofh__")
     bofh.define("\.bofh")
 
-    youtube = Event("__youtubes__")
-    youtube.define("youtube.com[\S]+")
+    #youtube = Event("__youtubes__")
+    #youtube.define("youtube.com[\S]+")
 
     weather = Event("__.weather__")
     weather.define("\.weather")
@@ -110,7 +110,7 @@ class Bot(threading.Thread):
     self.events_list.append(lastfm)
     self.events_list.append(dance)
     self.events_list.append(pimp)
-    self.events_list.append(youtube)
+    #self.events_list.append(youtube)
     self.events_list.append(bofh)
     self.events_list.append(weather)
     self.events_list.append(steam)
@@ -160,8 +160,8 @@ class Bot(threading.Thread):
       if specific is None:
         nonspecific = True
         if ext == '.py' and not name == '__init__': # ignore compiled python and __init__ files
-          f, filename, descr = imp.find_module(name, [modules_path])
-          mods[name] = imp.load_module(name, f, filename, descr)
+          f, filename, descr = imp.find_module(name, [modules_path]) # look for a python module by 'name' in the spec. directory
+          mods[name] = imp.load_module(name, f, filename, descr) # have imp load it, and stick that new obj into the mods dict
           self.logger.write(Logger.INFO, " loaded " + name)
       else:
         if name == specific: # we're reloading only one module

@@ -2,11 +2,13 @@ import steamapi
 import cPickle as pickle
 
 class Steam:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.interests = ['__.steam__']
     self.bot = bot
+    self.say = say
+
     self.api_key = "4FE154D08A234F786A64D05E78B4280D"
 
     self.cmd = ".steam set <username> <steamid>, .steam friends <username>"
