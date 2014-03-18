@@ -1,4 +1,20 @@
-Modules are loaded dynamically from this directory by the bot's load_modules function. Each module must define an __init__ function with the following signature: (self, events=None, printer_handle=None, bot=None), as well as a handle function, with the following signature:  (self, event). 
+Modules are loaded dynamically from this directory by the bot's load_modules function. 
 
-Any more is gravy. Inside the init function, either subscribe to an existing event, or create your own, and ask the bot to register it.
-An excellent example is in modules/example.py.
+Each module must:
+  * Define __init__(self, events=None, printer_handle=None, bot=None)
+  * Define a handle(self, event)
+
+So, that's a lot of work. Happily, there is a BaseModule class that defines a minimalistic (if non-functional, complete) __init__ and handle. Your module may override both, either, or neither of them. There is a convenience function, however -- post_init(). You may define an event and subscribe your module to it, then register that event with the bot.
+
+ex.
+
+    youtube = Event("__.youtubes__")
+    youtube.define(msg_definition="youtube.com[\S]+")
+    youtube.subscribe(self)
+
+    self.bot.register_event(youtube, self)
+
+
+Any more is gravy. 
+An excellent example of inheriting (and how it saves you trouble) is in modules/examplederived.py.
+A fuller example is in example.py.
