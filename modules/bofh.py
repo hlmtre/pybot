@@ -10,7 +10,7 @@ class Bofh:
 
     for event in events:
       if event._type in self.interests:
-	      event.subscribe(self)
+        event.subscribe(self)
 
   def handle(self, event):
     try:

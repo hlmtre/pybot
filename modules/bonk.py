@@ -8,10 +8,10 @@ class Bonk:
         self.interests = ['__.bonk__']
         self.bot = bot
 
-	bonk = Event("__.bonk__")
-	bonk.define(msg_definition="^\.bonk")
+        bonk = Event("__.bonk__")
+        bonk.define(msg_definition="^\.bonk")
         bonk.subscribe(self)
-	self.bot.register_event(bonk, self)
+        self.bot.register_event(bonk, self)
 
         self.help = ".bonk <bonkee>" 
 
@@ -57,7 +57,7 @@ class Bonk:
                        'telefrags %s'
                        ]
         bonk_action = random.choice(bonk_actions) % bonkee
-	return "\001ACTION " + bonk_action 
+        return "\001ACTION " + bonk_action 
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)

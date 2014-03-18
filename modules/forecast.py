@@ -9,10 +9,10 @@ class Forecast:
         self.interests = ['__.forecast__']
         self.bot = bot
 
-	forecast = Event("__.forecast__")
-	forecast.define(msg_definition="^\.forecast")
+        forecast = Event("__.forecast__")
+        forecast.define(msg_definition="^\.forecast")
         forecast.subscribe(self)
-	self.bot.register_event(forecast, self)
+        self.bot.register_event(forecast, self)
 
         self.help = ".forecast <location>" 
 
@@ -88,7 +88,7 @@ class Forecast:
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
-	#print "Debugging: Reached stage 1 of handle()"
+        #print "Debugging: Reached stage 1 of handle()"
         if _z[1] != '':
             cur = ''
             loc = self.get_location(_z[1])
