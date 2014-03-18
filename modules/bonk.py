@@ -58,7 +58,7 @@ class Bonk:
                        'telefrags %s'
                        ]
         bonk_action = random.choice(bonk_actions) % bonkee
-	return "\001ACTION " + bonk_action 
+        return "\001ACTION " + bonk_action 
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
