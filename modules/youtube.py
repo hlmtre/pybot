@@ -4,10 +4,11 @@ from urlparse import urlparse, parse_qsl
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
 class Youtube:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.bot = bot
+    self.say = say
     self.interests = ['__youtubes__']
     for event in events:
       if event._type in self.interests:
