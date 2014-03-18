@@ -2,11 +2,12 @@ import urllib2
 import json
 
 class Weather:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.interests = ['__.weather__']
     self.bot = bot
+    self.say = say
 
     self.help = ".weather <zipcode>"
 
