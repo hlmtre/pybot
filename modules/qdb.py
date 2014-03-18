@@ -16,7 +16,7 @@ class QDB:
         qdb.define(msg_definition=".*")
         qdb.subscribe(self)
 
-	self.bot.register_event(qdb, self)
+        self.bot.register_event(qdb, self)
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
         self.MAX_BUFFER_SIZE = 100 
