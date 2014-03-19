@@ -77,8 +77,8 @@ class Bot(threading.Thread):
     bofh = Event("__.bofh__")
     bofh.define("\.bofh")
 
-    youtube = Event("__youtubes__")
-    youtube.define("youtube.com[\S]+")
+    #youtube = Event("__youtubes__")
+    #youtube.define("youtube.com[\S]+")
 
     weather = Event("__.weather__")
     weather.define("\.weather")
@@ -107,7 +107,7 @@ class Bot(threading.Thread):
     self.events_list.append(lastfm)
     self.events_list.append(dance)
     self.events_list.append(pimp)
-    self.events_list.append(youtube)
+    #self.events_list.append(youtube)
     self.events_list.append(bofh)
     self.events_list.append(weather)
     self.events_list.append(steam)
@@ -169,16 +169,21 @@ class Bot(threading.Thread):
         nonspecific = True
         # ignore compiled python and __init__ files. 
         #choose to either load all .py files or, available, just ones specified in autoloads
-        if self.network not in autoloads.keys():
+        if self.network not in autoloads.keys(): # if autoload does not specify for this network
           if ext == '.py' and not name == '__init__': 
             f, filename, descr = imp.find_module(name, [modules_path])
             mods[name] = imp.load_module(name, f, filename, descr)
             self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
-        else:
-          if ext == '.py' and not name == '__init__' and fname in autoloads[self.network] or fname == 'module.py':
-            f, filename, descr = imp.find_module(name, [modules_path])
-            mods[name] = imp.load_module(name, f, filename, descr)
-            self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+        else: # follow autoload's direction
+          if ext == '.py' and not name == '__init__':
+            if name == 'module':
+              f, filename, descr = imp.find_module(name, [modules_path])
+              mods[name] = imp.load_module(name, f, filename, descr)
+              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+            elif ('include' in autoloads[self.network] and name in autoloads[self.network]['include']) or ('exclude' in autoloads[self.network] and name not in autoloads[self.network]['exclude']):
+              f, filename, descr = imp.find_module(name, [modules_path])
+              mods[name] = imp.load_module(name, f, filename, descr)
+              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
       else:
         if name == specific: # we're reloading only one module
           if ext != '.pyc': # ignore compiled 

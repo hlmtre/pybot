@@ -1,35 +1,8 @@
 { 
-  "irc.teamschoolyd.org" : [
-        "dance.py",
-        "bonk.py",
-        "bofh.py",
-        "hello.py",
-        "weather.py",
-        "lastfm.py",
-        "steam.py",
-        "part.py",
-        "pimp.py",
-        "youtube.py",
-        "tell.py",
-        "help.py"
-    ]
-  "zero9f9.com" : [
-        "dance.py",
-        "bonk.py",
-        "bofh.py",
-        "hello.py",
-        "weather.py",
-        "lastfm.py",
-        "steam.py",
-        "part.py",
-        "pimp.py",
-        "youtube.py",
-        "tell.py",
-        "help.py",
-        "qdb.py",
-        "example.py",
-        "examplederived.py",
-        "told.py",
-        "forecast.py"
-    ]
+  "irc.teamschoolyd.org": { 
+    "exclude": [
+      "shortener",
+      "told"
+      ]
+  }
 }
