@@ -10,5 +10,16 @@
     "dbusername": "pybot",
     "dbpass": "password",
     "dbname": "pybot"
-  }
+  },
+  "network2": {
+    "channels": [
+      "#somechannel"
+     ],
+    "port":"6667",
+    "nick": "othernick", 
+    "ircpass": "otherpass",
+    "owner": "hlmtre",
+    "dbusername": "pybot",
+    "dbpass": "password",
+    "dbname": "pybot"
 }
