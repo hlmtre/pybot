@@ -88,7 +88,7 @@ class Forecast:
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
-	#print "Debugging: Reached stage 1 of handle()"
+        #print "Debugging: Reached stage 1 of handle()"
         if _z[1] != '':
             cur = ''
             loc = self.get_location(_z[1])

@@ -85,6 +85,8 @@ class BotBrain:
     self.ww = webwriter.WebWriter()
 
   def _isAdmin(self, username):
+    if self.bot.conf.getOwner(self.bot.network) == username:
+      return True
     if self.db._isAdmin(username):
       return True
     return False

@@ -1,5 +1,6 @@
 from event import Event
 import requests
+import difflib
 
 class QDB:
     def __init__(self, events=None, printer_handle=None, bot=None):
@@ -7,7 +8,9 @@ class QDB:
         self.printer = printer_handle
         self.interests = ['__.qdb__'] 
         self.bot = bot
-        self.bot.mem_store['qdb'] = {} 
+        self.bot.mem_store['qdb'] = {}
+        #define a key for _recent since that will not be a potential channel name
+        self.bot.mem_store['qdb']['_recent'] = []
 
         qdb = Event("__.qdb__")
         qdb.define(msg_definition=".*")
@@ -17,6 +20,7 @@ class QDB:
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
         self.MAX_BUFFER_SIZE = 100 
+        self.MAX_HISTORY_SIZE = 10
 
     def add_buffer(self, event=None): 
         """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
@@ -120,10 +124,43 @@ class QDB:
             return "HTTPError encountered when submitting to QDB"
         try:
             q_url = qdb.json()
+            self.add_recently_submitted(q_url['id'], qdb_submission)
             return "QDB submission successful! http://qdb.zero9f9.com/quote.php?id=" + str(q_url['id'])
         except (KeyError, UnicodeDecodeError):
             return "Error getting status of quote submission." 
         return "That was probably successful since no errors came up, but no status available."
+
+    def recently_submitted(self, submission):
+        """Checks to see if the given submission is string is at least 75% similar to the strings
+        in the list of recently submitted quotes.
+        Returns the id of the quote if it was recently submitted. If not, returns -1.
+        """
+        #set up a difflib SequenceMatcher with the first string to test
+        comparer = difflib.SequenceMatcher()
+        comparer.set_seq1(submission)
+        #if we find that it has 75% similarity or greater to a recent submission, return True
+        try:
+            for recent_quote in self.bot.mem_store['qdb']['_recent']:
+                comparer.set_seq2(recent_quote.values()[0])
+                if comparer.ratio() >= .75:
+                    return recent_quote.keys()[0]
+        except TypeError:
+            return -1
+        except KeyError:
+            return -1
+        except IndexError:
+            return -1
+        return -1 
+
+    def add_recently_submitted(self, q_id, submission):
+        """Takes a string, submission, and adds it to the list of recent submissions.
+        Also we do length checking, only keep record of the previous MAX_HISTORY_SIZE quotes.
+        """
+        #first, see if we have reached the maximum history size. if so, remove last item
+        if len(self.bot.mem_store['qdb']['_recent']) >= self.MAX_HISTORY_SIZE:
+            self.bot.mem_store['qdb']['_recent'].pop()
+        #inserting a dict with the qdb id of the submission and the submission content
+        self.bot.mem_store['qdb']['_recent'].insert(0, {q_id:submission})
 
     def handle(self, event):
         #first we see if we're going to generate a qdb submission, or just add the line to the buffer
@@ -135,6 +172,11 @@ class QDB:
             if len(string_token) == 1:
                 #s is the string to submit
                 s = self.get_qdb_submission(event.channel, start_msg)
+                recent = self.recently_submitted(s)
+                if recent > 0:
+                    q_url = "http://qdb.zero0f0.com/quote.php?id=" + str(recent)
+                    self.printer("PRIVMSG " + event.channel + " :QDB Error: A quote of >75% similarity has already been posted here: " + q_url + "\n")
+                    return
                 if not s:
                     self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested string.\n')
                     return
@@ -144,6 +186,11 @@ class QDB:
             #We should only get here if there are two items in string_token
             end_msg = string_token[1].lstrip()
             s = self.get_qdb_submission(event.channel, start_msg, end_msg)
+            recent = self.recently_submitted(s)
+            if recent > 0:
+                q_url = "http://qdb.zero0f0.com/quote.php?id=" + str(recent)
+                self.printer("PRIVMSG " + event.channel + " :QDB Error: A quote of >75% similarity has already been posted here: " + q_url + "\n")
+                return
             #if there's nothing found for the submission, then we alert the channel and gtfo
             if not s: 
                 self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested quotes.\n')
@@ -151,7 +198,6 @@ class QDB:
             #print the link to the new submission
             self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s) + '\n')
             return
-        #we only want lines that are PRIVMSGs
+        #add any line containing PRIVMSG to the buffer
         if "PRIVMSG" in event.line:
             self.add_buffer(event)
-        #self.printer("PRIVMSG " + event.channel + ' :QDB' + '\n')
