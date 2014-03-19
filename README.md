@@ -2,6 +2,8 @@ pybot is a python irc bot. he is a project.
 
 he is modular, extensible, multi-threaded, and configurable.
 
+pybot runs on python 2.6 and 2.7. python versions > 3 are in the works.
+
 
 10-second TL;DR:
 ================
