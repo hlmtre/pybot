@@ -98,9 +98,6 @@ class Bot(threading.Thread):
     links = Event("__urls__")
     links.define("https?://*")
 
-    forecast = Event("__.forecast__")
-    forecast.define(msg_definition="^\.forecast")
-
   # example
   #  test = Event("__test__")
   #  test.define(msg_definition="^\.test")
@@ -118,7 +115,6 @@ class Bot(threading.Thread):
     self.events_list.append(tell)
     self.events_list.append(unload)
     self.events_list.append(links)
-    self.events_list.append(forecast)
   # example
   #  self.events_list.append(test)
 
@@ -147,22 +143,42 @@ class Bot(threading.Thread):
     tmp_list = list()
     
     modules_path = 'modules'
+    autoload_path = 'modules/autoloads'
 
     # this is magic.
 
     import inspect
-    import os, imp
+    import os, imp, json
     dir_list = os.listdir(modules_path)
     mods = {}
+    autoloads = {}
+    #load autoloads if it exists
+    if os.path.isfile(autoload_path): 
+      self.logger.write(Logger.INFO, "Found autoloads file")
+      try:
+        autoloads = json.load(open(autoload_path))
+        #logging
+        for k in autoloads.keys():
+          self.logger.write(Logger.INFO, "Autoloads found for network " + k)
+      except IOError:
+        self.logger.write(Logger.ERROR, "Could not load autoloads file.")
     # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
       if specific is None:
         nonspecific = True
-        if ext == '.py' and not name == '__init__': # ignore compiled python and __init__ files
-          f, filename, descr = imp.find_module(name, [modules_path])
-          mods[name] = imp.load_module(name, f, filename, descr)
-          self.logger.write(Logger.INFO, " loaded " + name)
+        # ignore compiled python and __init__ files. 
+        #choose to either load all .py files or, available, just ones specified in autoloads
+        if self.network not in autoloads.keys():
+          if ext == '.py' and not name == '__init__': 
+            f, filename, descr = imp.find_module(name, [modules_path])
+            mods[name] = imp.load_module(name, f, filename, descr)
+            self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+        else:
+          if ext == '.py' and not name == '__init__' and fname in autoloads[self.network] or fname == 'module.py':
+            f, filename, descr = imp.find_module(name, [modules_path])
+            mods[name] = imp.load_module(name, f, filename, descr)
+            self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
       else:
         if name == specific: # we're reloading only one module
           if ext != '.pyc': # ignore compiled 
