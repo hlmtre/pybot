@@ -3,11 +3,13 @@ import requests
 import difflib
 
 class QDB:
-    def __init__(self, events=None, printer_handle=None, bot=None):
+    def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
         self.interests = ['__.qdb__'] 
         self.bot = bot
+        self.say = say
+
         self.bot.mem_store['qdb'] = {}
         #define a key for _recent since that will not be a potential channel name
         self.bot.mem_store['qdb']['_recent'] = []

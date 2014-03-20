@@ -7,15 +7,16 @@ class Help:
     self.interests = ['__.help__']
     self.bot = bot
 
-    help = Event("__.help__")
-    help.define("\.help")
-    self.bot.events_list.append(help)
-
-    self.help = ".help"
-
     for event in events:
       if event._type in self.interests:
         event.subscribe(self)
+
+    help = Event("__.help__")
+    help.define(msg_definition="^\.help")
+    help.subscribe(self)
+    self.bot.register_event(help)
+
+    self.help = ".help"
 
   def handle(self, event):
     try:

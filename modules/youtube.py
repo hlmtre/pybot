@@ -18,16 +18,19 @@ class Youtube(BaseModule):
     url = re.search("youtube.com[\S]+", event.line).group(0)
     if url:
       get_dict = dict(parse_qsl(urlparse(url).query)) # create dictionary of strings, instead of of lists. this fails to handle if there are multiple values for a key in the GET
-      video_tag = get_dict['v']
-      if video_tag.__len__() > 1:
-        response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
-        xml_response = parseString(response)
-        duration = xml_response.getElementsByTagName('yt:duration')
-        ulength = duration[0].getAttribute("seconds")
-        alength = ulength.encode('ascii', 'ignore')
-        length = str(timedelta(seconds=int(alength)))
-        titletag = xml_response.getElementsByTagName('title')[0]
-        video_title = titletag.childNodes[0].nodeValue
-        self.say(event.channel, "Youtube: " + video_title + "("+length+")")
-      else:
+      try:
+        video_tag = get_dict['v']
+        if video_tag.__len__() > 1:
+          response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
+          xml_response = parseString(response)
+          duration = xml_response.getElementsByTagName('yt:duration')
+          ulength = duration[0].getAttribute("seconds")
+          alength = ulength.encode('ascii', 'ignore')
+          length = str(timedelta(seconds=int(alength)))
+          titletag = xml_response.getElementsByTagName('title')[0]
+          video_title = titletag.childNodes[0].nodeValue
+          self.say(event.channel, "Youtube: " + video_title + "("+length+")")
+        else:
+          pass
+      except KeyError:
         pass
