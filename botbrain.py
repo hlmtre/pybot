@@ -104,7 +104,11 @@ class BotBrain:
     self.microphone(thing + '\n')
 
   def say(self, channel, thing):
-    self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
+    try:
+      self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
+    except UnicodeEncodeError as e:
+      print e
+      print thing
 
   def notice(self, channel, thing):
     self.microphone('NOTICE ' + channel + ' :' + str(thing) + '\n')

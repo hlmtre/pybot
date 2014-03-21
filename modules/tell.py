@@ -6,11 +6,12 @@ class Notice:
     self.message = message
 
 class Tell:
-  def __init__(self, events=None, printer_handle=None, bot=None):
+  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.bot = bot
     self.interests = ['__privmsg__']
+    self.say = say
 
     self.cmd = ".tell"
     self.help = ".tell <nick> <thing to tell when they're back>"
