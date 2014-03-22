@@ -1,2 +1,2 @@
 praw
-mysqldb
+MySQL-python
