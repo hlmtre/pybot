@@ -3,3 +3,6 @@ python:
   - "2.6"
   - "2.7"
 script: nosetests
+notifications:
+  email:false
+  irc: "zero9f9.com#bots"
