@@ -4,5 +4,5 @@ python:
   - "2.7"
 script: nosetests
 notifications:
-  email:false
+  email: false
   irc: "zero9f9.com#bots"
