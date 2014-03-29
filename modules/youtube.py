@@ -4,9 +4,12 @@ from urlparse import urlparse, parse_qsl
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
 from collections import OrderedDict
-
 from event import Event
-from basemodule import BaseModule
+
+try:
+  from modules.basemodule import BaseModule
+except ImportError:
+  from basemodule import BaseModule
 class Youtube(BaseModule):
   def post_init(self):
     youtube = Event("__.youtubes__")

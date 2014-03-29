@@ -1,4 +1,8 @@
-from basemodule import BaseModule
+try:
+  from modules.basemodule import BaseModule
+except ImportError:
+  from basemodule import BaseModule
+
 from event import Event
 import difflib
 class YTH(BaseModule):
@@ -9,7 +13,7 @@ class YTH(BaseModule):
 
     self.bot.register_event(command, self)
     self.help = ".yth, .yth <search terms>"
-    comparer = difflib.SequenceMatcher()
+    self.comparer = difflib.SequenceMatcher()
 
   def handle(self, event):
     if len(event.msg.split()) == 1:
@@ -23,10 +27,10 @@ class YTH(BaseModule):
     elif len(event.msg.split()) > 1: # we're searching for specific terms
       terms = event.msg.split()[1:-1] # terms from 1 (ignore .yth) to the end
       msg = list()
-      for k, v in self.bot.mem_store['youtube']:
-        comparer.set_seq1(k)
-        comparer.set_seq2(" ".join(terms))
-        if comparer.ratio() >= .75:
+      for k, v in self.bot.mem_store['youtube'].items():
+        self.comparer.set_seq1(k.lower())
+        self.comparer.set_seq2(" ".join(terms))
+        if self.comparer.ratio() >= .75:
           msg.append(k + " - " + v)
 
       self.say(event.user, ", ".join(msg))
