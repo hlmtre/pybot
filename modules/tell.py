@@ -10,6 +10,7 @@ class Tell:
     self.events = events
     self.printer = printer_handle
     self.bot = bot
+    self.say = say
     self.interests = ['__privmsg__']
     self.say = say
 
