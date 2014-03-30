@@ -22,4 +22,5 @@
     "dbusername": "pybot",
     "dbpass": "password",
     "dbname": "pybot"
+  }
 }

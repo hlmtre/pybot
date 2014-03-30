@@ -25,7 +25,7 @@ import db
 DEBUG = False
 
 class Bot(threading.Thread):
-  def __init__(self, conf, network, d):
+  def __init__(self, conf=None, network=None, d=None):
     threading.Thread.__init__(self)
 
     self.logger = Logger()
