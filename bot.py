@@ -41,6 +41,7 @@ class Bot(threading.Thread):
     self.JOINED = False
     self.conf = conf
     self.db = db.DB()
+    self.pid = os.getpid()
 
     # arbitrary key/value store for modules
     # they should be 'namespaced' like bot.mem_store.module_name
@@ -246,7 +247,6 @@ class Bot(threading.Thread):
           self.chan_list = self.conf.getChannels(self.network) 
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
-            #print "JOIN "+c+" \n"
           self.JOINED = True
         
         line_array = line.split()
@@ -390,14 +390,23 @@ if __name__ == "__main__":
       i = 0
       if cm.getNumNets() > 1:
         for c in cm.getNetworks():
-          b = bot.Bot(cm, net_list[i], DEBUG)
+          try:
+            b = bot.Bot(cm, net_list[i], DEBUG)
+            b.daemon = True
+            b.start()
+            botslist.append(b)
+            i += 1
+            while True: time.sleep(5)
+          except (KeyboardInterrupt, SystemExit):
+            print "keyboard interrupt caught; exiting..."
+            sys.exit(0)
+      else:
+        try:
+          b = bot.Bot(cm, net_list[0], DEBUG)
+          b.daemon = True
           b.start()
           botslist.append(b)
-          i += 1
-      else:
-        b = bot.Bot(cm, net_list[0], DEBUG)
-        b.start()
-        botslist.append(b)
-
-  for _bot in botslist:
-    b.join()
+          while True: time.sleep(5)
+        except (KeyboardInterrupt, SystemExit):
+          print "keyboard interrupt caught; exiting..."
+          sys.exit(0)
