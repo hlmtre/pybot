@@ -1,5 +1,8 @@
 from event import Event
-from basemodule import BaseModule
+try:
+  from basemodule import BaseModule
+except ImportError:
+  from modules.basemodule import BaseModule
 class ExampleDerived(BaseModule):
   def post_init(self):
     pass

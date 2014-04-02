@@ -1,4 +1,4 @@
-pybot is a python irc bot. he is a project.
+pybot is a python irc bot. he is a project. [![Build Status](https://travis-ci.org/hlmtre/pybot.svg?branch=master)](https://travis-ci.org/hlmtre/pybot)
 
 he is modular, extensible, multi-threaded, and configurable.
 

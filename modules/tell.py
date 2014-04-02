@@ -12,6 +12,7 @@ class Tell:
     self.bot = bot
     self.say = say
     self.interests = ['__privmsg__']
+    self.say = say
 
     self.cmd = ".tell"
     self.help = ".tell <nick> <thing to tell when they're back>"

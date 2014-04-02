@@ -63,3 +63,7 @@ v0.6.2
 ======
   Features:
     * BaseModule, allowing modules to inherit from it and have it do all the boilerplate on the default __init__, and doing any additional work they need in a post_init function.
+
+v0.6.5
+======
+  Fixes the keyboard interrupt in debug mode issue.

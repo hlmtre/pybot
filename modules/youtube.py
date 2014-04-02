@@ -3,9 +3,13 @@ import urllib2
 from urlparse import urlparse, parse_qsl
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
-
+from collections import OrderedDict
 from event import Event
-from basemodule import BaseModule
+
+try:
+  from modules.basemodule import BaseModule
+except ImportError:
+  from basemodule import BaseModule
 class Youtube(BaseModule):
   def post_init(self):
     youtube = Event("__.youtubes__")
@@ -13,6 +17,8 @@ class Youtube(BaseModule):
     youtube.subscribe(self)
 
     self.bot.register_event(youtube, self)
+
+    self.bot.mem_store['youtube'] = OrderedDict()
 
   def handle(self, event):
     url = re.search("youtube.com[\S]+", event.line).group(0)
@@ -29,7 +35,8 @@ class Youtube(BaseModule):
           length = str(timedelta(seconds=int(alength)))
           titletag = xml_response.getElementsByTagName('title')[0]
           video_title = titletag.childNodes[0].nodeValue
-          self.say(event.channel, "Youtube: " + video_title + "("+length+")")
+          self.say(event.channel, "Youtube: " + video_title + " ("+length+")")
+          self.bot.mem_store['youtube'][video_title] = url
         else:
           pass
       except KeyError:
