@@ -9,6 +9,7 @@ class Event:
     self.channel = ""
     self.line = ""
     self.msg = ""
+    self.verb = ""
     
   def subscribe(self, e):
     self.subscribers.append(e)
@@ -48,6 +49,10 @@ class Event:
     for e in l:
       if e.startswith("#"):
         self.channel = e
+        break
+    for v in l:
+      if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE"]:
+        self.verb = v
         break
     for s in self.subscribers:
       s.handle(self)

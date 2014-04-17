@@ -218,7 +218,8 @@ class Bot(threading.Thread):
         print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
 
       self.s.send(message.encode('utf-8'))
-      self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
+      if not message.startswith('PONG'):
+        self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
 
   def pong(self, response):
     self.send('PONG ' + response + '\n')
@@ -234,15 +235,12 @@ class Bot(threading.Thread):
       for e in self.events_list:
         if e.matches(line):
           e.notifySubscribers(line)
-
-  # don't bother going any further if it's a PING/PONG request
+      # don't bother going any further if it's a PING/PONG request
       if line.startswith("PING"):
         ping_response_line = line.split(":", 1)
         self.pong(ping_response_line[1])
-
       # pings we respond to directly. everything else...
       else:
-
 # if we get disconnected this should be true upon a reconnect attempt.. ideally
         if self.JOINED is False and message_number == "376": # wait until we receive end of MOTD before joining
           self.chan_list = self.conf.getChannels(self.network) 

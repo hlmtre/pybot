@@ -1,4 +1,5 @@
 from event import Event
+import re
 import requests
 import difflib
 
@@ -15,7 +16,7 @@ class QDB:
         self.bot.mem_store['qdb']['_recent'] = []
 
         qdb = Event("__.qdb__")
-        qdb.define(msg_definition=".*")
+        qdb.define(msg_definition="^(?!PING|PONG).*$")
         qdb.subscribe(self)
 
         self.bot.register_event(qdb, self)
@@ -33,6 +34,8 @@ class QDB:
         """
         if not event:
             return
+        if not event.channel:
+            return
         #create a dictionary associating the channel with an empty list if it doesn't exist yet
         if event.channel not in self.bot.mem_store['qdb']:
             self.bot.mem_store['qdb'][event.channel] = []
@@ -40,33 +43,46 @@ class QDB:
         #check for the length of the buffer. if it's too long, pop the last item
             if len(self.bot.mem_store['qdb'][event.channel]) >= self.MAX_BUFFER_SIZE:
                 self.bot.mem_store['qdb'][event.channel].pop()
-            #define a line as a dict associating user to msg
+            #get a line by passing event to format_line
             #insert the line into the first position in the list
-            line = {event.user:event.msg}
-            self.bot.mem_store['qdb'][event.channel].insert(0, line)
-        except KeyError:
-            print "QDB add_buffer() error. Couldn't find dictionary key."
+            line = self.format_line(event) 
+            if line:
+                self.bot.mem_store['qdb'][event.channel].insert(0, line)
         except IndexError:
             print "QDB add_buffer() error. Couldn't access the list index."
 
-    def format_line(self, line):
-        """Takes a dict with a nick:msg relationship and formats it for QDB submission"""
-        if len(line) != 1:
-            return "\n"
-        try:
-            nick = line.keys()[0].strip()
-            msg = line.values()[0]
+    def format_line(self, event):
+        """Takes an event and formats a string appropriate for quotation from it"""
+        #format all strings based on the verb
+        if event.verb == "":
+            return ''
+        elif event.verb == "PRIVMSG":
             #special formatting for ACTION strings
-            if msg.startswith('\001ACTION'): 
+            if event.msg.startswith('\001ACTION'): 
                 #strip out the word ACTION from the msg
-                msg = msg[7:]
-                return ' * %s %s\n' % (nick, msg)
+                return ' * %s %s\n' % (event.user, event.msg[7:])
             else:
-                return '<%s > %s\n' % (nick, msg)
-        except KeyError:
-            print "QDB format_line() error. Couldn't find dictionary keys."
-        except IndexError:
-            print "QDB format_line() error. Couldn't get selected index from list."
+                return '<%s> %s\n' % (event.user, event.msg)
+        elif event.verb == "JOIN":
+            return ' --> %s has joined channel %s\n' % (event.user, event.channel)
+        elif event.verb == "PART":
+            return ' <-- %s has left channel %s\n' % (event.user, event.channel)
+        elif event.verb == "NICK":
+            return ' -- %s has changed their nick to %s\n' % (event.user, event.msg)
+        elif event.verb == "TOPIC":
+            return ' -- %s has changed the topic for %s to "%s"\n' % (event.user, event.channel, event.msg)
+        elif event.verb == "QUIT":
+            return ' <-- %s has quit (%s)\n' % (event.user, event.msg)
+        elif event.verb == "KICK":
+            #this little bit of code finds the kick target by getting the last
+            #thing before the event message begins
+            target = event.line.split(":", 2)[1].split()[-1]
+            return ' <--- %s has kicked %s from %s (%s)\n' % (event.user, target, event.channel, event.msg)
+        elif event.verb == "NOTICE":
+            return ' --NOTICE from %s: %s\n' % (event.user, event.msg)
+        else:
+            #no matching verbs found. just ignore the line
+            return ''
 
     def get_qdb_submission(self, channel=None, start_msg='', end_msg=''):
         """Given two strings, start_msg and end_msg, this function will assemble a submission for the QDB.
@@ -81,8 +97,8 @@ class QDB:
         if end_msg == '':
             for line in self.bot.mem_store['qdb'][channel]:
                 #self.bot.mem_store['qdb'][channel][i] will contain a dict with only one key:value pair
-                if start_msg.lower() in line.values()[0].lower():
-                    return self.format_line(line)
+                if start_msg.lower() in line.lower():
+                    return line
             #making sure we get out of the function if no matching strings were found
             #don't want to search for a nonexistent second string later
             return None
@@ -92,9 +108,9 @@ class QDB:
         #goes through all lines in buffer
         #not really a bug, but if the same string is found multiple times, it will choose the oldest one
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
-            if start_msg.lower() in line.values()[0].lower():
+            if start_msg.lower() in line.lower():
                 start_index = index
-            if end_msg.lower() in line.values()[0].lower():
+            if end_msg.lower() in line.lower():
                 end_index = index
         #check to see if index values are positive. if not, string was not found and we're done
         if start_index == -1 or end_index == -1 or start_index < end_index:
@@ -104,11 +120,9 @@ class QDB:
         try:
             for i in reversed(range(end_index, start_index + 1)):
                 #print 'Index number is ' + str(i) + ' and current submission is ' + submission
-                submission += self.format_line(self.bot.mem_store['qdb'][channel][i])
+                submission += self.bot.mem_store['qdb'][channel][i]
         except IndexError:
             print "QDB get_qdb_submission() error when accessing list index"
-        except KeyError:
-            print "QDB get_qdb_submission() error when retrieving dict keys"
         return submission
 
     def submit(self, qdb_submission):
@@ -195,11 +209,10 @@ class QDB:
                 return
             #if there's nothing found for the submission, then we alert the channel and gtfo
             if not s: 
-                self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested quotes.\n')
+                self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested quotes or parameters were not specific enough.\n')
                 return
             #print the link to the new submission
             self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s) + '\n')
             return
-        #add any line containing PRIVMSG to the buffer
-        if "PRIVMSG" in event.line:
-            self.add_buffer(event)
+        #add any line that isn't PING or PONG to the buffer
+        self.add_buffer(event)
