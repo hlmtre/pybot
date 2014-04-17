@@ -1,5 +1,4 @@
 from event import Event
-import re
 import requests
 import difflib
 
@@ -90,13 +89,14 @@ class QDB:
         to search for the last desired line in the submission. This function returns a string ready
         for submission to the QDB if it finds the desired selection. If not, it returns None.
         """
+        if not channel:
+            return None
         #must have at least one msg to search for and channel to look it up in
         if len(start_msg) == 0 or not channel:
             return None
         #first, check to see if we are doing a single string submission.
         if end_msg == '':
             for line in self.bot.mem_store['qdb'][channel]:
-                #self.bot.mem_store['qdb'][channel][i] will contain a dict with only one key:value pair
                 if start_msg.lower() in line.lower():
                     return line
             #making sure we get out of the function if no matching strings were found
@@ -214,5 +214,4 @@ class QDB:
             #print the link to the new submission
             self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s) + '\n')
             return
-        #add any line that isn't PING or PONG to the buffer
         self.add_buffer(event)
