@@ -46,12 +46,14 @@ class Event:
       self.msg = ""
 
     l = line.split()
+    self.channel = ""
+    self.verb = ""
     for e in l:
       if e.startswith("#"):
         self.channel = e
         break
     for v in l:
-      if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE"]:
+      if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE", "PING", "PONG", "MODE"]:
         self.verb = v
         break
     for s in self.subscribers:

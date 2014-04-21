@@ -15,7 +15,7 @@ class QDB:
         self.bot.mem_store['qdb']['_recent'] = []
 
         qdb = Event("__.qdb__")
-        qdb.define(msg_definition="^(?!PING|PONG).*$")
+        qdb.define(msg_definition=".*")
         qdb.subscribe(self)
 
         self.bot.register_event(qdb, self)
@@ -24,13 +24,18 @@ class QDB:
         self.MAX_BUFFER_SIZE = 100 
         self.MAX_HISTORY_SIZE = 10
 
-    def add_buffer(self, event=None): 
+    def add_buffer(self, event=None, debug=False): 
         """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
         for future access. The dict will have channel as key. The value to that key will be a list
         of dicts associating a username with the message they posted.
         If the buffer size is not yet exceeded, lines are just added. If the buffer
         is maxed out, the oldest line is removed and newest one inserted at the beginning.
         """
+        if debug:
+            print "Line: " + event.line
+            print "Verb: " + event.verb
+            print "Channel: " + event.channel
+            print ""
         if not event:
             return
         if not event.channel:
@@ -125,10 +130,17 @@ class QDB:
             print "QDB get_qdb_submission() error when accessing list index"
         return submission
 
-    def submit(self, qdb_submission):
+    def submit(self, qdb_submission, debug=False):
         """Given a string, qdb_submission, this function will upload the string to hlmtre's qdb
         server. Returns a string with status of submission. If it worked, includes a link to new quote. 
         """ 
+        if debug:
+            print "Submission is:"
+            print qdb_submission
+            print "Current buffer is:"
+            print self.bot.mem_store['qdb']
+            print ""
+            return ''
         #accessing hlmtre's qdb api
         url = 'http://qdb.zero9f9.com/api.php'
         payload = {'q':'new', 'quote': qdb_submission.rstrip('\n')}
@@ -212,6 +224,6 @@ class QDB:
                 self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested quotes or parameters were not specific enough.\n')
                 return
             #print the link to the new submission
-            self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s) + '\n')
+            self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s, debug=True) + '\n')
             return
-        self.add_buffer(event)
+        self.add_buffer(event, debug=True)
