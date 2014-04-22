@@ -174,9 +174,9 @@ class BotBrain:
      if url:
        self._insertImg(usr, url, channel)
 # this bit is
-    if message.startswith("join"):
+    if message.startswith(".join"):
       self._join(usr, message)
-    if message.startswith("quit"):
+    if message.strip() == ".quit":
       self.__quit(usr)
     if message.startswith(".imgs"):
       self.ww._generate(self.db._getImgs())
