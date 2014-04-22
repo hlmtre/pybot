@@ -27,7 +27,7 @@ class QDB:
     def add_buffer(self, event=None, debug=False): 
         """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
         for future access. The dict will have channel as key. The value to that key will be a list
-        of dicts associating a username with the message they posted.
+        of formatted lines of activity. 
         If the buffer size is not yet exceeded, lines are just added. If the buffer
         is maxed out, the oldest line is removed and newest one inserted at the beginning.
         """
@@ -38,22 +38,42 @@ class QDB:
             print ""
         if not event:
             return
+        #there are certain things we want to record in history, like nick changes and quits
+        #these often add to the humor of a quote. however, these are not specific to a channel
+        #in IRC and our bot does not maintain a userlist per channel. Therefore, when nick
+        #changes and quits occur, we will add them to every buffer. This is not technically
+        #correct behavior and could very well lead to quits/nick changes that are not visible
+        #showing up in a quote, but it's the best we can do at the moment
         if not event.channel:
-            return
+            #discard events with no verb and non-channel specific notices
+            if event.channel in ["", "NOTICE"]:
+                return
+            try:
+                for chan in self.bot.mem_store['qdb'].keys():
+                    if chan != '_recent':
+                        if len(self.bot.mem_store['qdb'][chan]) >= self.MAX_BUFFER_SIZE:
+                            self.bot.mem_store['qdb'][chan].pop()
+                        line = self.format_line(event)
+                        if line:
+                            self.bot.mem_store['qdb'][chan].insert(0, line)
+            except KeyError, IndexError:
+                print "QDB add_buffer() error when no event channel"
+        #now we continue with normal, per channel line addition
         #create a dictionary associating the channel with an empty list if it doesn't exist yet
-        if event.channel not in self.bot.mem_store['qdb']:
-            self.bot.mem_store['qdb'][event.channel] = []
-        try:
-        #check for the length of the buffer. if it's too long, pop the last item
-            if len(self.bot.mem_store['qdb'][event.channel]) >= self.MAX_BUFFER_SIZE:
-                self.bot.mem_store['qdb'][event.channel].pop()
-            #get a line by passing event to format_line
-            #insert the line into the first position in the list
-            line = self.format_line(event) 
-            if line:
-                self.bot.mem_store['qdb'][event.channel].insert(0, line)
-        except IndexError:
-            print "QDB add_buffer() error. Couldn't access the list index."
+        else:
+            if event.channel not in self.bot.mem_store['qdb']:
+                self.bot.mem_store['qdb'][event.channel] = []
+            try:
+            #check for the length of the buffer. if it's too long, pop the last item
+                if len(self.bot.mem_store['qdb'][event.channel]) >= self.MAX_BUFFER_SIZE:
+                    self.bot.mem_store['qdb'][event.channel].pop()
+                #get a line by passing event to format_line
+                #insert the line into the first position in the list
+                line = self.format_line(event) 
+                if line:
+                    self.bot.mem_store['qdb'][event.channel].insert(0, line)
+            except IndexError:
+                print "QDB add_buffer() error. Couldn't access the list index."
 
     def format_line(self, event):
         """Takes an event and formats a string appropriate for quotation from it"""
@@ -82,7 +102,7 @@ class QDB:
             #thing before the event message begins
             target = event.line.split(":", 2)[1].split()[-1]
             return ' <--- %s has kicked %s from %s (%s)\n' % (event.user, target, event.channel, event.msg)
-        elif event.verb == "NOTICE":
+        elif event.verb == "NOTICE": 
             return ' --NOTICE from %s: %s\n' % (event.user, event.msg)
         else:
             #no matching verbs found. just ignore the line
@@ -224,6 +244,6 @@ class QDB:
                 self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested quotes or parameters were not specific enough.\n')
                 return
             #print the link to the new submission
-            self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s, debug=True) + '\n')
+            self.printer("PRIVMSG " + event.channel + ' :' + self.submit(s) + '\n')
             return
-        self.add_buffer(event, debug=True)
+        self.add_buffer(event)
