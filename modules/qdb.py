@@ -222,7 +222,7 @@ class QDB:
                 s = self.get_qdb_submission(event.channel, start_msg)
                 recent = self.recently_submitted(s)
                 if recent > 0:
-                    q_url = "http://qdb.zero0f0.com/quote.php?id=" + str(recent)
+                    q_url = "http://qdb.zero9f9.com/quote.php?id=" + str(recent)
                     self.printer("PRIVMSG " + event.channel + " :QDB Error: A quote of >75% similarity has already been posted here: " + q_url + "\n")
                     return
                 if not s:
@@ -236,7 +236,7 @@ class QDB:
             s = self.get_qdb_submission(event.channel, start_msg, end_msg)
             recent = self.recently_submitted(s)
             if recent > 0:
-                q_url = "http://qdb.zero0f0.com/quote.php?id=" + str(recent)
+                q_url = "http://qdb.zero9f9.com/quote.php?id=" + str(recent)
                 self.printer("PRIVMSG " + event.channel + " :QDB Error: A quote of >75% similarity has already been posted here: " + q_url + "\n")
                 return
             #if there's nothing found for the submission, then we alert the channel and gtfo
