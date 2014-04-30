@@ -23,7 +23,6 @@ class Bonk:
                        'slaps %s around with a large trout',
                        'slaps %s around wiiIIITTTTHHH.....A HERRING!',
                        'bitch slaps %s',
-                       'sack taps %s',
                        'feeds %s a knuckle sandwich',
                        'sucker punches %s',
                        'drops an ACME anvil on %s',
@@ -33,7 +32,6 @@ class Bonk:
                        'bonks %s',
                        'gently caresses %s',
                        'falcon punches %s',
-                       'grants %s\'s wishes with a particularly cruel twist',
                        'pulls a Mike Tyson on %s\'s ear',
                        'charges up his lazer and fries %s',
                        'introduces %s to his fist',
@@ -47,15 +45,14 @@ class Bonk:
                        'beats %s in Halo 1v1',
                        'ruins %s',
                        'reks %s',
-                       'casts the Cruciatus Curse on %s',
                        'tramples %s under foot',
                        'unleashes his wrath upon %s',
-                       'awkwardly flirts with %s and won\'t take a hint',
                        'goes all ninja assassin on %s',
                        'beats %s down with the flag and teabags the body',
                        'takes %s\'s mother out for a nice dinner and then never calls her back',
                        'rockets %s from across the map',
-                       'telefrags %s'
+                       'telefrags %s',
+                       'throws a Dorito into %s\'s jugular from the shadows'
                        ]
         bonk_action = random.choice(bonk_actions) % bonkee
         return "\001ACTION " + bonk_action 
