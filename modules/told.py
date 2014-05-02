@@ -57,7 +57,8 @@ class Told:
                   "TOLDEN CAULFIELD",
                   "THE TOLD MAN AND THE SEA",
                   "TOLD MEDAL WINNER IN THE WINTER OLYMPICS",
-                  "POT OF TOLD AT THE END OF THE RAINBOW"
+                  "POT OF TOLD AT THE END OF THE RAINBOW",
+                  "J.R.R. TOLDKIEN"
                   ]
         return "[X] " + random.choice(status)
 
