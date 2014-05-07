@@ -1,8 +1,7 @@
 { 
   "irc.teamschoolyd.org": { 
     "exclude": [
-      "shortener",
-      "told"
+      "shortener"
       ]
   }
 }

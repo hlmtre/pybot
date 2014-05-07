@@ -62,9 +62,9 @@ class Bot(threading.Thread):
     implying = Event("__implying__")
     implying.define(">")
 
-    command = Event("__command__")
+    #command = Event("__command__")
    # this is an example of passing in a regular expression to the event definition
-    command.define("fo.bar")
+    #command.define("fo.bar")
 
     lastfm = Event("__.lastfm__")
     lastfm.define(".lastfm")
@@ -210,14 +210,14 @@ class Bot(threading.Thread):
     
   def send(self, message):
     if self.OFFLINE:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
     else:
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "\n DEBUGGING OUTPUT")
-        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8'))
-        print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
+        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'))
+        print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
 
-      self.s.send(message.encode('utf-8'))
+      self.s.send(message.encode('utf-8', 'ignore'))
       self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
 
   def pong(self, response):
