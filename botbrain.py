@@ -115,7 +115,7 @@ class BotBrain:
       print thing
       return None
 
-    outstring = 'PRIVMSG ' + channel + ' :' + s.decode('utf-8','ignore') + '\n'.encode('utf-8','ignore')
+    outstring = 'PRIVMSG ' + channel + ' :' + s.decode('utf-8','ignore') + '\n'
     self.microphone(outstring)
 
   def notice(self, channel, thing):
