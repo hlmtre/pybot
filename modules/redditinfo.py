@@ -16,7 +16,7 @@ if successful_import is True:
       self.bot = bot
       self.say = say
 
-      self.user_agent = 'pybot 0.5.4 by /u/hlmtre; http://bits.zero9f9.com/pybot'
+      self.user_agent = 'pybot 0.6.4 by /u/hlmtre; http://bits.zero9f9.com/pybot'
 
       self.help = None
 

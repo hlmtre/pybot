@@ -218,7 +218,9 @@ class Bot(threading.Thread):
         print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
 
       self.s.send(message.encode('utf-8', 'ignore'))
-      self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
+      target = message.split()[1]
+      if target.startswith("#"):
+        self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
 
   def pong(self, response):
     self.send('PONG ' + response + '\n')

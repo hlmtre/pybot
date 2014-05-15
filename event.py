@@ -10,6 +10,7 @@ class Event:
     self.line = ""
     self.msg = ""
     self.verb = ""
+    self.is_pm = False
     
   def subscribe(self, e):
     self.subscribers.append(e)
@@ -56,5 +57,7 @@ class Event:
       if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE", "PING", "PONG", "MODE"]:
         self.verb = v
         break
+    if len(self.channel) == 0:
+      self.is_pm = True
     for s in self.subscribers:
       s.handle(self)
