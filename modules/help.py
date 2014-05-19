@@ -6,6 +6,7 @@ class Help:
     self.printer = printer_handle
     self.interests = ['__.help__']
     self.bot = bot
+    self.say = say
 
     for event in events:
       if event._type in self.interests:
@@ -14,7 +15,7 @@ class Help:
     help = Event("__.help__")
     help.define(msg_definition="^\.help")
     help.subscribe(self)
-    self.bot.register_event(help)
+    self.bot.register_event(help,self)
 
     self.help = ".help"
 
@@ -32,7 +33,7 @@ class Help:
         if hasattr(sm, "help") and sm.help is not None:
           line_list.append(sm.help)
 
-      self.printer("PRIVMSG " + event.user + " :" + ", ".join(line_list) + "\n")
-
+      self.say(event.user, ", ".join(line_list))
+      #self.printer("PRIVMSG " + event.user + " :" + ", ".join(line_list) + "\n")
     except:
       pass

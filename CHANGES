@@ -42,15 +42,17 @@ v0.5.1
   * Code still very much needs to be cleaned up and restructured. 
 
   * bot class still passing only PRIVMSGs to botbrain -- for events to be really useful (see Future), JOINS, PARTS,
-  etc would need to get passed as well.
+  etc would need to get passed as well. --WONTFIX - CORE ADDITIONAL FUNCTIONALITY MOVED TO MODULES --
+
 
 v0.6
 ======
 
   Features: 
-    * Dynamic module loading and unloading, and dynamic event creation are add. 
+    * Dynamic module loading and unloading, and dynamic event creation are add.  --DONE--
     * setup.sh generates mysql commands to create database and add user for the bot to log in as.
     * Dynamic help and some more framework additions to modules. help.py module checks for every module's field 'help' and will display that if available.
+
 
   Bugs fixed:
     DB respects username and password and db name from configuration file.
