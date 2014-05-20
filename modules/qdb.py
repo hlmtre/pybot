@@ -45,7 +45,7 @@ class QDB:
         #correct behavior and could very well lead to quits/nick changes that are not visible
         #showing up in a quote, but it's the best we can do at the moment
         if not event.channel:
-            #discard events with no verb and non-channel specific notices
+            #discard events with unwanted verbs 
             if event.verb not in ["QUIT", "NICK"]:
                 return
             try:
