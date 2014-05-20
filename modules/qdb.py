@@ -21,7 +21,7 @@ class QDB:
         self.bot.register_event(qdb, self)
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
-        self.MAX_BUFFER_SIZE = 100 
+        self.MAX_BUFFER_SIZE = 200 
         self.MAX_HISTORY_SIZE = 10
 
     def add_buffer(self, event=None, debug=False): 
@@ -130,13 +130,15 @@ class QDB:
         #search for a matching start and end string and get the buffer index for the start and end message
         start_index = -1
         end_index = -1
-        #goes through all lines in buffer
-        #not really a bug, but if the same string is found multiple times, it will choose the oldest one
+        #finds oldest matching string for beginning line
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
             if start_msg.lower() in line.lower():
                 start_index = index
+        #finds newest matching string for ending line
+        for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
             if end_msg.lower() in line.lower():
                 end_index = index
+                break
         #check to see if index values are positive. if not, string was not found and we're done
         if start_index == -1 or end_index == -1 or start_index < end_index:
             return None
