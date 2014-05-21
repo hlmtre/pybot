@@ -25,6 +25,9 @@ class Tell:
     #try:
       if event.msg.startswith(".tell"):
         target = event.msg.split()[1]
+        if target == self.bot.conf.getNick(self.bot.network):
+          self.say(event.channel, "I can't tell myself; gtfo")
+          return
         thing = event.msg.split()[2:] # all the way to the end
         n = Notice(event.user, target, thing)
 

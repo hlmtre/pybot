@@ -25,6 +25,8 @@ class Youtube(BaseModule):
     self.bot.mem_store['youtube'] = OrderedDict()
 
   def print_video_title(self, event, url, video_tag):
+    if event.user == self.bot.conf.getNick(self.bot.network): #ignore himself
+      return
     try:
       response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
     except urllib2.HTTPError:
