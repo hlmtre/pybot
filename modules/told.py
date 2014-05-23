@@ -65,6 +65,10 @@ class Told:
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
         told_status = self.get_told_status()
+        if _z[1].startswith(('.', '#', '!')) and len(str.split(_z[1])) > 1:
+            self.say(event.channel, "Nice try, " + event.user + ". Looks like you might be trying to trick me.")
+            self.say(event.channel, event.user + "\'s told status: " + told_status)
+            return
         try:
             self.printer("PRIVMSG " + event.channel + ' :' + _z[1] + '\'s told status: ' + told_status + '\n')
         except IndexError:
