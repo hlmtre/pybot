@@ -48,7 +48,7 @@ class Youtube(BaseModule):
         get_dict = dict(parse_qsl(urlparse(url).query)) # create dictionary of strings, instead of of lists. this fails to handle if there are multiple values for a key in the GET
         video_tag = get_dict['v']
       except KeyError:
-        pass
+        return
     elif event._type == "__.youtubeshort__":
       url = re.search("youtu\.be[\S]+", event.line).group(0)
       video_tag = url.split("/")[-1]
