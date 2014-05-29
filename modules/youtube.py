@@ -51,8 +51,9 @@ class Youtube(BaseModule):
         return
     elif event._type == "__.youtubeshort__":
       url = re.search("youtu\.be[\S]+", event.line).group(0)
-      video_tag = url.split("/")[-1]
-    if not url:
-      print "No url found."
+      if url: 
+        video_tag = url.split("/")[-1]
+      else:
+        return
     if url and video_tag.__len__() > 1:
       self.print_video_title(event, url, video_tag)
