@@ -16,7 +16,7 @@ class Told:
 
         self.help = ".told <nick>" 
 
-    def get_told_status(self):
+    def get_told_status(self, target):
         """Randomly selects and returns a string with a "told" status."""
         status = ["FUCKING TOLD",
                   "CASH4TOLD.COM",
@@ -60,20 +60,18 @@ class Told:
                   "POT OF TOLD AT THE END OF THE RAINBOW",
                   "J.R.R. TOLDKIEN"
                   ]
-        return "[X] " + random.choice(status)
+        exclamation = ["Damn!",
+                       "Damn, son!",
+                       "Snap!",
+                       "Sheeeiiiiittttt.",
+                       "Ouch!"
+                      ]
+        return random.choice(exclamation) + " %s\'s told status: [X] " % target + random.choice(status)
 
     def handle(self, event):
         _z = str.split(event.msg, None, 1)
-        told_status = self.get_told_status()
-        if _z[1].startswith(('.', '#', '!')) and len(str.split(_z[1])) > 1:
-            self.say(event.channel, "Nice try, " + event.user + ". Looks like you might be trying to trick me.")
-            self.say(event.channel, event.user + "\'s told status: " + told_status)
-            return
         try:
-            self.printer("PRIVMSG " + event.channel + ' :' + _z[1] + '\'s told status: ' + told_status + '\n')
+            self.say(event.channel, self.get_told_status(_z[1]))
         except IndexError:
-            self.printer("PRIVMSG " + event.channel + ' :You didn\'t say who got told. Your told status: ' + told_status + '\n') 
-        except TypeError:
-            print "DEBUG: TypeError: ",
-            print event.channel,
-            print event.user
+            self.say(event.channel, "You didn\'t say who got told!")
+            self.say(event.channel, self.get_told_status(event.user))
