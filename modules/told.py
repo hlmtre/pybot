@@ -25,7 +25,7 @@ class Told:
                   "CURE FOR THE COMMON TOLD",
                   "BEN TOLDS FIVE",
                   "THE 40 YEAR TOLD VIRGIN",
-                  "007: TOLDENEYE",
+                  "TOLDENEYE 007",
                   "TEXAS TOLD'EM",
                   "AUSTIN POWERS IN TOLDMEMBER",
                   "PTERODACTOLD",
