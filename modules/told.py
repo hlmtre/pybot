@@ -58,7 +58,9 @@ class Told:
                   "THE TOLD MAN AND THE SEA",
                   "TOLD MEDAL WINNER IN THE WINTER OLYMPICS",
                   "POT OF TOLD AT THE END OF THE RAINBOW",
-                  "J.R.R. TOLDKIEN"
+                  "J.R.R. TOLDKIEN",
+                  "CALIFORNIA TOLD RUSH",
+                  "THERE'S TOLD IN THEM THAR HILLS"
                   ]
         exclamation = ["Damn!",
                        "Damn, son!",
