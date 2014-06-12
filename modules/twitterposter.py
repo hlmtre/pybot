@@ -20,10 +20,14 @@ class TwitterPoster(BaseModule):
   try:
     from modules.twitter_credentials import PybotTwitter as pt
   except ImportError:
-    pt.api_key = ""
-    pt.api_secret = ""
-    pt.access_token = ""
-    pt.access_token_secret = ""
+    class PhonyPt:
+      api_key = ""
+      api_secret = ""
+      access_token = ""
+      access_token_secret = ""
+
+    pt = PhonyPt()
+
   user_to_track = "bhhorg"
 
   def post_init(self):
