@@ -17,7 +17,13 @@ except ImportError:
 
 """
 class TwitterPoster(BaseModule):
-  from modules.twitter_credentials import PybotTwitter as pt
+  try:
+    from modules.twitter_credentials import PybotTwitter as pt
+  except ImportError:
+    pt.api_key = ""
+    pt.api_secret = ""
+    pt.access_token = ""
+    pt.access_token_secret = ""
   user_to_track = "bhhorg"
 
   def post_init(self):
