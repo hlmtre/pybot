@@ -39,7 +39,7 @@ class Event:
         return True
 
     if len(self.user_definition) > 0:
-      if len(line) > 0:
+      if len(line) and "PRIVMSG" in line > 0:
         line_array = line.split()
         user_and_mask = line_array[0][1:]
         user = user_and_mask.split("!")[0]
