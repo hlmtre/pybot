@@ -2,7 +2,7 @@ pybot is a python irc bot. he is a project. [![Build Status](https://travis-ci.o
 
 he is modular, extensible, multi-threaded, and configurable.
 
-pybot runs on python 2.6 and 2.7. python versions > 3 are in the works.
+pybot runs on python 2.6 and 2.7 (though steamapi does not work with 2.6, the core bot does). python versions > 3 are in the works.
 
 
 10-second TL;DR:
