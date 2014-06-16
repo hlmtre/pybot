@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>db &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for db</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">MySQLdb</span> <span class="kn">as</span> <span class="nn">mdb</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span><span class="n">timedelta</span>
+<div class="viewcode-block" id="DB"><a class="viewcode-back" href="../docs/db.html#db.DB">[docs]</a><span class="k">class</span> <span class="nc">DB</span><span class="p">:</span>
+  <span class="n">age</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+    
+  <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">dbusername</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getDBUsername</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+      <span class="n">password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getDBPass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+      <span class="n">dbname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getDBName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">dbusername</span> <span class="o">=</span> <span class="s">&quot;pybot&quot;</span>
+      <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;1q2w3e4r&quot;</span>
+      <span class="n">dbname</span> <span class="o">=</span> <span class="s">&quot;pybot&quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">con</span> <span class="o">=</span> <span class="n">mdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="n">dbusername</span><span class="p">,</span><span class="n">password</span><span class="p">,</span><span class="n">dbname</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+  
+  <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">con</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+  <span class="c"># should prevent mysql has gone away errors.. ideally</span>
+  <span class="k">def</span> <span class="nf">_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">cur</span>
+    <span class="k">global</span> <span class="n">age</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">con</span> <span class="o">=</span> <span class="n">mdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="s">&quot;pybot&quot;</span><span class="p">,</span><span class="s">&quot;1q2w3e4r&quot;</span><span class="p">,</span><span class="s">&quot;pybot&quot;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DB.select"><a class="viewcode-back" href="../docs/db.html#db.DB.select">[docs]</a>  <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;SELECT </span><span class="si">%s</span><span class="s"> FROM </span><span class="si">%s</span><span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+</div>
+<div class="viewcode-block" id="DB.replace"><a class="viewcode-back" href="../docs/db.html#db.DB.replace">[docs]</a>  <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;REPLACE INTO </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">) VALUES (</span><span class="si">%s</span><span class="s">)&quot;&quot;&quot;</span><span class="p">,(</span><span class="n">where</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">what</span><span class="p">))</span> 
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="DB.e"><a class="viewcode-back" href="../docs/db.html#db.DB.e">[docs]</a>  <span class="k">def</span> <span class="nf">e</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> 
+      <span class="k">if</span> <span class="s">&quot;INSERT&quot;</span> <span class="ow">in</span> <span class="n">sql</span> <span class="ow">or</span> <span class="s">&quot;REPLACE&quot;</span> <span class="ow">in</span> <span class="n">sql</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">elif</span> <span class="s">&quot;SELECT&quot;</span> <span class="ow">in</span> <span class="n">sql</span><span class="p">:</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+      <span class="k">print</span> <span class="n">e</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="DB.insert"><a class="viewcode-back" href="../docs/db.html#db.DB.insert">[docs]</a>  <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;INSERT INTO </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">) VALUES (</span><span class="si">%s</span><span class="s">)&quot;&quot;&quot;</span><span class="p">,(</span><span class="n">where</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">what</span><span class="p">))</span> 
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="DB.updateSeen"><a class="viewcode-back" href="../docs/db.html#db.DB.updateSeen">[docs]</a>  <span class="k">def</span> <span class="nf">updateSeen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">who</span><span class="p">,</span><span class="n">statement</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+    <span class="c">#print &quot;executing REPLACE INTO seen (user_name, statement, event) VALUES ( &quot; + str(who) + &quot; &quot; + str(statement) + &quot; &quot; + str(event) + &quot;)&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;REPLACE INTO seen (user_name, statement, event) VALUES (</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">who</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">event</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="DB.getSeen"><a class="viewcode-back" href="../docs/db.html#db.DB.getSeen">[docs]</a>  <span class="k">def</span> <span class="nf">getSeen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">who</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT user_name, date, statement, event FROM seen WHERE user_name = </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">who</span><span class="p">)</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+      <span class="k">return</span> <span class="n">data</span><span class="p">;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">None</span> 
+</div>
+  <span class="k">def</span> <span class="nf">_insertImg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="ow">or</span> <span class="n">user</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">user</span> <span class="o">=</span> <span class="s">&quot;nobody&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;INSERT INTO img (user, url, channel) VALUES (</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">)&quot;&quot;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">_getImgs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;SELECT * FROM img ORDER BY time DESC&quot;&quot;&quot;</span><span class="p">)</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+  <span class="k">def</span> <span class="nf">_isAdmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;SELECT * FROM admins WHERE username = </span><span class="si">%s</span><span class="s">&quot;&quot;&quot;</span><span class="p">,(</span><span class="n">username</span><span class="p">))</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

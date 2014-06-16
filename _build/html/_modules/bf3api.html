@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bf3api &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for bf3api</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: UTF-8 -*-</span>
+<span class="c">#</span>
+<span class="c"># Copyright (c) 2012 Harry Gabriel &lt;h.gabriel@nodefab.de&gt;</span>
+<span class="c">#</span>
+<span class="c"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c"># it under the terms of the GNU General Public License as published by</span>
+<span class="c"># the Free Software Foundation, either version 2 of the License, or</span>
+<span class="c"># (at your option) any later version.</span>
+<span class="c">#</span>
+<span class="c"># This program is distributed in the hope that it will be useful,</span>
+<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
+<span class="c"># GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU General Public License</span>
+<span class="c"># along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">hmac</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c"># python version 2.6 or newer</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># older python versions</span>
+        <span class="kn">import</span> <span class="nn">simplejson</span> <span class="kn">as</span> <span class="nn">json</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="c"># Houston, we have a problem</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">,</span> <span class="s">&#39;Unable to load a json library&#39;</span>
+
+<div class="viewcode-block" id="API"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API">[docs]</a><span class="k">class</span> <span class="nc">API</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A python interface for the bf3stats.com API&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">plattform</span><span class="o">=</span><span class="s">&#39;pc&#39;</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ident</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="c"># setup url to bf3stats.com API</span>
+        <span class="k">if</span> <span class="n">base_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span> <span class="o">=</span> <span class="s">&#39;http://api.bf3stats.com&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="c"># can be pc, 360 or ps3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plattform</span> <span class="o">=</span> <span class="n">plattform</span>
+        <span class="c"># ident and secret for signed requests</span>
+        <span class="k">if</span> <span class="n">ident</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ident</span> <span class="o">=</span> <span class="n">ident</span>
+        <span class="k">if</span> <span class="n">secret</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_secret</span> <span class="o">=</span> <span class="n">secret</span>
+
+    <span class="k">def</span> <span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_data</span><span class="p">,</span> <span class="n">data_group</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">plattform</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Access bfstats.com API via HTTP POST&quot;&quot;&quot;</span>
+        <span class="c"># build url for current request</span>
+        <span class="k">if</span> <span class="n">plattform</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">plattform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plattform</span>
+        <span class="n">api_url</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">/&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span><span class="p">,</span> <span class="n">plattform</span><span class="p">,</span> <span class="n">data_group</span><span class="p">)</span>
+        <span class="c"># sign data if we need</span>
+        <span class="k">if</span> <span class="n">sign</span><span class="p">:</span>
+            <span class="n">post_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span><span class="p">(</span><span class="n">post_data</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">con</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">api_url</span><span class="p">,</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">post_data</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">raw_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">raw_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;status&#39;</span> <span class="p">:</span> <span class="s">&#39;error&#39;</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="n">err</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">objDict</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sign data for a signed request&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">urlsafe_b64encode</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data_dict</span><span class="p">))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">urlsafe_b64encode</span><span class="p">(</span>
+                <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_secret</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">digestmod</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="s">&#39;sig&#39;</span><span class="p">:</span> <span class="n">sig</span> <span class="p">}</span>
+
+    <span class="c"># reimplement bf3stats.com JSON API</span>
+    <span class="c"># Method names taken from the documentation</span>
+    <span class="c"># http://bf3stats.com/api_url</span>
+<div class="viewcode-block" id="API.playerlist"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.playerlist">[docs]</a>    <span class="k">def</span> <span class="nf">playerlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">players</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request a list of players&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="API.player"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.player">[docs]</a>    <span class="k">def</span> <span class="nf">player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_name</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request a player&quot;&quot;&quot;</span>
+        <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s">&#39;player&#39;</span> <span class="p">:</span> <span class="n">player_name</span><span class="p">,</span>
+                <span class="s">&#39;opt&#39;</span> <span class="p">:</span> <span class="n">parts</span>
+                <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">post_data</span><span class="p">,</span> <span class="s">&#39;player&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="API.dogtags"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.dogtags">[docs]</a>    <span class="k">def</span> <span class="nf">dogtags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request Player dogtags&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;player&#39;</span><span class="p">:</span> <span class="n">player_name</span><span class="p">},</span> <span class="n">data_group</span><span class="o">=</span><span class="s">&#39;dogtags&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="API.onlinestats"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.onlinestats">[docs]</a>    <span class="k">def</span> <span class="nf">onlinestats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count of online players&quot;&quot;&quot;</span>
+        <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">post_data</span><span class="o">=</span><span class="p">{},</span> <span class="n">data_group</span><span class="o">=</span><span class="s">&#39;onlinestats&#39;</span><span class="p">,</span> <span class="n">plattform</span><span class="o">=</span><span class="s">&#39;global&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="API.playerupdate"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.playerupdate">[docs]</a>    <span class="k">def</span> <span class="nf">playerupdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_name</span><span class="p">,</span> <span class="n">data_group</span><span class="o">=</span><span class="s">&#39;playerupdate&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Request a playerupdate. (signed request)</span>
+
+<span class="sd">        bf3stats.com request the current data from EA for this player.</span>
+<span class="sd">        If the player was not in bf3stats.com database, they do automatically a lookup and add the player.</span>
+
+<span class="sd">        Note: Clock should not have more than 1 minute difference to current time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s">&#39;ident&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ident</span><span class="p">,</span>
+                <span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+                <span class="s">&#39;player&#39;</span><span class="p">:</span> <span class="n">player_name</span>
+                <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">post_data</span><span class="p">,</span> <span class="n">data_group</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="API.playerlookup"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.playerlookup">[docs]</a>    <span class="k">def</span> <span class="nf">playerlookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lookup a player. (signed request)&quot;&quot;&quot;</span>
+        <span class="c"># the code would be the same as playerupdate - let reuse this function</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">playerupdate</span><span class="p">(</span><span class="n">player_name</span><span class="p">,</span> <span class="n">data_group</span><span class="o">=</span><span class="s">&#39;playerlookup&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="API.setupkey"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.setupkey">[docs]</a>    <span class="k">def</span> <span class="nf">setupkey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_ident</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate an individual client key for every installation&quot;&quot;&quot;</span>
+        <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s">&#39;ident&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ident</span><span class="p">,</span>
+                <span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+                <span class="s">&#39;clientident&#39;</span><span class="p">:</span> <span class="n">client_ident</span><span class="p">,</span>
+                <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span>
+                <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">post_data</span><span class="p">,</span> <span class="n">data_group</span><span class="o">=</span><span class="s">&#39;setupkey&#39;</span><span class="p">,</span> <span class="n">plattform</span><span class="o">=</span><span class="s">&#39;global&#39;</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="API.getkey"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.API.getkey">[docs]</a>    <span class="k">def</span> <span class="nf">getkey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_ident</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;&quot;Get information about a existing client key or your own key.&quot;&quot;&quot;</span>
+        <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s">&#39;ident&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ident</span><span class="p">,</span>
+                <span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+                <span class="s">&#39;clientident&#39;</span><span class="p">:</span> <span class="n">client_ident</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">post_data</span><span class="p">,</span> <span class="n">data_group</span><span class="o">=</span><span class="s">&#39;getkey&#39;</span><span class="p">,</span> <span class="n">plattform</span><span class="o">=</span><span class="s">&#39;global&#39;</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="objDict"><a class="viewcode-back" href="../docs/bf3api.html#bf3api.objDict">[docs]</a><span class="k">class</span> <span class="nc">objDict</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;The recursive class for building and representing objects with.&#39;&#39;&#39;</span>
+    <span class="c"># http://stackoverflow.com/questions/1305532/convert-python-dict-to-object</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_to_str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">objDict</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;{</span><span class="si">%s</span><span class="s">}&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()))</span>
+
+		</div>
+<span class="k">def</span> <span class="nf">_to_str</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add _ if given string is a digit.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;_</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+
+    <span class="k">return</span> <span class="n">name</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

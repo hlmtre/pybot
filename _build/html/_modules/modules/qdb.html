@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>modules.qdb &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for modules.qdb</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">event</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">difflib</span>
+
+<div class="viewcode-block" id="QDB"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB">[docs]</a><span class="k">class</span> <span class="nc">QDB</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">printer_handle</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">say</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span> <span class="o">=</span> <span class="n">printer_handle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interests</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;__.qdb__&#39;</span><span class="p">]</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">say</span> <span class="o">=</span> <span class="n">say</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c">#define a key for _recent since that will not be a potential channel name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="s">&#39;_recent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">qdb</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__.qdb__&quot;</span><span class="p">)</span>
+        <span class="n">qdb</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="n">msg_definition</span><span class="o">=</span><span class="s">&quot;.*&quot;</span><span class="p">)</span>
+        <span class="n">qdb</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="n">qdb</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="s">&quot;.qdb &lt;search string of first line&gt; | &lt;search string of last line&gt;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">200</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">MAX_HISTORY_SIZE</span> <span class="o">=</span> <span class="mi">10</span>
+
+<div class="viewcode-block" id="QDB.add_buffer"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.add_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">add_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Takes a channel name and line passed to it and stores them in the bot&#39;s mem_store dict</span>
+<span class="sd">        for future access. The dict will have channel as key. The value to that key will be a list</span>
+<span class="sd">        of formatted lines of activity. </span>
+<span class="sd">        If the buffer size is not yet exceeded, lines are just added. If the buffer</span>
+<span class="sd">        is maxed out, the oldest line is removed and newest one inserted at the beginning.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Line: &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">line</span>
+            <span class="k">print</span> <span class="s">&quot;Verb: &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span>
+            <span class="k">print</span> <span class="s">&quot;Channel: &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span>
+            <span class="k">print</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c">#there are certain things we want to record in history, like nick changes and quits</span>
+        <span class="c">#these often add to the humor of a quote. however, these are not specific to a channel</span>
+        <span class="c">#in IRC and our bot does not maintain a userlist per channel. Therefore, when nick</span>
+        <span class="c">#changes and quits occur, we will add them to every buffer. This is not technically</span>
+        <span class="c">#correct behavior and could very well lead to quits/nick changes that are not visible</span>
+        <span class="c">#showing up in a quote, but it&#39;s the best we can do at the moment</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
+            <span class="c">#discard events with unwanted verbs </span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;QUIT&quot;</span><span class="p">,</span> <span class="s">&quot;NICK&quot;</span><span class="p">]:</span>
+                <span class="k">return</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">chan</span> <span class="o">!=</span> <span class="s">&#39;_recent&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">chan</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BUFFER_SIZE</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_line</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">chan</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;QDB add_buffer() error when no event channel&quot;</span>
+        <span class="c">#now we continue with normal, per channel line addition</span>
+        <span class="c">#create a dictionary associating the channel with an empty list if it doesn&#39;t exist yet</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">try</span><span class="p">:</span>
+            <span class="c">#check for the length of the buffer. if it&#39;s too long, pop the last item</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BUFFER_SIZE</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="c">#get a line by passing event to format_line</span>
+                <span class="c">#insert the line into the first position in the list</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_line</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> 
+                <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;QDB add_buffer() error. Couldn&#39;t access the list index.&quot;</span>
+</div>
+<div class="viewcode-block" id="QDB.format_line"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.format_line">[docs]</a>    <span class="k">def</span> <span class="nf">format_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes an event and formats a string appropriate for quotation from it&quot;&quot;&quot;</span>
+        <span class="c">#format all strings based on the verb</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;&#39;</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;PRIVMSG&quot;</span><span class="p">:</span>
+            <span class="c">#special formatting for ACTION strings</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\001</span><span class="s">ACTION&#39;</span><span class="p">):</span> 
+                <span class="c">#strip out the word ACTION from the msg</span>
+                <span class="k">return</span> <span class="s">&#39; * </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">[</span><span class="mi">7</span><span class="p">:])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;JOIN&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39; --&gt; </span><span class="si">%s</span><span class="s"> has joined channel </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;PART&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39; &lt;-- </span><span class="si">%s</span><span class="s"> has left channel </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;NICK&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39; -- </span><span class="si">%s</span><span class="s"> has changed their nick to </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;TOPIC&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39; -- </span><span class="si">%s</span><span class="s"> has changed the topic for </span><span class="si">%s</span><span class="s"> to &quot;</span><span class="si">%s</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;QUIT&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39; &lt;-- </span><span class="si">%s</span><span class="s"> has quit (</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;KICK&quot;</span><span class="p">:</span>
+            <span class="c">#this little bit of code finds the kick target by getting the last</span>
+            <span class="c">#thing before the event message begins</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="s">&#39; &lt;--- </span><span class="si">%s</span><span class="s"> has kicked </span><span class="si">%s</span><span class="s"> from </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;NOTICE&quot;</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="s">&#39; --NOTICE from </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#no matching verbs found. just ignore the line</span>
+            <span class="k">return</span> <span class="s">&#39;&#39;</span>
+</div>
+<div class="viewcode-block" id="QDB.get_qdb_submission"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.get_qdb_submission">[docs]</a>    <span class="k">def</span> <span class="nf">get_qdb_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start_msg</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">end_msg</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given two strings, start_msg and end_msg, this function will assemble a submission for the QDB.</span>
+<span class="sd">        start_msg is a substring to search for and identify a starting line. end_msg similarly is used</span>
+<span class="sd">        to search for the last desired line in the submission. This function returns a string ready</span>
+<span class="sd">        for submission to the QDB if it finds the desired selection. If not, it returns None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="c">#must have at least one msg to search for and channel to look it up in</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="c">#first, check to see if we are doing a single string submission.</span>
+        <span class="k">if</span> <span class="n">end_msg</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">channel</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">start_msg</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">line</span>
+            <span class="c">#making sure we get out of the function if no matching strings were found</span>
+            <span class="c">#don&#39;t want to search for a nonexistent second string later</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="c">#search for a matching start and end string and get the buffer index for the start and end message</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">end_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c">#finds oldest matching string for beginning line</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">channel</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">start_msg</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">start_index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="c">#finds newest matching string for ending line</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">channel</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">end_msg</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">end_index</span> <span class="o">=</span> <span class="n">index</span>
+                <span class="k">break</span>
+        <span class="c">#check to see if index values are positive. if not, string was not found and we&#39;re done</span>
+        <span class="k">if</span> <span class="n">start_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">end_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">start_index</span> <span class="o">&lt;</span> <span class="n">end_index</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="c">#now we generate the string to be returned for submission</span>
+        <span class="n">submission</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">end_index</span><span class="p">,</span> <span class="n">start_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+                <span class="c">#print &#39;Index number is &#39; + str(i) + &#39; and current submission is &#39; + submission</span>
+                <span class="n">submission</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="n">channel</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;QDB get_qdb_submission() error when accessing list index&quot;</span>
+        <span class="k">return</span> <span class="n">submission</span>
+</div>
+<div class="viewcode-block" id="QDB.submit"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.submit">[docs]</a>    <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qdb_submission</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a string, qdb_submission, this function will upload the string to hlmtre&#39;s qdb</span>
+<span class="sd">        server. Returns a string with status of submission. If it worked, includes a link to new quote. </span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Submission is:&quot;</span>
+            <span class="k">print</span> <span class="n">qdb_submission</span>
+            <span class="k">print</span> <span class="s">&quot;Current buffer is:&quot;</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">]</span>
+            <span class="k">print</span> <span class="s">&quot;&quot;</span>
+            <span class="k">return</span> <span class="s">&#39;&#39;</span>
+        <span class="c">#accessing hlmtre&#39;s qdb api</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;http://qdb.zero9f9.com/api.php&#39;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;q&#39;</span><span class="p">:</span><span class="s">&#39;new&#39;</span><span class="p">,</span> <span class="s">&#39;quote&#39;</span><span class="p">:</span> <span class="n">qdb_submission</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)}</span>
+        <span class="n">qdb</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="c">#check for any HTTP errors and return False if there were any</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">qdb</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;HTTPError encountered when submitting to QDB&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">q_url</span> <span class="o">=</span> <span class="n">qdb</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_recently_submitted</span><span class="p">(</span><span class="n">q_url</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="n">qdb_submission</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s">&quot;QDB submission successful! http://qdb.zero9f9.com/quote.php?id=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">q_url</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s">&quot;Error getting status of quote submission.&quot;</span> 
+        <span class="k">return</span> <span class="s">&quot;That was probably successful since no errors came up, but no status available.&quot;</span>
+</div>
+<div class="viewcode-block" id="QDB.recently_submitted"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.recently_submitted">[docs]</a>    <span class="k">def</span> <span class="nf">recently_submitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submission</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks to see if the given submission is string is at least 75% similar to the strings</span>
+<span class="sd">        in the list of recently submitted quotes.</span>
+<span class="sd">        Returns the id of the quote if it was recently submitted. If not, returns -1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#set up a difflib SequenceMatcher with the first string to test</span>
+        <span class="n">comparer</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">SequenceMatcher</span><span class="p">()</span>
+        <span class="n">comparer</span><span class="o">.</span><span class="n">set_seq1</span><span class="p">(</span><span class="n">submission</span><span class="p">)</span>
+        <span class="c">#if we find that it has 75% similarity or greater to a recent submission, return True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">recent_quote</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="s">&#39;_recent&#39;</span><span class="p">]:</span>
+                <span class="n">comparer</span><span class="o">.</span><span class="n">set_seq2</span><span class="p">(</span><span class="n">recent_quote</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">comparer</span><span class="o">.</span><span class="n">ratio</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="o">.</span><span class="mi">75</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">recent_quote</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> 
+</div>
+<div class="viewcode-block" id="QDB.add_recently_submitted"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.add_recently_submitted">[docs]</a>    <span class="k">def</span> <span class="nf">add_recently_submitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_id</span><span class="p">,</span> <span class="n">submission</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a string, submission, and adds it to the list of recent submissions.</span>
+<span class="sd">        Also we do length checking, only keep record of the previous MAX_HISTORY_SIZE quotes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#first, see if we have reached the maximum history size. if so, remove last item</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="s">&#39;_recent&#39;</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_HISTORY_SIZE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="s">&#39;_recent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="c">#inserting a dict with the qdb id of the submission and the submission content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="s">&#39;_recent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="n">q_id</span><span class="p">:</span><span class="n">submission</span><span class="p">})</span>
+</div>
+<div class="viewcode-block" id="QDB.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="c">#first we see if we&#39;re going to generate a qdb submission, or just add the line to the buffer</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.qdb &quot;</span><span class="p">):</span>
+            <span class="c">#split the msg with &#39;.qdb &#39; stripped off beginning and divide into 1 or 2 search strings</span>
+            <span class="n">string_token</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;|&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">start_msg</span> <span class="o">=</span> <span class="n">string_token</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="c">#see if we only have a one line submission</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string_token</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c">#s is the string to submit</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_qdb_submission</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">start_msg</span><span class="p">)</span>
+                <span class="n">recent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recently_submitted</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">recent</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">q_url</span> <span class="o">=</span> <span class="s">&quot;http://qdb.zero9f9.com/quote.php?id=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">recent</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&quot; :QDB Error: A quote of &gt;75</span><span class="si">% s</span><span class="s">imilarity has already been posted here: &quot;</span> <span class="o">+</span> <span class="n">q_url</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&#39; :QDB Error: Could not find requested string.</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="c">#Print the link to the newly submitted quote</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="c">#We should only get here if there are two items in string_token</span>
+            <span class="n">end_msg</span> <span class="o">=</span> <span class="n">string_token</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_qdb_submission</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">start_msg</span><span class="p">,</span> <span class="n">end_msg</span><span class="p">)</span>
+            <span class="n">recent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recently_submitted</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">recent</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">q_url</span> <span class="o">=</span> <span class="s">&quot;http://qdb.zero9f9.com/quote.php?id=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">recent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&quot; :QDB Error: A quote of &gt;75</span><span class="si">% s</span><span class="s">imilarity has already been posted here: &quot;</span> <span class="o">+</span> <span class="n">q_url</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="c">#if there&#39;s nothing found for the submission, then we alert the channel and gtfo</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&#39; :QDB Error: Could not find requested quotes or parameters were not specific enough.</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="c">#print the link to the new submission</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_buffer</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

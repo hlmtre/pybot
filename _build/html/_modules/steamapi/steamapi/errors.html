@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>steamapi.steamapi.errors &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for steamapi.steamapi.errors</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;SmileyBarry&#39;</span>
+
+<span class="kn">from</span> <span class="nn">.decorators</span> <span class="kn">import</span> <span class="n">debug</span>
+
+
+<div class="viewcode-block" id="APIException"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APIException">[docs]</a><span class="k">class</span> <span class="nc">APIException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all API exceptions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="APIUserError"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APIUserError">[docs]</a><span class="k">class</span> <span class="nc">APIUserError</span><span class="p">(</span><span class="n">APIException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An API error caused by a user error, like wrong data or just empty results for a query.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="UserNotFoundError"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.UserNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">UserNotFoundError</span><span class="p">(</span><span class="n">APIUserError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The specified user was not found on the Steam Community. (Bad vanity URL? Non-existent ID?)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="APIError"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APIError">[docs]</a><span class="k">class</span> <span class="nc">APIError</span><span class="p">(</span><span class="n">APIException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An API error signifies a problem with the server, a temporary issue or some other easily-repairable</span>
+<span class="sd">    problem.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="APIFailure"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APIFailure">[docs]</a><span class="k">class</span> <span class="nc">APIFailure</span><span class="p">(</span><span class="n">APIException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An API failure signifies a problem with your request (e.g.: invalid API), a problem with your data,</span>
+<span class="sd">    or any error that resulted from improper use.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="APIBadCall"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APIBadCall">[docs]</a><span class="k">class</span> <span class="nc">APIBadCall</span><span class="p">(</span><span class="n">APIFailure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Your API call doesn&#39;t match the API&#39;s specification. Check your arguments, service name, command &amp;</span>
+<span class="sd">    version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="APINotFound"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APINotFound">[docs]</a><span class="k">class</span> <span class="nc">APINotFound</span><span class="p">(</span><span class="n">APIFailure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The API you tried to call does not exist. (404)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="APIUnauthorized"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APIUnauthorized">[docs]</a><span class="k">class</span> <span class="nc">APIUnauthorized</span><span class="p">(</span><span class="n">APIFailure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The API you&#39;ve attempted to call either requires a key, or your key has insufficient permissions.</span>
+<span class="sd">    If you&#39;re requesting user details, make sure their privacy level permits you to do so, or that you&#39;ve</span>
+<span class="sd">    properly authorised said user. (401)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="APIConfigurationError"><a class="viewcode-back" href="../../../docs/steamapi.steamapi.html#steamapi.steamapi.errors.APIConfigurationError">[docs]</a><span class="k">class</span> <span class="nc">APIConfigurationError</span><span class="p">(</span><span class="n">APIFailure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    There&#39;s either no APIConnection defined, or</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<span class="nd">@debug.no_return</span>
+<span class="k">def</span> <span class="nf">raiseAppropriateException</span><span class="p">(</span><span class="n">status_code</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">status_code</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">APINotFound</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">APIUnauthorized</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">status_code</span> <span class="o">==</span> <span class="mi">400</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">APIBadCall</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">APIFailure</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">status_code</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">APIError</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

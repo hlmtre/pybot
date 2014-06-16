@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>modules.forecast &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for modules.forecast</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">event</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<div class="viewcode-block" id="Forecast"><a class="viewcode-back" href="../../docs/modules.html#modules.forecast.Forecast">[docs]</a><span class="k">class</span> <span class="nc">Forecast</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">printer_handle</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">say</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span> <span class="o">=</span> <span class="n">printer_handle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interests</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;__.forecast__&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+
+        <span class="n">forecast</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__.forecast__&quot;</span><span class="p">)</span>
+        <span class="n">forecast</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="n">msg_definition</span><span class="o">=</span><span class="s">&quot;^\.forecast&quot;</span><span class="p">)</span>
+        <span class="n">forecast</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="n">forecast</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="s">&quot;.forecast &lt;location&gt;&quot;</span> 
+
+<div class="viewcode-block" id="Forecast.get_location"><a class="viewcode-back" href="../../docs/modules.html#modules.forecast.Forecast.get_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location_search</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of 3 strings. A formatted location, its latitude, and its longitude&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">location_search</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">address</span> <span class="o">=</span> <span class="n">location_search</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;+&#39;</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s">&#39;AIzaSyBr4KECytQxPN8PDZhWczIvyK7voqjdN3c&#39;</span>
+        <span class="c">#key = &quot;AIzaSyA95TSuDZMUySAeijsNuIiqX7cJFbXKUSw&quot; </span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="n">address</span><span class="p">,</span> <span class="s">&#39;sensor&#39;</span><span class="p">:</span> <span class="s">&#39;false&#39;</span><span class="p">,</span> <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="n">key</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;https://maps.googleapis.com/maps/api/geocode/json&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+            <span class="n">raw</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">geocode</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s">&#39;Error: Cannot form json object&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s">&#39;Trouble retrieving data from Google API&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">latitude</span> <span class="o">=</span> <span class="n">geocode</span><span class="p">[</span><span class="s">&#39;results&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;geometry&#39;</span><span class="p">][</span><span class="s">&#39;location&#39;</span><span class="p">][</span><span class="s">&#39;lat&#39;</span><span class="p">]</span>
+            <span class="n">longitude</span> <span class="o">=</span> <span class="n">geocode</span><span class="p">[</span><span class="s">&#39;results&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;geometry&#39;</span><span class="p">][</span><span class="s">&#39;location&#39;</span><span class="p">][</span><span class="s">&#39;lng&#39;</span><span class="p">]</span>
+            <span class="n">location_name</span> <span class="o">=</span> <span class="n">geocode</span><span class="p">[</span><span class="s">&#39;results&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;formatted_address&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">),</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s">&#39;Location not found&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">location_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">latitude</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">longitude</span><span class="p">)]</span>
+</div>
+<div class="viewcode-block" id="Forecast.get_forecast"><a class="viewcode-back" href="../../docs/modules.html#modules.forecast.Forecast.get_forecast">[docs]</a>    <span class="k">def</span> <span class="nf">get_forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a JSON formatted object with all weather data on the requested </span>
+<span class="sd">        latitude and longitude. latitude and longitude are strings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s">&quot;5a9290d413a126311a547f2de4f510c6&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;https://api.forecast.io/forecast/&#39;</span><span class="o">+</span><span class="n">key</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">latitude</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">+</span><span class="n">longitude</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+</div>
+<div class="viewcode-block" id="Forecast.current"><a class="viewcode-back" href="../../docs/modules.html#modules.forecast.Forecast.current">[docs]</a>    <span class="k">def</span> <span class="nf">current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_data</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a JSON formatted object of data on current weather conditions from forecast.io</span>
+<span class="sd">        Formats into a summarized string for IRC bot use</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#if no data provided, return a string saying so</span>
+        <span class="n">conditions</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">current_data</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">return</span> <span class="s">&quot;No data on current weather conditions.&quot;</span>
+        <span class="c">#Add the data on current temperature. We round the data, cast as int, add into the string</span>
+        <span class="n">conditions</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">current_data</span><span class="p">[</span><span class="s">&#39;temperature&#39;</span><span class="p">])))</span> <span class="o">+</span> <span class="s">u&#39;</span><span class="se">\u00B0</span><span class="s">.&#39;</span>
+        <span class="c">#Add data on cloud cover. Should alway be available. Descriptions taken from forecast.io api docs</span>
+        <span class="k">if</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;cloudCover&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;cloudCover&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.4</span><span class="p">:</span>
+            <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Clear skies.&quot;</span>
+        <span class="k">elif</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;cloudCover&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.4</span> <span class="ow">and</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;cloudCover&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.75</span><span class="p">:</span>
+            <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Partly cloudy.&quot;</span>
+        <span class="k">elif</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;cloudCover&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.75</span> <span class="ow">and</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;cloudCover&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span> 
+            <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Mostly cloudy.&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Overcast.&quot;</span>
+
+        <span class="c">#If there is any precipitation data, get the intensity and type of precipitation added into the description</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.017</span><span class="p">:</span>
+                    <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Very light &quot;</span>
+                <span class="k">elif</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.017</span> <span class="ow">and</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.1</span><span class="p">:</span>
+                    <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Light &quot;</span>
+                <span class="k">elif</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.1</span> <span class="ow">and</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.4</span><span class="p">:</span>
+                    <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Moderate &quot;</span>
+                <span class="k">elif</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipIntensity&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.4</span><span class="p">:</span>
+                    <span class="n">conditions</span> <span class="o">+=</span> <span class="s">&quot; Heavy &quot;</span>
+                <span class="n">conditions</span> <span class="o">+=</span> <span class="n">current_data</span><span class="p">[</span><span class="s">&#39;precipType&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;.&#39;</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">conditions</span>
+</div>
+<div class="viewcode-block" id="Forecast.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.forecast.Forecast.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">_z</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c">#print &quot;Debugging: Reached stage 1 of handle()&quot;</span>
+        <span class="k">if</span> <span class="n">_z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_location</span><span class="p">(</span><span class="n">_z</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c">#if there are 3 items, valid data retrieved. if not, it didn&#39;t work</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_forecast</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">])[</span><span class="s">&#39;currently&#39;</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cur</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;DEBUG: TypeError: &quot;</span><span class="p">,</span>
+                <span class="k">print</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span>
+                <span class="k">print</span> <span class="n">event</span><span class="o">.</span><span class="n">user</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

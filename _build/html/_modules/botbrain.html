@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>botbrain &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for botbrain</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">webwriter</span>
+<span class="kn">import</span> <span class="nn">bf3api</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logger</span> 
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">battlelog</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlparse</span><span class="p">,</span> <span class="n">parse_qsl</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">xml.dom.minidom</span> <span class="kn">import</span> <span class="n">parseString</span>
+<span class="kn">import</span> <span class="nn">db</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">bf3api</span><span class="o">.</span><span class="n">API</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">)</span>
+
+<span class="n">bf3players</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;tarehart&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;tarehart&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
+              <span class="c">#&#39;hlmtre&#39;: (&#39;hellmitre&#39;, &#39;360&#39;),</span>
+              <span class="s">&#39;willfro&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;fro4thought&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
+              <span class="s">&#39;BoneKin&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;BoneKin&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
+              <span class="s">&#39;Lucifer7&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;Lucifer7&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
+              <span class="s">&#39;i7&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;Infinite Se7en&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">)}</span>
+
+<div class="viewcode-block" id="getbf3stats"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.getbf3stats">[docs]</a><span class="k">def</span> <span class="nf">getbf3stats</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
+<span class="c"># global bf3players</span>
+  <span class="k">global</span> <span class="n">api</span>
+
+  <span class="n">gt</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="c"># grab gamertag off the end and strip it of terminators</span>
+  <span class="n">command</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+  <span class="n">data</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">player</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="s">&quot;clear,ranking&quot;</span><span class="p">)</span>
+
+  <span class="n">l</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">Logger</span><span class="p">()</span>
+  <span class="n">date</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M:%S&quot;</span><span class="p">))</span>
+  <span class="n">string</span> <span class="o">=</span> <span class="s">&quot;getting &quot;</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s">&quot; for player &quot;</span> <span class="o">+</span> <span class="n">gt</span> <span class="o">+</span> <span class="s">&quot; at &quot;</span> <span class="o">+</span> <span class="n">date</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+  <span class="n">l</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">formatbf3data</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="formatbf3data"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.formatbf3data">[docs]</a><span class="k">def</span> <span class="nf">formatbf3data</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s">&quot;data&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;spm&quot;</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot;&#39;s SPM: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Spm</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
+    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;kdr&quot;</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot;&#39;s KDR: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Kdr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
+    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;wlr&quot;</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot;&#39;s WLR: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Wlr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
+    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;stats&quot;</span><span class="p">:</span>
+      <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">player</span><span class="o">+</span><span class="s">&quot;&#39;s stats: &quot;</span><span class="p">,</span> <span class="s">&quot;KDR: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Kdr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">],</span> <span class="s">&quot;SPM: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Spm</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">],</span> <span class="s">&quot;Headshots/kill: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Hskillperc</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">],</span> <span class="s">&quot;win/loss: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Wlr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
+      <span class="k">return</span> <span class="n">l</span>
+      
+  <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s">&quot;notfound&quot;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot; not found &quot;</span><span class="p">]</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s">&quot;ERROR&quot;</span><span class="p">]</span>
+  
+</div>
+<div class="viewcode-block" id="getbf3last"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.getbf3last">[docs]</a><span class="k">def</span> <span class="nf">getbf3last</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+  <span class="k">global</span> <span class="n">api</span>
+  
+  <span class="n">command</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+  <span class="n">gt</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="c"># grab gamertag off the end and strip it of terminators</span>
+  <span class="n">fact</span> <span class="o">=</span> <span class="n">battlelog</span><span class="o">.</span><span class="n">getLatestGameFact</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">gt</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">gt</span> <span class="o">+</span> <span class="s">&quot;&#39;s latest &quot;</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s">&quot; is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fact</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]</span>
+
+  
+  </div>
+<div class="viewcode-block" id="BotBrain"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.BotBrain">[docs]</a><span class="k">class</span> <span class="nc">BotBrain</span><span class="p">:</span>
+  <span class="n">BRAINDEBUG</span> <span class="o">=</span> <span class="bp">False</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">microphone</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>             
+<span class="c"># get time for uptime start</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c"># get time for current length of uptime</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">localtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+<span class="c"># get handle on output</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span> <span class="o">=</span> <span class="n">microphone</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+    <span class="n">yth</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">DB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ww</span> <span class="o">=</span> <span class="n">webwriter</span><span class="o">.</span><span class="n">WebWriter</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">_isAdmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getOwner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">network</span><span class="p">)</span> <span class="o">==</span> <span class="n">username</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">_isAdmin</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="BotBrain.getMicrophone"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.BotBrain.getMicrophone">[docs]</a>  <span class="k">def</span> <span class="nf">getMicrophone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span>
+</div>
+  <span class="k">def</span> <span class="nf">_updateSeen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">updateSeen</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+  
+  <span class="k">def</span> <span class="nf">_insertImg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">_insertImg</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">__bareSay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="n">thing</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BotBrain.say"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.BotBrain.say">[docs]</a>  <span class="k">def</span> <span class="nf">say</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">s</span> <span class="o">=</span> <span class="n">thing</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">UnicodeEncodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="k">print</span> <span class="n">e</span>
+      <span class="k">print</span> <span class="n">thing</span>
+      <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+      <span class="k">print</span> <span class="n">d</span>
+      <span class="k">print</span> <span class="n">thing</span>
+      <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">outstring</span> <span class="o">=</span> <span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">channel</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="n">outstring</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BotBrain.notice"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.BotBrain.notice">[docs]</a>  <span class="k">def</span> <span class="nf">notice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;NOTICE &#39;</span> <span class="o">+</span> <span class="n">channel</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+  <span class="c"># now implemented as a module</span>
+  <span class="c">#def _weather(self, channel, zipcode):</span>
+
+  <span class="c"># now implemented as a module</span>
+ <span class="c"># def _getyoutubetitle(self, line, channel):</span>
+</div>
+  <span class="k">def</span> <span class="nf">_ctof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">c_temp</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">c_temp</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="mf">1.8</span><span class="p">)</span><span class="o">+</span><span class="mi">32</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;* F&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_ftoc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">f_temp</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f_temp</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="mi">5555</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;* C&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_uptime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span><span class="s">&quot;I&#39;ve been up &quot;</span> <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span><span class="p">))[:</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;, since &quot;</span><span class="o">+</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%a, </span><span class="si">%d</span><span class="s"> %b %Y %H:%M:%S -0800&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localtime</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">_speak</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> 
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">target</span> <span class="o">=</span> <span class="s">&quot;#&quot;</span> <span class="o">+</span> <span class="n">target</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_onstat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;Yep, I&#39;m on. Idiot.&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.bf3 [spm, kdr, wlr, stats],</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.uptime,</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.imgs,</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.ctof [celsius],</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.ftoc [fahrenheit],</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usr</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isAdmin</span><span class="p">(</span><span class="n">usr</span><span class="p">):</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="ow">is</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">extraArg</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bareSay</span><span class="p">(</span><span class="s">&quot;JOIN &quot;</span> <span class="o">+</span> <span class="n">channel</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">extraArg</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c"># second word (join #channel password)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bareSay</span><span class="p">(</span><span class="s">&quot;JOIN &quot;</span> <span class="o">+</span> <span class="n">channel</span><span class="p">)</span>
+
+
+  <span class="k">def</span> <span class="nf">__quit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usr</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isAdmin</span><span class="p">(</span><span class="n">usr</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">__bareSay</span><span class="p">(</span><span class="s">&quot;QUIT :quitting&quot;</span><span class="p">)</span>
+      <span class="k">print</span> <span class="s">&quot;quitting as per &quot;</span> <span class="o">+</span> <span class="n">usr</span>
+      <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+  
+<div class="viewcode-block" id="BotBrain.respond"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.BotBrain.respond">[docs]</a>  <span class="k">def</span> <span class="nf">respond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usr</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="c"># this bit is not a command</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s">&quot;.png&quot;</span> <span class="ow">in</span> <span class="n">message</span> <span class="ow">or</span> <span class="s">&quot;.gif&quot;</span> <span class="ow">in</span> <span class="n">message</span> <span class="ow">or</span> <span class="s">&quot;.jpg&quot;</span> <span class="ow">in</span> <span class="n">message</span> <span class="ow">or</span> <span class="s">&quot;.jpeg&quot;</span> <span class="ow">in</span> <span class="n">message</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s">&quot;http:&quot;</span> <span class="ow">in</span> <span class="n">message</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s">&quot;imgur.com&quot;</span> <span class="ow">in</span> <span class="n">message</span> <span class="ow">and</span> <span class="s">&quot;gallery&quot;</span> <span class="ow">in</span> <span class="n">message</span><span class="p">):</span>
+     <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;(?P&lt;url&gt;https?://[^\s]+)&quot;</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&quot;url&quot;</span><span class="p">)</span>
+     <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">_insertImg</span><span class="p">(</span><span class="n">usr</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+<span class="c"># this bit is</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.join&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_join</span><span class="p">(</span><span class="n">usr</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;.quit&quot;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">__quit</span><span class="p">(</span><span class="n">usr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.imgs&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">ww</span><span class="o">.</span><span class="n">_generate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">_getImgs</span><span class="p">())</span>
+      <span class="c"># hackish TODO</span>
+      <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;USER&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;pybot&#39;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;http://pybot.zero9f9.com/img/&quot;</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;http://zero9f9.com/~&quot;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;USER&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;/img/&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.seen&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_seen</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">channel</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.ctof&quot;</span><span class="p">):</span>
+      <span class="n">last</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">last</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctof</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">last</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.ftoc&quot;</span><span class="p">):</span>
+      <span class="n">last</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">last</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ftoc</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">last</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> 
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.help&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_help</span><span class="p">(</span><span class="n">usr</span><span class="p">)</span>     
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.bf3pc&quot;</span><span class="p">):</span>
+      <span class="n">stats</span> <span class="o">=</span> <span class="n">getbf3stats</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s">&#39;pc&#39;</span><span class="p">)</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;WOOPS&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.bf3&quot;</span><span class="p">):</span>
+      <span class="n">stats</span> <span class="o">=</span> <span class="n">getbf3stats</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">)</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;WOOPS&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.lastbf3&quot;</span><span class="p">):</span>
+      <span class="n">last</span> <span class="o">=</span> <span class="n">getbf3last</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.uptime&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_uptime</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.onstat&quot;</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_onstat</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.speak&quot;</span><span class="p">):</span>
+      <span class="n">tmp</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+      <span class="n">chnl</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">msg</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_speak</span><span class="p">(</span><span class="n">usr</span><span class="p">,</span> <span class="n">chnl</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+<span class="c"># utility function</span></div>
+  <span class="k">def</span> <span class="nf">__prettyDate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">time</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+      <span class="n">diff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">datetime</span><span class="p">):</span>
+      <span class="n">diff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">time</span> 
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">time</span><span class="p">:</span>
+      <span class="n">diff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">now</span>
+    <span class="n">second_diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">seconds</span>
+    <span class="n">day_diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">days</span>
+
+    <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">return</span> <span class="s">&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">day_diff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;just now&quot;</span>
+      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">second_diff</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; seconds ago&quot;</span>
+      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">120</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="s">&quot;a minute ago&quot;</span>
+      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">3600</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="n">second_diff</span> <span class="o">/</span> <span class="mi">60</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&quot; minutes ago&quot;</span>
+      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">7200</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;an hour ago&quot;</span>
+      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">86400</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="n">second_diff</span> <span class="o">/</span> <span class="mi">3600</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&quot; hours ago&quot;</span>
+      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;Yesterday&quot;</span>
+      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; days ago&quot;</span>
+      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">31</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="o">/</span><span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; weeks ago&quot;</span>
+      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">365</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="o">/</span><span class="mi">30</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; months ago&quot;</span>
+      <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="o">/</span><span class="mi">365</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; years ago&quot;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
