@@ -38,3 +38,4 @@ As that user, `./bot.py.`
 This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration, and [PRAW (python reddit API wrapper)](https://praw.readthedocs.org/en/latest/) for the redditinfo module.
 
 Join #pybot at [irc.zero9f9.com](http://irc.zero9f9.com?channels=#pybot "zero9f9.com IRC") if you have questions.
+Check out [ci.zero9f9.com](http://ci.zero9f9.com "ci.zero9f9.com") for builds. (There's obviously travis-ci at the top, but that's because of the pretty button.)
