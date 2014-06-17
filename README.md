@@ -1,25 +1,44 @@
-pybot is a python irc bot. he is a project. [![Build Status](https://travis-ci.org/hlmtre/pybot.svg?branch=master)](https://travis-ci.org/hlmtre/pybot)
+pybot is a python irc bot. he is a project.
+[![Build Status](https://travis-ci.org/hlmtre/pybot.svg?branch=master)](https://travis-ci.org/hlmtre/pybot)
 
 he is modular, extensible, multi-threaded, and configurable.
 
-pybot runs on python 2.6 and 2.7 (though steamapi does not work with 2.6, the core bot does). python versions > 3 are in the works.
+pybot runs on python 2.6 and 2.7 (though steamapi does not work with 2.6, the core bot does).
+python versions > 3 are in the works.
 
 
 10-second TL;DR:
 ================
 
+Local Development
+-----------------
 1. modify pybotrc with your channels and passwords.
-2. Run `./setup.sh`. It will check for dependencies and create a mysql_init file.
-3. `./bot.py pybotrc`
-4. rejoice.
+2. run `sudo ./bootstrap.sh` to install pybot dependencies such as mysql.
+3. Run `./setup.sh`. It will check for module dependencies and create a mysql_init file.
+4. `./bot.py pybotrc`
+5. rejoice.
 
-Longer explanation:
+Vagrant Development
+-------------------
+If you have Vagrant locally installed and configured, you can set up pybot by invoking
+`vagrant up`. Your development environment will be configured, and you can skip step 1 and
+2 above. After that, SSH into your VM and do steps 3 through 5 to finish things off.
+
+Environment Dependencies
+------------------------
 pybot requires mysqldb. It's probably in your package manager.
-It _will_ run without it, it'll just throw lots of exceptions. SQLite integration and no-db (pickle) support are in the works.
+It _will_ run without it, it'll just throw lots of exceptions. SQLite integration and
+no-db (pickle) support are in the works.
 
 Automagic
 ---------
-Run `./setup.sh` and follow the prompts. It will create a mysql_init file, which you can then run against mysql with `mysql -p < mysql_init`. This will create your database and add a user with full privileges on that database. Your bot will run as this user.
+Run `./bootstrap.sh` and wait for your system to be configured. Mysql will be installed with a
+default password of 'root', which you'll definitely want to change.
+
+Run `./setup.sh` and follow the prompts. It will create a mysql_init file, which you can then
+run against mysql with `mysql -p < mysql_init`. This will create your database and add a user
+with full privileges on that database. Your bot will run as this user.
+
 Put that information into the pybotrc.
 If you do not run `./setup.sh` you will have to perform the step below.
 ___
@@ -30,12 +49,10 @@ Logged into mysql: `grant all on <dbname>.* to '<username>' identified by '<pass
 ___
 
 Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
-Set his dbpass in the config file (pybotrc) to the password you've given him. 
+Set his dbpass in the config file (pybotrc) to the password you've given him.
 Copy that config file to the home folder of whatever user will be running the bot. (~user/.pybotrc)
 As that user, `./bot.py.`
 
 
-This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration, and [PRAW (python reddit API wrapper)](https://praw.readthedocs.org/en/latest/) for the redditinfo module.
-
-Join #pybot at [irc.zero9f9.com](http://irc.zero9f9.com?channels=#pybot "zero9f9.com IRC") if you have questions.
-Check out [ci.zero9f9.com](http://ci.zero9f9.com "ci.zero9f9.com") for builds. (There's obviously travis-ci at the top, but that's because of the pretty button.)
+This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration, and
+[PRAW (python reddit API wrapper)](https://praw.readthedocs.org/en/latest/) for the redditinfo module.
