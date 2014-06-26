@@ -243,7 +243,8 @@ class Bot(threading.Thread):
       # pings we respond to directly. everything else...
       else:
 # if we get disconnected this should be true upon a reconnect attempt.. ideally
-        if self.JOINED is False and message_number == "376": # wait until we receive end of MOTD before joining
+        if self.JOINED is False and (message_number == "376" or message_number == "422"): 
+          # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exist
           self.chan_list = self.conf.getChannels(self.network) 
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
