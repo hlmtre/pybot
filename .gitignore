@@ -3,3 +3,4 @@
 logfile.txt
 pylog*
 *.bak
+.vagrant
