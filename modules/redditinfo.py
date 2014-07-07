@@ -43,7 +43,6 @@ if successful_import is True:
           author = s.author.name
       else:
           author = '[deleted]'
-      message = (message + ' | ' + str(s.ups - s.downs) + ' points (03'
-                 + str(s.ups) + '|05' + str(s.downs) + ') | ' + author)
+      message = (message + ' | ' + author)
       #TODO add creation time with s.created
       self.printer("PRIVMSG " + event.channel + " :" + message + "\n")
