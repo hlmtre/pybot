@@ -56,6 +56,10 @@ class Bot(threading.Thread):
 
     # define events here and add them to the events_list
 
+    all_lines = Event("1__all_lines__")
+    all_lines.define(".*")
+    self.events_list.append(all_lines)
+
     joins = Event("__joins__")
     joins.define("JOIN")
 

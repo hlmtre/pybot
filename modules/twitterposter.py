@@ -45,6 +45,6 @@ class TwitterPoster(BaseModule):
     if event._type == "__.twitter__":
       pt = self.pt
       api = twitter.Api(consumer_key=pt.api_key, consumer_secret=pt.api_secret, access_token_key=pt.access_token, access_token_secret=pt.access_token_secret)
-      status = api.PostUpdate(event.user + ": " + event.msg[:(140 - len(event.user) + 2)])
+      status = api.PostUpdate(event.user + ": " + event.msg[:(140 - len(event.user) + 2)]) # "username: <message>" all must be <= 140 char
     elif event._type == "__.twitter_command__":
       self.say(event.channel, "https://twitter.com/pybot_posts_irc")

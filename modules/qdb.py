@@ -6,7 +6,7 @@ class QDB:
     def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
-        self.interests = ['__.qdb__'] 
+        self.interests = ['__.qdb__', '1__all_lines__']  # should be first event in the listing.. so lines being added is a priority
         self.bot = bot
         self.say = say
 
@@ -14,11 +14,15 @@ class QDB:
         #define a key for _recent since that will not be a potential channel name
         self.bot.mem_store['qdb']['_recent'] = []
 
-        qdb = Event("__.qdb__")
-        qdb.define(msg_definition=".*")
-        qdb.subscribe(self)
+        for event in events:
+          if event._type in self.interests:
+            event.subscribe(self)
 
-        self.bot.register_event(qdb, self)
+        #qdb = Event("__.qdb__")
+        #qdb.define(msg_definition=".*")
+        #qdb.subscribe(self)
+
+        #self.bot.register_event(qdb, self)
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
         self.MAX_BUFFER_SIZE = 200 
