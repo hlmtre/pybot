@@ -8,7 +8,7 @@ class Logger:
 
   def write(self, level, line):
     try: 
-      f = open('pylog-'+str(time.strftime("%d-%m-%Y"))+'.log', "a")
+      f = open('pylog-'+str(time.strftime("%m-%d-%Y"))+'.log', "a")
       f.write(str(datetime.datetime.now())+ " (" + inspect.stack()[1][3] + ") " + str(Logger.levels[level]) + ": " + line + '\n')
     except IOError:
       pass
