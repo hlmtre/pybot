@@ -193,8 +193,8 @@ class BotBrain:
         self.say(channel, "http://pybot.zero9f9.com/img/")
       else:
         self.say(channel, "http://zero9f9.com/~"+os.getenv('USER')+"/img/")
-    if message.startswith(".seen"):
-      self._seen(message.split()[-1], channel)
+    #if message.startswith(".seen"):
+    #  self._seen(message.split()[-1], channel)
     if message.startswith(".ctof"):
       last = message.split()
       if last[-1] != "":

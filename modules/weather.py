@@ -33,7 +33,10 @@ class Weather:
             return
 
           parsed = json.loads(j)
-          zipcode = parsed['RESULTS'][0]['zmw']
+          try:
+            zipcode = parsed['RESULTS'][0]['zmw']
+          except IndexError:
+            return
           url = 'http://api.wunderground.com/api/1fe31b3b4cfdab66/conditions/lang:EN/q/'+zipcode[:5]+'.json'
 
         # by zipcode
