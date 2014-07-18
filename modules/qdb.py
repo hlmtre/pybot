@@ -231,7 +231,7 @@ class QDB:
 
     def handle(self, event):
         #first check to see if there is a special deletion going on
-        if event.msg.startswith(".qdbdelete"):
+        if event.msg.startswith(".qdbdelete") and event.is_pm:
             deletion = event.msg.split(' ', 2)
             try:
                 #requires the format ".qdbdelete <post_id> <password>"
