@@ -60,7 +60,12 @@ class Event:
     l = line.split()
     self.channel = ""
     self.verb = ""
+    ind = 0
+    privmsg_index = 0
     for e in l:
+      ind+=1
+      if e == "PRIVMSG":
+        privmsg_index = ind
       if e.startswith("#"):
         self.channel = e
         break
@@ -68,7 +73,8 @@ class Event:
       if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE", "PING", "PONG", "MODE"]:
         self.verb = v
         break
-    if len(self.channel) == 0:
+    # our channel is the next one from PRIVMSG
+    if self.verb == "PRIVMSG" and not l[privmsg_index].startswith("#"):
       self.is_pm = True
     for s in self.subscribers:
       s.handle(self)
