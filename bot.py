@@ -56,15 +56,19 @@ class Bot(threading.Thread):
 
     # define events here and add them to the events_list
 
+    all_lines = Event("1__all_lines__")
+    all_lines.define(".*")
+    self.events_list.append(all_lines)
+
     joins = Event("__joins__")
     joins.define("JOIN")
 
     implying = Event("__implying__")
     implying.define(">")
 
-    command = Event("__command__")
+    #command = Event("__command__")
    # this is an example of passing in a regular expression to the event definition
-    command.define("fo.bar")
+    #command.define("fo.bar")
 
     lastfm = Event("__.lastfm__")
     lastfm.define(".lastfm")
@@ -210,15 +214,17 @@ class Bot(threading.Thread):
     
   def send(self, message):
     if self.OFFLINE:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
     else:
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "\n DEBUGGING OUTPUT")
-        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8'))
-        print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8')
+        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'))
+        print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
 
-      self.s.send(message.encode('utf-8'))
-      self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
+      self.s.send(message.encode('utf-8', 'ignore'))
+      target = message.split()[1]
+      if target.startswith("#"):
+        self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
 
   def pong(self, response):
     self.send('PONG ' + response + '\n')
@@ -241,7 +247,9 @@ class Bot(threading.Thread):
       # pings we respond to directly. everything else...
       else:
 # if we get disconnected this should be true upon a reconnect attempt.. ideally
-        if self.JOINED is False and message_number == "376": # wait until we receive end of MOTD before joining
+# patch contributed by github.com/thekanbo
+        if self.JOINED is False and (message_number == "376" or message_number == "422"): 
+          # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exis
           self.chan_list = self.conf.getChannels(self.network) 
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')

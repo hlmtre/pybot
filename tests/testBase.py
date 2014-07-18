@@ -12,17 +12,21 @@ class TestBase():
     import confman
     assert bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com") is not None, "bot is None!"
 
-  # we cannot test initializing the bot yet, because threading is hard.
-  # this currently does not work.
-  #def testSocket(self):
-  #  import bot
-  #  import confman
-  #  from subprocess import call
-  #  b = bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com", True)
-  #  b.start()
-  #  # make sure the socket has actually been initialized
-  #  import time
-  #  time.sleep(5)
-  #  assert b.s is not None, "socket is none!"
-  #  # since we're threaded and we've started the thread, we have to kill the process
-  #  # TODO
+  # this one you might want to remove, since it connects to a hardcoded ircd
+  def testBotSocket(self):
+    import bot
+    import confman
+    from subprocess import call
+    b = bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com", True)
+    b.connect()
+    assert b.s is not None
+
+  # if this fails someone screwed something up
+  def testEventMatches(self):
+    import event
+    e = event.Event('__.test__')
+    assert e is not None
+    assert e._type is not None and e._type == "__.test__"
+    e.define(msg_definition="^test")
+    assert e.msg_definition == "^test"
+    assert e.matches(":hlmtre!~hlmtre@bxr.bxr.bxr PRIVMSG #bots :test") == True

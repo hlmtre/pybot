@@ -105,10 +105,18 @@ class BotBrain:
 
   def say(self, channel, thing):
     try:
-      self.microphone('PRIVMSG ' + channel + ' :' + str(thing) + '\n')
+      s = thing.encode('utf-8', 'ignore')
     except UnicodeEncodeError as e:
       print e
       print thing
+      return None
+    except UnicodeDecodeError as d:
+      print d
+      print thing
+      return None
+
+    outstring = 'PRIVMSG ' + channel + ' :' + s.decode('utf-8','ignore') + '\n'
+    self.microphone(outstring)
 
   def notice(self, channel, thing):
     self.microphone('NOTICE ' + channel + ' :' + str(thing) + '\n')
@@ -185,8 +193,8 @@ class BotBrain:
         self.say(channel, "http://pybot.zero9f9.com/img/")
       else:
         self.say(channel, "http://zero9f9.com/~"+os.getenv('USER')+"/img/")
-    if message.startswith(".seen"):
-      self._seen(message.split()[-1], channel)
+    #if message.startswith(".seen"):
+    #  self._seen(message.split()[-1], channel)
     if message.startswith(".ctof"):
       last = message.split()
       if last[-1] != "":

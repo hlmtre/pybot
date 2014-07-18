@@ -25,6 +25,9 @@ class Tell:
     #try:
       if event.msg.startswith(".tell"):
         target = event.msg.split()[1]
+        if target == self.bot.conf.getNick(self.bot.network):
+          self.say(event.channel, "I can't tell myself; gtfo")
+          return
         thing = event.msg.split()[2:] # all the way to the end
         n = Notice(event.user, target, thing)
 
@@ -39,7 +42,7 @@ class Tell:
         if "tell" in self.bot.mem_store:
           for n in self.bot.mem_store["tell"]:
             if event.user.lower() == n.obj.lower():
-              self.printer("PRIVMSG " + event.channel + " :Hey " + n.obj + ", " + n.subject + " says \""+ " ".join(n.message) + '\"\n')
+              self.printer("PRIVMSG " + event.channel + " :Hey " + n.obj + ", " + n.subject + " says \""+ " ".join(n.message).encode('utf-8', 'ignore')+ '\"\n')
               # we've said it, now delete it.
               if n in self.bot.mem_store["tell"]: self.bot.mem_store["tell"].remove(n)
             

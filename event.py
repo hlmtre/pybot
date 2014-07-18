@@ -6,19 +6,23 @@ class Event:
     self.user = ""
     self.definition = ""
     self.msg_definition = ""
+    self.user_definition = ""
     self.channel = ""
     self.line = ""
     self.msg = ""
     self.verb = ""
+    self.is_pm = False
     
   def subscribe(self, e):
     self.subscribers.append(e)
 
-  def define(self, definition=None, msg_definition=None):
+  def define(self, definition=None, msg_definition=None, user_definition=None):
     if definition is not None:
       self.definition = definition
     if msg_definition is not None:
       self.msg_definition = msg_definition
+    if user_definition is not None:
+      self.user_definition = user_definition
 
   def matches(self, line):
     try:
@@ -33,6 +37,14 @@ class Event:
     if len(self.definition) > 0:
       if re.search(self.definition, line):
         return True
+
+    if len(self.user_definition) > 0:
+      if len(line) and "PRIVMSG" in line > 0:
+        line_array = line.split()
+        user_and_mask = line_array[0][1:]
+        user = user_and_mask.split("!")[0]
+        if self.user_definition == user:
+          return True
 
     return False
 
@@ -56,5 +68,7 @@ class Event:
       if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE", "PING", "PONG", "MODE"]:
         self.verb = v
         break
+    if len(self.channel) == 0:
+      self.is_pm = True
     for s in self.subscribers:
       s.handle(self)
