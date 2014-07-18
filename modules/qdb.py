@@ -191,7 +191,9 @@ class QDB:
             return "HTTPError encountered when accessing QDB"
         try:
             del_status = deletion.json()
-            return "QDB deletion was a " + del_status['status'] + "." 
+            if del_status['success'] == "true":
+              return "QDB deletion succeeded."
+            return "QDB deletion failed."
         except (KeyError, UnicodeDecodeError):
             return "Error getting status of quote deletion." 
 
