@@ -18,12 +18,6 @@ class QDB:
           if event._type in self.interests:
             event.subscribe(self)
 
-        #qdb = Event("__.qdb__")
-        #qdb.define(msg_definition=".*")
-        #qdb.subscribe(self)
-
-        #self.bot.register_event(qdb, self)
-
         self.help = ".qdb <search string of first line> | <search string of last line>"
         self.MAX_BUFFER_SIZE = 200 
         self.MAX_HISTORY_SIZE = 10
@@ -184,6 +178,23 @@ class QDB:
             return "Error getting status of quote submission." 
         return "That was probably successful since no errors came up, but no status available."
 
+    def delete(self, user, post_id='', passcode=''):
+        """A special function that allows certain users to delete posts"""
+        #accessing hlmtre's qdb api
+        url = 'http://qdb.zero9f9.com/api.php'
+        payload = {'q':'delete', 'user':user, 'id':post_id, 'code':passcode}
+        deletion = requests.get(url, params=payload)
+        #check for any HTTP errors and return False if there were any
+        try:
+            deletion.raise_for_status()
+        except requests.exceptions.HTTPError:
+            return "HTTPError encountered when accessing QDB"
+        try:
+            del_status = deletion.json()
+            return "QDB deletion was a " + del_status['status'] + "." 
+        except (KeyError, UnicodeDecodeError):
+            return "Error getting status of quote deletion." 
+
     def recently_submitted(self, submission):
         """Checks to see if the given submission is string is at least 75% similar to the strings
         in the list of recently submitted quotes.
@@ -217,7 +228,16 @@ class QDB:
         self.bot.mem_store['qdb']['_recent'].insert(0, {q_id:submission})
 
     def handle(self, event):
-        #first we see if we're going to generate a qdb submission, or just add the line to the buffer
+        #first check to see if there is a special deletion going on
+        if event.msg.startswith(".qdbdelete"):
+            deletion = event.msg.split(' ', 2)
+            try:
+                #requires the format ".qdbdelete <post_id> <password>"
+                self.say(event.user, self.delete(event.user, deletion[1], deletion[2]))
+            except IndexError:
+                self.say(event.user, "Not enough parameters provided for deletion.")
+            return
+        #we see if we're going to generate a qdb submission, or just add the line to the buffer
         if event.msg.startswith(".qdb "):
             #split the msg with '.qdb ' stripped off beginning and divide into 1 or 2 search strings
             string_token = event.msg[5:].split('|', 1)
