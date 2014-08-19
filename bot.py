@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.6.5
+# v0.7.0
 # works with python 2.6.x and 2.7.x
 #
 
