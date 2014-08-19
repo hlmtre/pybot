@@ -28,11 +28,6 @@ class Bot(threading.Thread):
   def __init__(self, conf=None, network=None, d=None):
     threading.Thread.__init__(self)
 
-    self.logger = Logger()
-
-    self.logger.write(Logger.INFO, "\n")
-    self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()))
-
     self.DEBUG = d
     self.brain = None
     self.network = network
@@ -42,6 +37,12 @@ class Bot(threading.Thread):
     self.conf = conf
     self.db = db.DB()
     self.pid = os.getpid()
+    self.logger = Logger()
+
+    self.NICK = self.conf.getNick(self.network)
+
+    self.logger.write(Logger.INFO, "\n", self.NICK)
+    self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()), self.NICK)
 
     # arbitrary key/value store for modules
     # they should be 'namespaced' like bot.mem_store.module_name
@@ -124,7 +125,7 @@ class Bot(threading.Thread):
   #  self.events_list.append(test)
 
     self.load_modules()
-    self.logger.write(Logger.INFO, "bot initialized.")
+    self.logger.write(Logger.INFO, "bot initialized.", self.NICK)
 
   # conditionally subscribe to events list or add event to listing
   def register_event(self, event, module):
@@ -159,14 +160,14 @@ class Bot(threading.Thread):
     autoloads = {}
     #load autoloads if it exists
     if os.path.isfile(autoload_path): 
-      self.logger.write(Logger.INFO, "Found autoloads file")
+      self.logger.write(Logger.INFO, "Found autoloads file", self.NICK)
       try:
         autoloads = json.load(open(autoload_path))
         #logging
         for k in autoloads.keys():
-          self.logger.write(Logger.INFO, "Autoloads found for network " + k)
+          self.logger.write(Logger.INFO, "Autoloads found for network " + k, self.NICK)
       except IOError:
-        self.logger.write(Logger.ERROR, "Could not load autoloads file.")
+        self.logger.write(Logger.ERROR, "Could not load autoloads file.",self.NICK)
     # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
@@ -178,17 +179,17 @@ class Bot(threading.Thread):
           if ext == '.py' and not name == '__init__': 
             f, filename, descr = imp.find_module(name, [modules_path])
             mods[name] = imp.load_module(name, f, filename, descr)
-            self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+            self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
         else: # follow autoload's direction
           if ext == '.py' and not name == '__init__':
             if name == 'module':
               f, filename, descr = imp.find_module(name, [modules_path])
               mods[name] = imp.load_module(name, f, filename, descr)
-              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
             elif ('include' in autoloads[self.network] and name in autoloads[self.network]['include']) or ('exclude' in autoloads[self.network] and name not in autoloads[self.network]['exclude']):
               f, filename, descr = imp.find_module(name, [modules_path])
               mods[name] = imp.load_module(name, f, filename, descr)
-              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
       else:
         if name == specific: # we're reloading only one module
           if ext != '.pyc': # ignore compiled 
@@ -217,8 +218,8 @@ class Bot(threading.Thread):
       print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
     else:
       if self.DEBUG is True:
-        self.logger.write(Logger.INFO, "\n DEBUGGING OUTPUT")
-        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'))
+        self.logger.write(Logger.INFO, "\n DEBUGGING OUTPUT", self.NICK)
+        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'), self.NICK)
         print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
 
       self.s.send(message.encode('utf-8', 'ignore'))
@@ -246,7 +247,6 @@ class Bot(threading.Thread):
         self.pong(ping_response_line[1])
       # pings we respond to directly. everything else...
       else:
-# if we get disconnected this should be true upon a reconnect attempt.. ideally
 # patch contributed by github.com/thekanbo
         if self.JOINED is False and (message_number == "376" or message_number == "422"): 
           # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exis
@@ -288,8 +288,14 @@ class Bot(threading.Thread):
     # connect to server
     self.s = socket.socket()
     while self.CONNECTED == False:
-      self.s.connect((self.HOST, self.PORT)) # force them into one argument
-      self.CONNECTED = True
+      try:
+        self.s.connect((self.HOST, self.PORT)) # force them into one argument
+        self.CONNECTED = True
+        self.logger.write(Logger.INFO, "Connected to " + self.network, self.NICK)
+      except:
+        print "Could not connect! Retrying... "
+        time.sleep(1)
+        self.worker()
 
       self.s.send('NICK '+self.NICK+'\n')
       self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
@@ -300,25 +306,49 @@ class Bot(threading.Thread):
     
     read = ""
     
+    timeout = 0
     # infinite loop to keep parsing lines
     while True:
       try:
+        timeout += 1
+        # if we haven't received anything for 120 seconds
+        if timeout > 120:
+          if self.DEBUG:
+            print "Disconnected! Retrying... "
+          self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
+          self.JOINED = False
+          self.CONNECTED = False
+          self.worker()
+
         time.sleep(1)
         if self.CONNECTED == False:
           self.connect()
         ready = select.select([self.s],[],[], 1)
         if ready[0]:
-          read = read + self.s.recv(1024)
+          try:
+            read = read + self.s.recv(1024)
+          except:
+            if self.DEBUG:
+              print "Disconnected! Retrying... "
+            self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
+            self.JOINED = False
+            self.CONNECTED = False
+            self.worker()
+
           lines = read.split('\n')
           
           # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
           # line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
           read = lines.pop() 
+
+          if len(lines) > 0:
+            timeout = 0
+
           for line in lines:
             line = line.rstrip()
             self.processline(line)      
       except KeyboardInterrupt:
-        print "keyboard interrupt caught"
+        print "keyboard interrupt caught; exiting ..."
         raise
   # end worker
 
@@ -327,6 +357,7 @@ class Bot(threading.Thread):
     self.s = socket.socket()
     try:
       self.s.connect((self.HOST, self.PORT)) # force them into one argument
+      self.CONNECTED = True
     except Exception, e:
       self.CONNECTED = False
     try:

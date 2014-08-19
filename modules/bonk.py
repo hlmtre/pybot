@@ -10,7 +10,7 @@ class Bonk:
         self.say = say
 
         bonk = Event("__.bonk__")
-        bonk.define(msg_definition="^\.bonk")
+        bonk.define(msg_definition="^\.bonk ")
         bonk.subscribe(self)
         self.bot.register_event(bonk, self)
 
