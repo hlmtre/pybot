@@ -44,6 +44,9 @@ class Youtube(BaseModule):
     self.bot.mem_store['youtube'][video_title] = url
 
   def handle(self, event):
+#   prevent bot from printing youtube information if a youtube link is in the channel topic (or elsewhere that isn't a message to a channel)
+    if "PRIVMSG" not in event.line:
+      return
     if event._type == "__.youtubes__":
       url = re.search("youtube.com[\S]+", event.line).group(0)
       try:
