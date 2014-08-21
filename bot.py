@@ -274,7 +274,7 @@ class Bot(threading.Thread):
       traceback.print_exc(file=sys.stdout)
 
       
-  def worker(self):
+  def worker(self, mock=False):
     self.HOST = self.network
     self.NICK = self.conf.getNick(self.network)
 
@@ -323,6 +323,10 @@ class Bot(threading.Thread):
     read = ""
     
     timeout = 0
+
+#   if we're only running a test of connecting, and don't want to loop forever
+    if mock:
+      return
     # infinite loop to keep parsing lines
     while True:
       try:

@@ -13,15 +13,13 @@ class TestBase():
     assert bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com") is not None, "bot is None!"
 
   # this one you might want to remove, since it connects to a hardcoded ircd
-  #TODO FIXME
-#  def testBotSocket(self):
-#    import bot
-#    import confman
-#    from subprocess import call
-#    b = bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com", True)
-#    b.worker()
-#    assert b.s is not None
-#    b.exit()
+  def testBotSocket(self):
+    import bot
+    import confman
+    from subprocess import call
+    b = bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com", True)
+    b.worker(mock=True)
+    assert b.s is not None
 
   # if this fails someone screwed something up
   def testEventMatches(self):
