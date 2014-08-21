@@ -36,7 +36,7 @@ class Event:
 
     try:
       message_id = int(temp)
-    except ValueError, UnboundLocalError:
+    except (ValueError, UnboundLocalError):
       message_id = 0
 
     try:

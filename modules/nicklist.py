@@ -28,5 +28,4 @@ class Nicklist(BaseModule):
     if event.message_id == 353:
       self.bot.mem_store['nicklist'][event.channel] = event.line.split(":")[2].split()
 
-      print self.bot.mem_store['nicklist'][event.channel]
 
