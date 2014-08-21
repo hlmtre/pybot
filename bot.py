@@ -289,18 +289,34 @@ class Bot(threading.Thread):
     self.s = socket.socket()
     while self.CONNECTED == False:
       try:
+# low level socket TCP/IP connection
         self.s.connect((self.HOST, self.PORT)) # force them into one argument
         self.CONNECTED = True
         self.logger.write(Logger.INFO, "Connected to " + self.network, self.NICK)
+        if self.DEBUG:
+          self.debug_print("connected to " + self.network)
       except:
         print "Could not connect! Retrying... "
         time.sleep(1)
         self.worker()
 
+    # core IRC protocol stuff
       self.s.send('NICK '+self.NICK+'\n')
+
+      if self.DEBUG:
+        self.debug_print("sent to " + self.network + ': NICK ' + self.NICK + '\\n')
+
       self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
+
+      if self.DEBUG:
+        self.debug_print("sent to " + self.network + ": USER " +self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\\n')
+
       time.sleep(3) # allow services to catch up
+
       self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
+
+      if self.DEBUG:
+        self.debug_print('sent to ' + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
 
     self.s.setblocking(1)
     
@@ -316,13 +332,14 @@ class Bot(threading.Thread):
           if self.DEBUG:
             print "Disconnected! Retrying... "
           self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
+# so that we rejoin all our channels upon reconnecting to the server
           self.JOINED = False
           self.CONNECTED = False
           self.worker()
 
         time.sleep(1)
-        if self.CONNECTED == False:
-          self.connect()
+       # if self.CONNECTED == False:
+       #   self.connect()
         ready = select.select([self.s],[],[], 1)
         if ready[0]:
           try:
@@ -352,26 +369,8 @@ class Bot(threading.Thread):
         raise
   # end worker
 
-  def connect(self):
-    time.sleep(10) # prevent attempting to reconnect too frequently errors
-    self.s = socket.socket()
-    try:
-      self.s.connect((self.HOST, self.PORT)) # force them into one argument
-      self.CONNECTED = True
-    except Exception, e:
-      self.CONNECTED = False
-    try:
-      self.s.send('NICK '+self.NICK+'\n')
-      self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
-      time.sleep(3) # allow services to catch up
-      self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
-    except Exception, e:
-      self.CONNECTED = False
-
-    self.s.setblocking(1)
-    
-  def debug_print(self):
-    print self.getName()
+  def debug_print(self, line):
+    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
 
   def run(self):
     self.worker()
@@ -388,7 +387,8 @@ if __name__ == "__main__":
   for i in sys.argv:
     if i == "-d":
       DEBUG = True
-  
+
+# duuude this is so old.
   if os.name == "posix":
     botslist = list()
     if not DEBUG:
