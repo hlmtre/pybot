@@ -42,7 +42,6 @@ class Nicklist(BaseModule):
       print self.bot.mem_store['nicklist'][event.channel]
 
     if event._type == "__.nicklisting_other_join__":
-      print strip_nick(event.user) + " joined " + event.channel
       try:
         self.bot.mem_store['nicklist'][event.channel].append(strip_nick(event.user))
       except KeyError:
