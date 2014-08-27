@@ -1,17 +1,24 @@
 from logger import Logger
+from event import Event
 class Module:
   def __init__(self, events=None, printer_handle=None, bot=None, say=None):
     self.events = events
     self.printer = printer_handle
     self.bot = bot
-    self.interests = ['__module__']
+    self.interests = []
 
     self.cmd = None
     self.help = None
 
-    for event in events:
-      if event._type in self.interests:
-        event.subscribe(self)
+    mod = Event("__.module__")
+    mod.define(msg_definition="^\.module ")
+    mod.subscribe(self)
+
+    self.bot.register_event(mod, self)
+
+    #for event in events:
+    #  if event._type in self.interests:
+    #    event.subscribe(self)
 
   def handle(self, event):
     if not self.bot.conf.getOwner(self.bot.network) == event.line.split()[0].split("!",1)[0].replace(":",""):

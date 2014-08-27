@@ -45,8 +45,6 @@ class Bot(threading.Thread):
     self.logger.write(Logger.INFO, "\n", self.NICK)
     self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()), self.NICK)
 
-    print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
-
     # arbitrary key/value store for modules
     # they should be 'namespaced' like bot.mem_store.module_name
     self.mem_store = dict()
@@ -76,6 +74,9 @@ class Bot(threading.Thread):
 
     dance = Event("__.dance__")
     dance.define("\.dance")
+
+    #unloads = Event("__module__")
+    #unloads.define("^\.module")
 
     pimp = Event("__pimp__")
     pimp.define("\.pimp")
@@ -117,6 +118,7 @@ class Bot(threading.Thread):
     self.events_list.append(part)
     self.events_list.append(tell)
     self.events_list.append(links)
+    #self.events_list.append(unloads)
   # example
   #  self.events_list.append(test)
 
@@ -432,6 +434,7 @@ if __name__ == "__main__":
     if not DEBUG:
       pid = os.fork()
       if pid == 0: # child
+        print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
         if len(sys.argv) > 1:
           CONF = sys.argv[1]
         else: CONF = "~/.pybotrc"
@@ -448,9 +451,9 @@ if __name__ == "__main__":
           b = bot.Bot(cm, net_list[0], DEBUG)
           b.start()
       elif pid > 0:
-        print "forking to background..."
         sys.exit(0)
     else: # don't background
+      print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
       if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
         CONF = sys.argv[1]
         try:
