@@ -20,12 +20,16 @@ class Event:
   def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None):
     if definition is not None:
       self.definition = definition
+      return
     if msg_definition is not None:
       self.msg_definition = msg_definition
+      return
     if user_definition is not None:
       self.user_definition = user_definition
+      return
     if message_id is not None:
       self.message_id = message_id
+      return
 
   def matches(self, line):
     # grab message id. not always present
@@ -69,7 +73,8 @@ class Event:
   def notifySubscribers(self, line):
     self.line = line
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
-    # we're on a function line - JOIN, PART, etc
+    if "JOIN" in line or "QUIT" in line:
+      self.user = line.split("!")[0].replace(":","")
     try:
       temp = line.split(":")[1].split(" ")[1]
     except IndexError:

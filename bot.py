@@ -21,6 +21,7 @@ import db
 import confman
 from event import Event
 import db
+import util
 
 DEBUG = False
 
@@ -44,6 +45,8 @@ class Bot(threading.Thread):
     self.logger.write(Logger.INFO, "\n", self.NICK)
     self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()), self.NICK)
 
+    print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
+
     # arbitrary key/value store for modules
     # they should be 'namespaced' like bot.mem_store.module_name
     self.mem_store = dict()
@@ -60,9 +63,6 @@ class Bot(threading.Thread):
     all_lines = Event("1__all_lines__")
     all_lines.define(".*")
     self.events_list.append(all_lines)
-
-    joins = Event("__joins__")
-    joins.define("JOIN")
 
     implying = Event("__implying__")
     implying.define(">")
@@ -98,9 +98,6 @@ class Bot(threading.Thread):
     tell = Event("__privmsg__")
     tell.define("PRIVMSG")
 
-    unload = Event("__module__")
-    unload.define("\.module")
-
     links = Event("__urls__")
     links.define("https?://*")
 
@@ -119,7 +116,6 @@ class Bot(threading.Thread):
     self.events_list.append(steam)
     self.events_list.append(part)
     self.events_list.append(tell)
-    self.events_list.append(unload)
     self.events_list.append(links)
   # example
   #  self.events_list.append(test)
@@ -197,7 +193,7 @@ class Bot(threading.Thread):
             mods[name] = imp.load_module(name, f, filename, descr)
             found = True
 
-    for k,v in mods.iteritems():
+    for k,v in mods.iteritems(): 
       for name in dir(v):
         obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
@@ -215,12 +211,12 @@ class Bot(threading.Thread):
     
   def send(self, message):
     if self.OFFLINE:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
+      self.debug_print(util.bcolors.YELLOW + " >> " + util.bcolors.ENDC + self.getName() + ": " + message.encode('utf-8', 'ignore'))
     else:
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "\n DEBUGGING OUTPUT", self.NICK)
         self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'), self.NICK)
-        print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
+        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'))
 
       self.s.send(message.encode('utf-8', 'ignore'))
       target = message.split()[1]
@@ -233,7 +229,7 @@ class Bot(threading.Thread):
   def processline(self, line):
     if self.DEBUG:
       import datetime
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
+      self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + self.getName() + ": " + line)
 
     message_number = line.split()[1]
 
@@ -284,7 +280,6 @@ class Bot(threading.Thread):
     self.REALNAME = 's1ash'
     self.OWNER = self.conf.getOwner(self.network) 
     
-    print os.getpid()
     # connect to server
     self.s = socket.socket()
     while self.CONNECTED == False:
@@ -294,9 +289,9 @@ class Bot(threading.Thread):
         self.CONNECTED = True
         self.logger.write(Logger.INFO, "Connected to " + self.network, self.NICK)
         if self.DEBUG:
-          self.debug_print("connected to " + self.network)
+          self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + "connected to " + self.network)
       except:
-        print "Could not connect! Retrying... "
+        self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect! Retrying... ")
         time.sleep(1)
         self.worker()
 
@@ -304,19 +299,19 @@ class Bot(threading.Thread):
       self.s.send('NICK '+self.NICK+'\n')
 
       if self.DEBUG:
-        self.debug_print("sent to " + self.network + ': NICK ' + self.NICK + '\\n')
+        self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': NICK ' + self.NICK + '\\n')
 
       self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
 
       if self.DEBUG:
-        self.debug_print("sent to " + self.network + ": USER " +self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\\n')
+        self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ": USER " +self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\\n')
 
       time.sleep(3) # allow services to catch up
 
       self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
 
       if self.DEBUG:
-        self.debug_print('sent to ' + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
+        self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
 
     self.s.setblocking(1)
     
@@ -376,6 +371,45 @@ class Bot(threading.Thread):
   def debug_print(self, line):
     print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
 
+  def commands(*command_list):
+# stolen shamelessly from willie. damn, this is a good idea.
+    """Decorator. Sets a command list for a callable.
+
+    This decorator can be used to add multiple commands to one callable in a
+    single line. The resulting match object will have the command as the first
+    group, rest of the line, excluding leading whitespace, as the second group.
+    Parameters 1 through 4, seperated by whitespace, will be groups 3-6.
+
+    Args:
+    command: A string, which can be a regular expression.
+
+    Returns:
+    A function with a new command appended to the commands
+    attribute. If there is no commands attribute, it is added.
+
+    Example:
+    @command("hello"):
+    If the command prefix is "\.", this would trigger on lines starting
+    with ".hello".
+
+    @commands('j', 'join')
+    If the command prefix is "\.", this would trigger on lines starting
+    with either ".j" or ".join".
+
+    """
+    def add_attribute(function):
+      if not hasattr(function, "commands"):
+        function.commands = []
+      function.commands.extend(command_list)
+      return function
+    return add_attribute
+
+  def depends(self, module_name):
+    for m in self.loaded_modules:
+      if m.__class__.__name__ == module_name:
+        return m
+    return None
+    
   def run(self):
     self.worker()
 

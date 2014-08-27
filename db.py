@@ -5,6 +5,7 @@ class DB:
 
   def __init__(self, bot=None):
     self.bot = bot
+    self.dry_run = False
     
   def _open(self):
     if self.bot is not None:
@@ -16,12 +17,19 @@ class DB:
       password = "1q2w3e4r"
       dbname = "pybot"
 
-    self.con = mdb.connect("localhost",dbusername,password,dbname)
+    try:
+      self.con = mdb.connect("localhost",dbusername,password,dbname)
+    except mdb.OperationalError as e:
+      self.dry_run = True
+      print e
+      return
+
     self.cur = self.con.cursor()
   
   def _close(self):
     self.con = None
-    self.cur.close()
+    if not self.dry_run:
+      self.cur.close()
 
   # should prevent mysql has gone away errors.. ideally
   def _handle(self):
@@ -103,9 +111,11 @@ class DB:
       user = "nobody"
     try:
       self.cur.execute("""INSERT INTO img (user, url, channel) VALUES (%s, %s, %s)""", (user, url, channel))
-      self.con.commit()
+      if not self.dry_run:
+        self.con.commit()
     except:
-      self.con.rollback()
+      if not self.dry_run:
+        self.con.rollback()
 
     self._close()
 
