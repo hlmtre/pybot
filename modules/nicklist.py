@@ -25,7 +25,7 @@ class Nicklist(BaseModule):
     nicklisting_quit.subscribe(self)
     nicklisting_part.subscribe(self)
 
-    # register ourself to our new custom event
+    # register ourself to our new custom event(s)
     self.bot.register_event(nicklisting_self_join, self)
     self.bot.register_event(nicklisting_other_join, self)
     self.bot.register_event(nicklisting_quit, self)
@@ -37,8 +37,6 @@ class Nicklist(BaseModule):
   def handle(self, event):
     if event.message_id == 353:
       self.bot.mem_store['nicklist'][event.channel] = event.line.split(":")[2].split()
-      print "adding to " + event.channel
-      print self.bot.mem_store['nicklist'][event.channel]
     
     if event.msg.startswith(".nicklist"):
       print self.bot.mem_store['nicklist'][event.channel]
@@ -51,7 +49,7 @@ class Nicklist(BaseModule):
         self.bot.mem_store['nicklist'][event.channel] = list()
 
     if event._type == "__.nicklisting_part__":
-      print strip_nick(event.user) + " parted " + event.channel
+      self.bot.mem_store['nicklist'][event.channel].remove(strip_nick(event.user))
 
     if event._type == "__.nicklisting_quit__":
       try:

@@ -32,6 +32,10 @@ class Event:
       return
 
   def matches(self, line):
+    # perhaps TODO
+    # first try very simply
+    if len(self.definition) and self.definition in line:
+      return True
     # grab message id. not always present
     try:
       temp = line.split(":")[1].split(" ")[1]
@@ -48,15 +52,15 @@ class Event:
     except IndexError:
       return
 
-    if len(self.msg_definition) > 0:
+    if len(self.msg_definition):
       if re.search(self.msg_definition, msg):
         return True
 
-    if len(self.definition) > 0:
+    if len(self.definition):
       if re.search(self.definition, line):
         return True
 
-    if len(self.user_definition) > 0:
+    if len(self.user_definition):
       if len(line) and "PRIVMSG" in line > 0:
         line_array = line.split()
         user_and_mask = line_array[0][1:]
