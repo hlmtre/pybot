@@ -17,7 +17,9 @@ Local Development
 3. run `./setup.sh`. It will check for module dependencies and create a mysql_init file.
 4. `./bot.py pybotrc`
 5. rejoice.
-5a. for debugging purposes, `./bot.py -d.`
+
+
+6. for debugging purposes, `./bot.py -d.`
 
 Vagrant Development
 -------------------
