@@ -64,7 +64,7 @@ If one server goes down, the other connections to other networks are unaffected.
 
 ![youtube module](http://i.imgur.com/kUYW3e5.png "youtube module")
 
-![a totally not contrived example](http://imgur.com/jMpkjRf "a totally not contrived example")
+![a totally not contrived example](http://i.imgur.com/jMpkjRf.png "a totally not contrived example")
 
 
 This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration, and
