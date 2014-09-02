@@ -14,9 +14,10 @@ Local Development
 -----------------
 1. modify pybotrc with your channels and passwords.
 2. run `sudo ./bootstrap.sh` to install pybot dependencies such as mysql.
-3. Run `./setup.sh`. It will check for module dependencies and create a mysql_init file.
+3. run `./setup.sh`. It will check for module dependencies and create a mysql_init file.
 4. `./bot.py pybotrc`
 5. rejoice.
+5a. for debugging purposes, `./bot.py -d.`
 
 Vagrant Development
 -------------------
@@ -52,6 +53,18 @@ Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < m
 Set his dbpass in the config file (pybotrc) to the password you've given him.
 Copy that config file to the home folder of whatever user will be running the bot. (~user/.pybotrc)
 As that user, `./bot.py.`
+
+Images & Explanation
+====================
+
+![debug mode](http://i.imgur.com/k5T7SKq.png "debug mode")
+
+Here pybot is connected to two networks at once. They are held entirely separately. Modules loaded on one are independent of modules loaded on another.
+If one server goes down, the other connections to other networks are unaffected.
+
+![youtube module](http://i.imgur.com/kUYW3e5.png "youtube module")
+
+![a totally not contrived example](http://imgur.com/jMpkjRf "a totally not contrived example")
 
 
 This project uses [smiley's steamapi](https://github.com/smiley/steamapi) for its steam integration, and

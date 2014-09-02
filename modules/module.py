@@ -34,11 +34,18 @@ class Module:
         self.bot.logger.write(Logger.WARNING, " failed to load " + event.msg.split()[2], self.bot.NICK)
         self.bot.brain.notice(event.channel, "failed to load " + event.msg.split()[2])
 
-    if event.msg.startswith(".module list"):
+    if event.msg == ".module eventslist":
       for m in self.bot.events_list:
-        #print m._type
+        print m._type
+
+    if event.msg.startswith(".module list"):
+      # the set prevents a module with multiple events being printed more than once
+      modules_set = set()
+      for m in self.bot.events_list:
         for s in m.subscribers:
-          print s.__class__.__name__
+          modules_set.add(s.__class__.__name__)
+
+      print modules_set
       return
 
     if event.msg.startswith(".module unload"):
