@@ -329,7 +329,8 @@ class Bot(threading.Thread):
       try:
         timeout += 1
         # if we haven't received anything for 120 seconds
-        if timeout > 120:
+        time_since = self.conf.getTimeout(self.network)
+        if timeout > time_since:
           if self.DEBUG:
             print "Disconnected! Retrying... "
           self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
