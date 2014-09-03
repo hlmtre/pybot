@@ -1,5 +1,5 @@
 pybot is a python irc bot. he is a project.
-[![Build Status](https://travis-ci.org/hlmtre/pybot.svg?branch=master)](https://travis-ci.org/hlmtre/pybot)
+[![Build Status](http://ci.zero9f9.com/job/pybot/badge/icon)](http://ci.zero9f9.com/job/pybot/)
 
 he is modular, extensible, multi-threaded, and configurable.
 
