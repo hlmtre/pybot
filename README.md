@@ -1,5 +1,5 @@
-pybot is a python irc bot. he is a project.
 [![Build Status](http://ci.zero9f9.com/job/pybot/badge/icon)](http://ci.zero9f9.com/job/pybot/)
+pybot is a python irc bot. he is a project.
 
 he is modular, extensible, multi-threaded, and configurable.
 
