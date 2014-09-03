@@ -1,4 +1,4 @@
-[![Build Status](http://ci.zero9f9.com/job/pybot/badge/icon)](http://ci.zero9f9.com/job/pybot/)
+[![Build Status](https://ci.zero9f9.com/job/pybot/badge/icon)](https://ci.zero9f9.com/job/pybot/)
 
 
 pybot is a python irc bot. he is a project.
