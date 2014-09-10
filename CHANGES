@@ -69,3 +69,10 @@ v0.6.2
 v0.6.5
 ======
   Fixes the keyboard interrupt in debug mode issue.
+
+v0.7.0
+======
+  Fixes the not reconnecting upon disconnect issue. 
+
+  Features
+    * Change logger functionality. Logger.write() now takes an additional (optional) argument for nickname, to distinguish logfiles.

@@ -10,7 +10,7 @@ class Bonk:
         self.say = say
 
         bonk = Event("__.bonk__")
-        bonk.define(msg_definition="^\.bonk")
+        bonk.define(msg_definition="^\.bonk ")
         bonk.subscribe(self)
         self.bot.register_event(bonk, self)
 
@@ -52,7 +52,8 @@ class Bonk:
                        'takes %s\'s mother out for a nice dinner and then never calls her back',
                        'rockets %s from across the map',
                        'telefrags %s',
-                       'throws a Dorito into %s\'s jugular from the shadows'
+                       'throws a Dorito into %s\'s jugular from the shadows',
+                       'wub-wubs %s'
                        ]
         bonk_action = random.choice(bonk_actions) % bonkee
         return "\001ACTION " + bonk_action 

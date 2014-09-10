@@ -11,7 +11,7 @@ class Hello:
 
     hello = Event("__hello__")
     nick = self.bot.conf.getNick(self.bot.network)
-    hello.define(msg_definition="^([H|h]ello|hi|howdy) " + nick)
+    hello.define(msg_definition="^([H|h]ello|[H|h]i|[H|h]owdy) " + nick)
     hello.subscribe(self)
 
     # register ourself to our new hello event
@@ -22,7 +22,6 @@ class Hello:
     # register ourself for any events that we're interested in that exist already
     for event in events:
       if event._type in self.interests:
-        print "registering to ", event._type
         event.subscribe(self)
 
   def handle(self, event):

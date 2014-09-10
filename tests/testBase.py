@@ -18,7 +18,7 @@ class TestBase():
     import confman
     from subprocess import call
     b = bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com", True)
-    b.connect()
+    b.worker(mock=True)
     assert b.s is not None
 
   # if this fails someone screwed something up

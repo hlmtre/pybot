@@ -32,6 +32,12 @@ class ConfManager:
   def getOwner(self, net):
     return self.parsed[net]["owner"]
 
+  def getTimeout(self, net):
+    try:
+      return int(self.parsed[net]["timeout"])
+    except:
+      return 120 
+
   def getIRCPass(self, net):
     return self.parsed[net]["ircpass"]
 

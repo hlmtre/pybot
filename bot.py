@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.6.5
+# v0.7.0
 # works with python 2.6.x and 2.7.x
 #
 
@@ -21,17 +21,13 @@ import db
 import confman
 from event import Event
 import db
+import util
 
 DEBUG = False
 
 class Bot(threading.Thread):
   def __init__(self, conf=None, network=None, d=None):
     threading.Thread.__init__(self)
-
-    self.logger = Logger()
-
-    self.logger.write(Logger.INFO, "\n")
-    self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()))
 
     self.DEBUG = d
     self.brain = None
@@ -42,6 +38,12 @@ class Bot(threading.Thread):
     self.conf = conf
     self.db = db.DB()
     self.pid = os.getpid()
+    self.logger = Logger()
+
+    self.NICK = self.conf.getNick(self.network)
+
+    self.logger.write(Logger.INFO, "\n", self.NICK)
+    self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()), self.NICK)
 
     # arbitrary key/value store for modules
     # they should be 'namespaced' like bot.mem_store.module_name
@@ -56,8 +58,9 @@ class Bot(threading.Thread):
 
     # define events here and add them to the events_list
 
-    joins = Event("__joins__")
-    joins.define("JOIN")
+    all_lines = Event("1__all_lines__")
+    all_lines.define(".*")
+    self.events_list.append(all_lines)
 
     implying = Event("__implying__")
     implying.define(">")
@@ -71,6 +74,9 @@ class Bot(threading.Thread):
 
     dance = Event("__.dance__")
     dance.define("\.dance")
+
+    #unloads = Event("__module__")
+    #unloads.define("^\.module")
 
     pimp = Event("__pimp__")
     pimp.define("\.pimp")
@@ -93,9 +99,6 @@ class Bot(threading.Thread):
     tell = Event("__privmsg__")
     tell.define("PRIVMSG")
 
-    unload = Event("__module__")
-    unload.define("\.module")
-
     links = Event("__urls__")
     links.define("https?://*")
 
@@ -114,13 +117,13 @@ class Bot(threading.Thread):
     self.events_list.append(steam)
     self.events_list.append(part)
     self.events_list.append(tell)
-    self.events_list.append(unload)
     self.events_list.append(links)
+    #self.events_list.append(unloads)
   # example
   #  self.events_list.append(test)
 
     self.load_modules()
-    self.logger.write(Logger.INFO, "bot initialized.")
+    self.logger.write(Logger.INFO, "bot initialized.", self.NICK)
 
   # conditionally subscribe to events list or add event to listing
   def register_event(self, event, module):
@@ -155,14 +158,14 @@ class Bot(threading.Thread):
     autoloads = {}
     #load autoloads if it exists
     if os.path.isfile(autoload_path): 
-      self.logger.write(Logger.INFO, "Found autoloads file")
+      self.logger.write(Logger.INFO, "Found autoloads file", self.NICK)
       try:
         autoloads = json.load(open(autoload_path))
         #logging
         for k in autoloads.keys():
-          self.logger.write(Logger.INFO, "Autoloads found for network " + k)
+          self.logger.write(Logger.INFO, "Autoloads found for network " + k, self.NICK)
       except IOError:
-        self.logger.write(Logger.ERROR, "Could not load autoloads file.")
+        self.logger.write(Logger.ERROR, "Could not load autoloads file.",self.NICK)
     # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
@@ -174,17 +177,17 @@ class Bot(threading.Thread):
           if ext == '.py' and not name == '__init__': 
             f, filename, descr = imp.find_module(name, [modules_path])
             mods[name] = imp.load_module(name, f, filename, descr)
-            self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+            self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
         else: # follow autoload's direction
           if ext == '.py' and not name == '__init__':
             if name == 'module':
               f, filename, descr = imp.find_module(name, [modules_path])
               mods[name] = imp.load_module(name, f, filename, descr)
-              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
             elif ('include' in autoloads[self.network] and name in autoloads[self.network]['include']) or ('exclude' in autoloads[self.network] and name not in autoloads[self.network]['exclude']):
               f, filename, descr = imp.find_module(name, [modules_path])
               mods[name] = imp.load_module(name, f, filename, descr)
-              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network)
+              self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
       else:
         if name == specific: # we're reloading only one module
           if ext != '.pyc': # ignore compiled 
@@ -192,7 +195,7 @@ class Bot(threading.Thread):
             mods[name] = imp.load_module(name, f, filename, descr)
             found = True
 
-    for k,v in mods.iteritems():
+    for k,v in mods.iteritems(): 
       for name in dir(v):
         obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
@@ -210,12 +213,12 @@ class Bot(threading.Thread):
     
   def send(self, message):
     if self.OFFLINE:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
+      self.debug_print(util.bcolors.YELLOW + " >> " + util.bcolors.ENDC + self.getName() + ": " + message.encode('utf-8', 'ignore'))
     else:
       if self.DEBUG is True:
-        self.logger.write(Logger.INFO, "\n DEBUGGING OUTPUT")
-        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'))
-        print str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore')
+        self.logger.write(Logger.INFO, "DEBUGGING OUTPUT", self.NICK)
+        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'), self.NICK)
+        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'))
 
       self.s.send(message.encode('utf-8', 'ignore'))
       target = message.split()[1]
@@ -228,7 +231,7 @@ class Bot(threading.Thread):
   def processline(self, line):
     if self.DEBUG:
       import datetime
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
+      self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + self.getName() + ": " + line)
 
     message_number = line.split()[1]
 
@@ -242,8 +245,9 @@ class Bot(threading.Thread):
         self.pong(ping_response_line[1])
       # pings we respond to directly. everything else...
       else:
-# if we get disconnected this should be true upon a reconnect attempt.. ideally
-        if self.JOINED is False and message_number == "376": # wait until we receive end of MOTD before joining
+# patch contributed by github.com/thekanbo
+        if self.JOINED is False and (message_number == "376" or message_number == "422"): 
+          # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exis
           self.chan_list = self.conf.getChannels(self.network) 
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
@@ -268,7 +272,7 @@ class Bot(threading.Thread):
       traceback.print_exc(file=sys.stdout)
 
       
-  def worker(self):
+  def worker(self, mock=False):
     self.HOST = self.network
     self.NICK = self.conf.getNick(self.network)
 
@@ -278,64 +282,137 @@ class Bot(threading.Thread):
     self.REALNAME = 's1ash'
     self.OWNER = self.conf.getOwner(self.network) 
     
-    print os.getpid()
     # connect to server
     self.s = socket.socket()
     while self.CONNECTED == False:
-      self.s.connect((self.HOST, self.PORT)) # force them into one argument
-      self.CONNECTED = True
+      try:
+# low level socket TCP/IP connection
+        self.s.connect((self.HOST, self.PORT)) # force them into one argument
+        self.CONNECTED = True
+        self.logger.write(Logger.INFO, "Connected to " + self.network, self.NICK)
+        if self.DEBUG:
+          self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + "connected to " + self.network)
+      except:
+        self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect! Retrying... ")
+        time.sleep(1)
+        self.worker()
 
+    # core IRC protocol stuff
       self.s.send('NICK '+self.NICK+'\n')
+
+      if self.DEBUG:
+        self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': NICK ' + self.NICK + '\\n')
+
       self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
+
+      if self.DEBUG:
+        self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ": USER " +self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\\n')
+
       time.sleep(3) # allow services to catch up
+
       self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
+
+      if self.DEBUG:
+        self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
 
     self.s.setblocking(1)
     
     read = ""
     
+    timeout = 0
+
+#   if we're only running a test of connecting, and don't want to loop forever
+    if mock:
+      return
     # infinite loop to keep parsing lines
     while True:
       try:
+        timeout += 1
+        # if we haven't received anything for 120 seconds
+        time_since = self.conf.getTimeout(self.network)
+        if timeout > time_since:
+          if self.DEBUG:
+            print "Disconnected! Retrying... "
+          self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
+# so that we rejoin all our channels upon reconnecting to the server
+          self.JOINED = False
+          self.CONNECTED = False
+          self.worker()
+
         time.sleep(1)
-        if self.CONNECTED == False:
-          self.connect()
+       # if self.CONNECTED == False:
+       #   self.connect()
         ready = select.select([self.s],[],[], 1)
         if ready[0]:
-          read = read + self.s.recv(1024)
+          try:
+            read = read + self.s.recv(1024)
+          except:
+            if self.DEBUG:
+              print "Disconnected! Retrying... "
+            self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
+            self.JOINED = False
+            self.CONNECTED = False
+            self.worker()
+
           lines = read.split('\n')
           
           # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
           # line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
           read = lines.pop() 
+
+          if len(lines) > 0:
+            timeout = 0
+
           for line in lines:
             line = line.rstrip()
             self.processline(line)      
       except KeyboardInterrupt:
-        print "keyboard interrupt caught"
+        print "keyboard interrupt caught; exiting ..."
         raise
   # end worker
 
-  def connect(self):
-    time.sleep(10) # prevent attempting to reconnect too frequently errors
-    self.s = socket.socket()
-    try:
-      self.s.connect((self.HOST, self.PORT)) # force them into one argument
-    except Exception, e:
-      self.CONNECTED = False
-    try:
-      self.s.send('NICK '+self.NICK+'\n')
-      self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
-      time.sleep(3) # allow services to catch up
-      self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
-    except Exception, e:
-      self.CONNECTED = False
+  def debug_print(self, line):
+    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
 
-    self.s.setblocking(1)
+  def commands(*command_list):
+# stolen shamelessly from willie. damn, this is a good idea.
+    """Decorator. Sets a command list for a callable.
+
+    This decorator can be used to add multiple commands to one callable in a
+    single line. The resulting match object will have the command as the first
+    group, rest of the line, excluding leading whitespace, as the second group.
+    Parameters 1 through 4, seperated by whitespace, will be groups 3-6.
+
+    Args:
+    command: A string, which can be a regular expression.
+
+    Returns:
+    A function with a new command appended to the commands
+    attribute. If there is no commands attribute, it is added.
+
+    Example:
+    @command("hello"):
+    If the command prefix is "\.", this would trigger on lines starting
+    with ".hello".
+
+    @commands('j', 'join')
+    If the command prefix is "\.", this would trigger on lines starting
+    with either ".j" or ".join".
+
+    """
+    def add_attribute(function):
+      if not hasattr(function, "commands"):
+        function.commands = []
+      function.commands.extend(command_list)
+      return function
+    return add_attribute
+
+  def depends(self, module_name):
+    for m in self.loaded_modules:
+      if m.__class__.__name__ == module_name:
+        return m
+    return None
     
-  def debug_print(self):
-    print self.getName()
-
   def run(self):
     self.worker()
 
@@ -351,12 +428,14 @@ if __name__ == "__main__":
   for i in sys.argv:
     if i == "-d":
       DEBUG = True
-  
+
+# duuude this is so old.
   if os.name == "posix":
     botslist = list()
     if not DEBUG:
       pid = os.fork()
       if pid == 0: # child
+        print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
         if len(sys.argv) > 1:
           CONF = sys.argv[1]
         else: CONF = "~/.pybotrc"
@@ -373,9 +452,9 @@ if __name__ == "__main__":
           b = bot.Bot(cm, net_list[0], DEBUG)
           b.start()
       elif pid > 0:
-        print "forking to background..."
         sys.exit(0)
     else: # don't background
+      print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
       if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
         CONF = sys.argv[1]
         try:

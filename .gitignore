@@ -3,3 +3,5 @@
 logfile.txt
 pylog*
 *.bak
+.vagrant
+mysql_init

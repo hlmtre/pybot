@@ -27,6 +27,8 @@ class Youtube(BaseModule):
   def print_video_title(self, event, url, video_tag):
     if event.user == self.bot.conf.getNick(self.bot.network): #ignore himself
       return
+    if event.msg.startswith("Youtube:"):
+      return
     try:
       response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
     except urllib2.HTTPError:
@@ -42,6 +44,9 @@ class Youtube(BaseModule):
     self.bot.mem_store['youtube'][video_title] = url
 
   def handle(self, event):
+#   prevent bot from printing youtube information if a youtube link is in the channel topic (or elsewhere that isn't a message to a channel)
+    if "PRIVMSG" not in event.line:
+      return
     if event._type == "__.youtubes__":
       url = re.search("youtube.com[\S]+", event.line).group(0)
       try:
