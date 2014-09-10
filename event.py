@@ -13,11 +13,14 @@ class Event:
     self.verb = ""
     self.is_pm = False
     self.message_id = -1
+    self.time_event = False
     
   def subscribe(self, e):
     self.subscribers.append(e)
 
-  def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None):
+  def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None, time_event=False):
+    if time_event is not False:
+      self.time_event = True
     if definition is not None:
       self.definition = definition
       return
@@ -73,6 +76,16 @@ class Event:
         return True
 
     return False
+
+  def time_notify_subscribers(self):
+    print "time_notify_subscribers called"
+    for s in self.subscribers:
+      if s.time_since >= s.time_delta:
+        s.time_since = 0
+        s.handle(self)
+      else:
+        s.time_since += 1
+    
 
   def notifySubscribers(self, line):
     self.line = line

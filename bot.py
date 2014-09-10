@@ -118,6 +118,11 @@ class Bot(threading.Thread):
     self.events_list.append(part)
     self.events_list.append(tell)
     self.events_list.append(links)
+
+    self.time_event = Event("__time_test__")
+    self.time_event.define(time_event=True)
+    self.events_list.append(self.time_event)
+
     #self.events_list.append(unloads)
   # example
   #  self.events_list.append(test)
@@ -339,6 +344,8 @@ class Bot(threading.Thread):
           self.CONNECTED = False
           self.worker()
 
+        self.time_event.time_notify_subscribers()
+        print "one second"
         time.sleep(1)
        # if self.CONNECTED == False:
        #   self.connect()
