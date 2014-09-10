@@ -48,7 +48,10 @@ class Nicklist(BaseModule):
         self.bot.mem_store['nicklist'][event.channel] = list()
 
     if event._type == "__.nicklisting_part__":
-      self.bot.mem_store['nicklist'][event.channel].remove(strip_nick(event.user))
+      try:
+        self.bot.mem_store['nicklist'][event.channel].remove(strip_nick(event.user))
+      except ValueError:
+        pass
 
     if event._type == "__.nicklisting_quit__":
       try:
