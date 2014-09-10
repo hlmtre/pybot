@@ -78,9 +78,8 @@ class Event:
     return False
 
   def time_notify_subscribers(self):
-    print "time_notify_subscribers called"
     for s in self.subscribers:
-      if s.time_since >= s.time_delta:
+      if s.time_since >= int(round(s.time_delta/2) - 1):
         s.time_since = 0
         s.handle(self)
       else:

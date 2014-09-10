@@ -344,8 +344,8 @@ class Bot(threading.Thread):
           self.CONNECTED = False
           self.worker()
 
-        self.time_event.time_notify_subscribers()
-        print "one second"
+        if self.JOINED:
+          self.time_event.time_notify_subscribers()
         time.sleep(1)
        # if self.CONNECTED == False:
        #   self.connect()

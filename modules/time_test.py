@@ -6,7 +6,7 @@ except ImportError:
 class TimeTest(BaseModule):
   def post_init(self):
     self.interests = ["__time_test__"]
-    self.time_delta = 5
+    self.time_delta = 20
     """
       the time_event will increment this each time it's called, unless we call handle on it. then it's set to 0, to restart the process. how zen.
     """
@@ -23,5 +23,5 @@ class TimeTest(BaseModule):
     
   def handle(self, event):
     for channel in self.bot.chan_list:
-      self.say(channel, "called every five^H^H^H twelve seconds, and this is one of 'em")
+      self.say(channel, "called every twenty seconds, and this is one of 'em")
     #self.say(event.channel, "custom event caught!")
