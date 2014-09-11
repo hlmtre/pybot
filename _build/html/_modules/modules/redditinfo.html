@@ -65,7 +65,7 @@
       <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">say</span> <span class="o">=</span> <span class="n">say</span>
 
-      <span class="bp">self</span><span class="o">.</span><span class="n">user_agent</span> <span class="o">=</span> <span class="s">&#39;pybot 0.6.4 by /u/hlmtre; http://bits.zero9f9.com/pybot&#39;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">user_agent</span> <span class="o">=</span> <span class="s">&#39;pybot 0.7.1 by /u/hlmtre; http://bits.zero9f9.com/pybot&#39;</span>
 
       <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -73,7 +73,6 @@
       <span class="n">reddit</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+&quot;</span><span class="p">)</span>
       <span class="n">reddit</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-      <span class="c"># this SHOULD replace the need to iterate below and conditionally subscribe...</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="n">reddit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RedditInfo.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.redditinfo.RedditInfo.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
