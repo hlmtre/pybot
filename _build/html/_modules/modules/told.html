@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>modules.told &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for modules.told</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">event</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">import</span> <span class="nn">random</span> 
+
+<div class="viewcode-block" id="Told"><a class="viewcode-back" href="../../docs/modules.html#modules.told.Told">[docs]</a><span class="k">class</span> <span class="nc">Told</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">printer_handle</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">say</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span> <span class="o">=</span> <span class="n">printer_handle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interests</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;__.told__&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">say</span> <span class="o">=</span> <span class="n">say</span>
+
+        <span class="n">told</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__.told__&quot;</span><span class="p">)</span>
+        <span class="n">told</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="n">msg_definition</span><span class="o">=</span><span class="s">&quot;^\.told&quot;</span><span class="p">)</span>
+        <span class="n">told</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="n">told</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="s">&quot;.told &lt;nick&gt;&quot;</span> 
+
+<div class="viewcode-block" id="Told.get_told_status"><a class="viewcode-back" href="../../docs/modules.html#modules.told.Told.get_told_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_told_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Randomly selects and returns a string with a &quot;told&quot; status.&quot;&quot;&quot;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;FUCKING TOLD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;CASH4TOLD.COM&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;KNIGHTS OF THE TOLD REPUBLIC&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;STONE TOLD STEVE AUSTIN&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;CURE FOR THE COMMON TOLD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;BEN TOLDS FIVE&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;THE 40 YEAR TOLD VIRGIN&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLDENEYE 007&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TEXAS TOLD&#39;EM&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;AUSTIN POWERS IN TOLDMEMBER&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;PTERODACTOLD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;NO COUNTRY FOR TOLD MEN&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;24 CARAT TOLD RING&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;ONLY SHOOTING STARS BREAK THE TOLD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;GOING ONCE...GOING TWICE...TOLD!&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;GARY TOLDMAN&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLD SPICE&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLD STONE CREAMERY&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;BABY IT&#39;S TOLD OUTSIDE&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;POKEMON TOLD AND SILVER&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLD YELLER&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;EL DORADO: THE LOST CITY OF TOLD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLDPLAY&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;BATMAN: THE BRAVE AND THE TOLD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;DANNY DEVITOLD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;FOR WHOM THE BELL TOLDS&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;CAN&#39;T TEACH A TOLD DOG NEW TRICKS&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;I AIN&#39;T SAYING SHE A TOLD DIGGER&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;THE TOLDEN COMPASS&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLDIER OF FORTUNE&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLDING CHAIR&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLDEN AXE&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLD MACDONALD HAD A FARM&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLDEN TOLDIES: HITS FROM THE 50&#39;S, 60&#39;S, AND 70&#39;S&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;BATTLETOLDS&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;YE TOLDE PUB&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLDEN CAULFIELD&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;THE TOLD MAN AND THE SEA&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;TOLD MEDAL WINNER IN THE WINTER OLYMPICS&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;POT OF TOLD AT THE END OF THE RAINBOW&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;J.R.R. TOLDKIEN&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;CALIFORNIA TOLD RUSH&quot;</span><span class="p">,</span>
+                  <span class="s">&quot;THERE&#39;S TOLD IN THEM THAR HILLS&quot;</span>
+                  <span class="p">]</span>
+        <span class="n">exclamation</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Damn!&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;Damn, son!&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;Snap!&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;Sheeeiiiiittttt.&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;Ouch!&quot;</span>
+                      <span class="p">]</span>
+        <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">exclamation</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; </span><span class="si">%s</span><span class="se">\&#39;</span><span class="s">s told status: [X] &quot;</span> <span class="o">%</span> <span class="n">target</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Told.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.told.Told.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">_z</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_told_status</span><span class="p">(</span><span class="n">_z</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;You didn</span><span class="se">\&#39;</span><span class="s">t say who got told!&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_told_status</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

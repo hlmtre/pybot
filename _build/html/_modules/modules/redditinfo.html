@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>modules.redditinfo &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for modules.redditinfo</h1><div class="highlight"><pre>
+<span class="k">try</span><span class="p">:</span>
+  <span class="kn">import</span> <span class="nn">praw</span>
+  <span class="n">successful_import</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&quot;WARNING: redditinfo requires praw (https://github.com/praw-dev/praw/).&quot;</span>
+  <span class="n">successful_import</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="k">if</span> <span class="n">successful_import</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+  <span class="kn">import</span> <span class="nn">re</span>
+  <span class="kn">from</span> <span class="nn">event</span> <span class="kn">import</span> <span class="n">Event</span>
+<div class="viewcode-block" id="RedditInfo"><a class="viewcode-back" href="../../docs/modules.html#modules.redditinfo.RedditInfo">[docs]</a>  <span class="k">class</span> <span class="nc">RedditInfo</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">printer_handle</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">say</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">events</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">printer</span> <span class="o">=</span> <span class="n">printer_handle</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">interests</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;__reddit__&#39;</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">say</span> <span class="o">=</span> <span class="n">say</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">user_agent</span> <span class="o">=</span> <span class="s">&#39;pybot 0.7.1 by /u/hlmtre; http://bits.zero9f9.com/pybot&#39;</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="bp">None</span>
+
+      <span class="n">reddit</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__reddit__&quot;</span><span class="p">)</span>
+      <span class="n">reddit</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+&quot;</span><span class="p">)</span>
+      <span class="n">reddit</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="n">reddit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RedditInfo.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.redditinfo.RedditInfo.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+      <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+&quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">me</span> <span class="o">=</span> <span class="n">praw</span><span class="o">.</span><span class="n">Reddit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_agent</span><span class="p">)</span>
+      <span class="n">s</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">get_submission</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+      <span class="n">message</span> <span class="o">=</span> <span class="s">&#39;[REDDIT] &#39;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">title</span>
+      <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">is_self</span><span class="p">:</span>
+          <span class="n">message</span> <span class="o">=</span> <span class="n">message</span> <span class="o">+</span> <span class="s">&#39; (self.&#39;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">subreddit</span><span class="o">.</span><span class="n">display_name</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span>
+      <span class="k">else</span><span class="p">:</span>
+          <span class="n">message</span> <span class="o">=</span> <span class="n">message</span> <span class="o">+</span> <span class="s">&#39; to r/&#39;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">subreddit</span><span class="o">.</span><span class="n">display_name</span>
+      <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">over_18</span><span class="p">:</span>
+          <span class="n">message</span> <span class="o">=</span> <span class="n">message</span> <span class="o">+</span> <span class="s">&#39; 05[NSFW]&#39;</span>
+          <span class="c">#TODO implement per-channel settings db, and make this able to kick</span>
+      <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">author</span><span class="p">:</span>
+          <span class="n">author</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">name</span>
+      <span class="k">else</span><span class="p">:</span>
+          <span class="n">author</span> <span class="o">=</span> <span class="s">&#39;[deleted]&#39;</span>
+      <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="n">message</span> <span class="o">+</span> <span class="s">&#39; | &#39;</span> <span class="o">+</span> <span class="n">author</span><span class="p">)</span>
+      <span class="c">#TODO add creation time with s.created</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="p">(</span><span class="s">&quot;PRIVMSG &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">channel</span> <span class="o">+</span> <span class="s">&quot; :&quot;</span> <span class="o">+</span> <span class="n">message</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pybot 0.6.5 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

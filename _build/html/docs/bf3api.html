@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bf3api module &mdash; pybot 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pybot 0.6.5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-bf3api">
+<span id="bf3api-module"></span><h1>bf3api module<a class="headerlink" href="#module-bf3api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="bf3api.API">
+<em class="property">class </em><tt class="descclassname">bf3api.</tt><tt class="descname">API</tt><big>(</big><em>base_url=None</em>, <em>plattform='pc'</em>, <em>secret=None</em>, <em>ident=None</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A python interface for the bf3stats.com API</p>
+<dl class="method">
+<dt id="bf3api.API.dogtags">
+<tt class="descname">dogtags</tt><big>(</big><em>player_name</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.dogtags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.dogtags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request Player dogtags</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bf3api.API.getkey">
+<tt class="descname">getkey</tt><big>(</big><em>client_ident</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.getkey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.getkey" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#8220;Get information about a existing client key or your own key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bf3api.API.onlinestats">
+<tt class="descname">onlinestats</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.onlinestats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.onlinestats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count of online players</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bf3api.API.player">
+<tt class="descname">player</tt><big>(</big><em>player_name</em>, <em>platform</em>, <em>parts=None</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.player" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request a player</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bf3api.API.playerlist">
+<tt class="descname">playerlist</tt><big>(</big><em>players</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.playerlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.playerlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request a list of players</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bf3api.API.playerlookup">
+<tt class="descname">playerlookup</tt><big>(</big><em>player_name</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.playerlookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.playerlookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lookup a player. (signed request)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bf3api.API.playerupdate">
+<tt class="descname">playerupdate</tt><big>(</big><em>player_name</em>, <em>data_group='playerupdate'</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.playerupdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.playerupdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request a playerupdate. (signed request)</p>
+<p>bf3stats.com request the current data from EA for this player.
+If the player was not in bf3stats.com database, they do automatically a lookup and add the player.</p>
+<p>Note: Clock should not have more than 1 minute difference to current time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bf3api.API.setupkey">
+<tt class="descname">setupkey</tt><big>(</big><em>client_ident</em>, <em>name</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#API.setupkey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.API.setupkey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an individual client key for every installation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bf3api.objDict">
+<em class="property">class </em><tt class="descclassname">bf3api.</tt><tt class="descname">objDict</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/bf3api.html#objDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bf3api.objDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>The recursive class for building and representing objects with.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/docs/bf3api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">pybot 0.6.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, hlmtre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
