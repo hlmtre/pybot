@@ -55,7 +55,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">printer_handle</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">say</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">events</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">printer</span> <span class="o">=</span> <span class="n">printer_handle</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">interests</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;__.qdb__&#39;</span><span class="p">]</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">interests</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;__.qdb__&#39;</span><span class="p">,</span> <span class="s">&#39;1__all_lines__&#39;</span><span class="p">]</span>  <span class="c"># should be first event in the listing.. so lines being added is a priority</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">say</span> <span class="o">=</span> <span class="n">say</span>
 
@@ -63,11 +63,9 @@
         <span class="c">#define a key for _recent since that will not be a potential channel name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="s">&#39;_recent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">qdb</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__.qdb__&quot;</span><span class="p">)</span>
-        <span class="n">qdb</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="n">msg_definition</span><span class="o">=</span><span class="s">&quot;.*&quot;</span><span class="p">)</span>
-        <span class="n">qdb</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="n">qdb</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+          <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">interests</span><span class="p">:</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="s">&quot;.qdb &lt;search string of first line&gt; | &lt;search string of last line&gt;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">200</span> 
@@ -229,6 +227,25 @@
             <span class="k">return</span> <span class="s">&quot;Error getting status of quote submission.&quot;</span> 
         <span class="k">return</span> <span class="s">&quot;That was probably successful since no errors came up, but no status available.&quot;</span>
 </div>
+<div class="viewcode-block" id="QDB.delete"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">post_id</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">passcode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A special function that allows certain users to delete posts&quot;&quot;&quot;</span>
+        <span class="c">#accessing hlmtre&#39;s qdb api</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;http://qdb.zero9f9.com/api.php&#39;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;q&#39;</span><span class="p">:</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">:</span><span class="n">user</span><span class="p">,</span> <span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">post_id</span><span class="p">,</span> <span class="s">&#39;code&#39;</span><span class="p">:</span><span class="n">passcode</span><span class="p">}</span>
+        <span class="n">deletion</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="c">#check for any HTTP errors and return False if there were any</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">deletion</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;HTTPError encountered when accessing QDB&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">del_status</span> <span class="o">=</span> <span class="n">deletion</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">del_status</span><span class="p">[</span><span class="s">&#39;success&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;true&quot;</span><span class="p">:</span>
+              <span class="k">return</span> <span class="s">&quot;QDB deletion succeeded.&quot;</span>
+            <span class="k">return</span> <span class="s">&quot;QDB deletion failed.&quot;</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s">&quot;Error getting status of quote deletion.&quot;</span> 
+</div>
 <div class="viewcode-block" id="QDB.recently_submitted"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.recently_submitted">[docs]</a>    <span class="k">def</span> <span class="nf">recently_submitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submission</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Checks to see if the given submission is string is at least 75% similar to the strings</span>
 <span class="sd">        in the list of recently submitted quotes.</span>
@@ -262,7 +279,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;qdb&#39;</span><span class="p">][</span><span class="s">&#39;_recent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="n">q_id</span><span class="p">:</span><span class="n">submission</span><span class="p">})</span>
 </div>
 <div class="viewcode-block" id="QDB.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.qdb.QDB.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
-        <span class="c">#first we see if we&#39;re going to generate a qdb submission, or just add the line to the buffer</span>
+        <span class="c">#first check to see if there is a special deletion going on</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.qdbdelete&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">is_pm</span><span class="p">:</span>
+            <span class="n">deletion</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c">#requires the format &quot;.qdbdelete &lt;post_id&gt; &lt;password&gt;&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">deletion</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">deletion</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s">&quot;Not enough parameters provided for deletion.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c">#we see if we&#39;re going to generate a qdb submission, or just add the line to the buffer</span>
         <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.qdb &quot;</span><span class="p">):</span>
             <span class="c">#split the msg with &#39;.qdb &#39; stripped off beginning and divide into 1 or 2 search strings</span>
             <span class="n">string_token</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;|&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -337,7 +363,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

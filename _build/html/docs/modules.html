@@ -322,6 +322,12 @@ Also we do length checking, only keep record of the previous MAX_HISTORY_SIZE qu
 </dd></dl>
 
 <dl class="method">
+<dt id="modules.qdb.QDB.delete">
+<tt class="descname">delete</tt><big>(</big><em>user</em>, <em>post_id=''</em>, <em>passcode=''</em><big>)</big><a class="reference internal" href="../_modules/modules/qdb.html#QDB.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.qdb.QDB.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>A special function that allows certain users to delete posts</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="modules.qdb.QDB.format_line">
 <tt class="descname">format_line</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="../_modules/modules/qdb.html#QDB.format_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.qdb.QDB.format_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes an event and formats a string appropriate for quotation from it</p>
@@ -435,33 +441,8 @@ server. Returns a string with status of submission. If it worked, includes a lin
 </dd></dl>
 
 </div>
-<div class="section" id="module-modules.twitter_credentials">
-<span id="modules-twitter-credentials-module"></span><h2>modules.twitter_credentials module<a class="headerlink" href="#module-modules.twitter_credentials" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="modules.twitter_credentials.PybotTwitter">
-<em class="property">class </em><tt class="descclassname">modules.twitter_credentials.</tt><tt class="descname">PybotTwitter</tt><a class="reference internal" href="../_modules/modules/twitter_credentials.html#PybotTwitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.twitter_credentials.PybotTwitter" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="modules.twitter_credentials.PybotTwitter.access_token">
-<tt class="descname">access_token</tt><em class="property"> = '2563845180-XWRYvQ2I3irdneJ6UGkrhb92N3SR2t8KC0EMLYM'</em><a class="headerlink" href="#modules.twitter_credentials.PybotTwitter.access_token" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="modules.twitter_credentials.PybotTwitter.access_token_secret">
-<tt class="descname">access_token_secret</tt><em class="property"> = 'JMps293v4bPGpTf18bD3cT0wg6B7uNvcEO8k482FYPCT5'</em><a class="headerlink" href="#modules.twitter_credentials.PybotTwitter.access_token_secret" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="modules.twitter_credentials.PybotTwitter.api_key">
-<tt class="descname">api_key</tt><em class="property"> = 'c43mLlyWaxAjnX55mbuOS2VDe'</em><a class="headerlink" href="#modules.twitter_credentials.PybotTwitter.api_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="modules.twitter_credentials.PybotTwitter.api_secret">
-<tt class="descname">api_secret</tt><em class="property"> = 'NmXYraZRIw2rPmNtHUdNQLWiy7XWubgpoRUfZRCblidF707Gin'</em><a class="headerlink" href="#modules.twitter_credentials.PybotTwitter.api_secret" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="modules-twitter-credentials-module">
+<h2>modules.twitter_credentials module<a class="headerlink" href="#modules-twitter-credentials-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-modules.twitterposter">
 <span id="modules-twitterposter-module"></span><h2>modules.twitterposter module<a class="headerlink" href="#module-modules.twitterposter" title="Permalink to this headline">¶</a></h2>
@@ -469,25 +450,49 @@ server. Returns a string with status of submission. If it worked, includes a lin
 <dt id="modules.twitterposter.TwitterPoster">
 <em class="property">class </em><tt class="descclassname">modules.twitterposter.</tt><tt class="descname">TwitterPoster</tt><big>(</big><em>events=None</em>, <em>printer_handle=None</em>, <em>bot=None</em>, <em>say=None</em><big>)</big><a class="reference internal" href="../_modules/modules/twitterposter.html#TwitterPoster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.twitterposter.TwitterPoster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#modules.basemodule.BaseModule" title="modules.basemodule.BaseModule"><tt class="xref py py-class docutils literal"><span class="pre">modules.basemodule.BaseModule</span></tt></a></p>
+<dl class="class">
+<dt id="modules.twitterposter.TwitterPoster.PhonyPt">
+<em class="property">class </em><tt class="descname">PhonyPt</tt><a class="reference internal" href="../_modules/modules/twitterposter.html#TwitterPoster.PhonyPt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.twitterposter.TwitterPoster.PhonyPt" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="modules.twitterposter.TwitterPoster.PhonyPt.access_token">
+<tt class="descname">access_token</tt><em class="property"> = ''</em><a class="headerlink" href="#modules.twitterposter.TwitterPoster.PhonyPt.access_token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.twitterposter.TwitterPoster.PhonyPt.access_token_secret">
+<tt class="descname">access_token_secret</tt><em class="property"> = ''</em><a class="headerlink" href="#modules.twitterposter.TwitterPoster.PhonyPt.access_token_secret" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.twitterposter.TwitterPoster.PhonyPt.api_key">
+<tt class="descname">api_key</tt><em class="property"> = ''</em><a class="headerlink" href="#modules.twitterposter.TwitterPoster.PhonyPt.api_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.twitterposter.TwitterPoster.PhonyPt.api_secret">
+<tt class="descname">api_secret</tt><em class="property"> = ''</em><a class="headerlink" href="#modules.twitterposter.TwitterPoster.PhonyPt.api_secret" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="method">
 <dt id="modules.twitterposter.TwitterPoster.handle">
-<tt class="descname">handle</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="../_modules/modules/twitterposter.html#TwitterPoster.handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.twitterposter.TwitterPoster.handle" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">TwitterPoster.</tt><tt class="descname">handle</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="../_modules/modules/twitterposter.html#TwitterPoster.handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.twitterposter.TwitterPoster.handle" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="modules.twitterposter.TwitterPoster.post_init">
-<tt class="descname">post_init</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/modules/twitterposter.html#TwitterPoster.post_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.twitterposter.TwitterPoster.post_init" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">TwitterPoster.</tt><tt class="descname">post_init</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/modules/twitterposter.html#TwitterPoster.post_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modules.twitterposter.TwitterPoster.post_init" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="modules.twitterposter.TwitterPoster.pt">
-<tt class="descname">pt</tt><a class="headerlink" href="#modules.twitterposter.TwitterPoster.pt" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">PybotTwitter</span></tt></p>
-</dd></dl>
+<tt class="descclassname">TwitterPoster.</tt><tt class="descname">pt</tt><em class="property"> = &lt;modules.twitterposter.PhonyPt instance at 0x2af1f5d81440&gt;</em><a class="headerlink" href="#modules.twitterposter.TwitterPoster.pt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="modules.twitterposter.TwitterPoster.user_to_track">
-<tt class="descname">user_to_track</tt><em class="property"> = 'bhhorg'</em><a class="headerlink" href="#modules.twitterposter.TwitterPoster.user_to_track" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">TwitterPoster.</tt><tt class="descname">user_to_track</tt><em class="property"> = 'bhhorg'</em><a class="headerlink" href="#modules.twitterposter.TwitterPoster.user_to_track" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -585,7 +590,7 @@ server. Returns a string with status of submission. If it worked, includes a lin
 <li><a class="reference internal" href="#module-modules.steam">modules.steam module</a></li>
 <li><a class="reference internal" href="#module-modules.tell">modules.tell module</a></li>
 <li><a class="reference internal" href="#module-modules.told">modules.told module</a></li>
-<li><a class="reference internal" href="#module-modules.twitter_credentials">modules.twitter_credentials module</a></li>
+<li><a class="reference internal" href="#modules-twitter-credentials-module">modules.twitter_credentials module</a></li>
 <li><a class="reference internal" href="#module-modules.twitterposter">modules.twitterposter module</a></li>
 <li><a class="reference internal" href="#module-modules.weather">modules.weather module</a></li>
 <li><a class="reference internal" href="#module-modules.youtube">modules.youtube module</a></li>
@@ -631,7 +636,7 @@ server. Returns a string with status of submission. If it worked, includes a lin
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

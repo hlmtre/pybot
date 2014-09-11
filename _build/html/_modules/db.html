@@ -54,6 +54,7 @@
 
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bot</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="bp">False</span>
     
   <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -65,12 +66,19 @@
       <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;1q2w3e4r&quot;</span>
       <span class="n">dbname</span> <span class="o">=</span> <span class="s">&quot;pybot&quot;</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">con</span> <span class="o">=</span> <span class="n">mdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="n">dbusername</span><span class="p">,</span><span class="n">password</span><span class="p">,</span><span class="n">dbname</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">con</span> <span class="o">=</span> <span class="n">mdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="n">dbusername</span><span class="p">,</span><span class="n">password</span><span class="p">,</span><span class="n">dbname</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">mdb</span><span class="o">.</span><span class="n">OperationalError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="o">=</span> <span class="bp">True</span>
+      <span class="k">print</span> <span class="n">e</span>
+      <span class="k">return</span>
+
     <span class="bp">self</span><span class="o">.</span><span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
   
   <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">con</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
   <span class="c"># should prevent mysql has gone away errors.. ideally</span>
   <span class="k">def</span> <span class="nf">_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -152,9 +160,11 @@
       <span class="n">user</span> <span class="o">=</span> <span class="s">&quot;nobody&quot;</span>
     <span class="k">try</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;INSERT INTO img (user, url, channel) VALUES (</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">)&quot;&quot;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
     <span class="k">except</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">con</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
 
@@ -220,7 +230,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

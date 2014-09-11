@@ -61,33 +61,55 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">verb</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">is_pm</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     
 <div class="viewcode-block" id="Event.subscribe"><a class="viewcode-back" href="../docs/event.html#event.Event.subscribe">[docs]</a>  <span class="k">def</span> <span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Event.define"><a class="viewcode-back" href="../docs/event.html#event.Event.define">[docs]</a>  <span class="k">def</span> <span class="nf">define</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">msg_definition</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">user_definition</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Event.define"><a class="viewcode-back" href="../docs/event.html#event.Event.define">[docs]</a>  <span class="k">def</span> <span class="nf">define</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">msg_definition</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">user_definition</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">message_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">definition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="n">definition</span>
+      <span class="k">return</span>
     <span class="k">if</span> <span class="n">msg_definition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">msg_definition</span> <span class="o">=</span> <span class="n">msg_definition</span>
+      <span class="k">return</span>
     <span class="k">if</span> <span class="n">user_definition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">user_definition</span> <span class="o">=</span> <span class="n">user_definition</span>
+      <span class="k">return</span>
+    <span class="k">if</span> <span class="n">message_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="o">=</span> <span class="n">message_id</span>
+      <span class="k">return</span>
 </div>
 <div class="viewcode-block" id="Event.matches"><a class="viewcode-back" href="../docs/event.html#event.Event.matches">[docs]</a>  <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+    <span class="c"># perhaps TODO</span>
+    <span class="c"># first try very simply</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">True</span>
+    <span class="c"># grab message id. not always present</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+      <span class="k">pass</span>
+
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">message_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">UnboundLocalError</span><span class="p">):</span>
+      <span class="n">message_id</span> <span class="o">=</span> <span class="mi">0</span>
+
     <span class="k">try</span><span class="p">:</span>
       <span class="n">msg</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-      <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+      <span class="k">return</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_definition</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_definition</span><span class="p">):</span>
       <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_definition</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">True</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">):</span>
       <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">True</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_definition</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_definition</span><span class="p">):</span>
       <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="ow">and</span> <span class="s">&quot;PRIVMSG&quot;</span> <span class="ow">in</span> <span class="n">line</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">line_array</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">user_and_mask</span> <span class="o">=</span> <span class="n">line_array</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
@@ -95,12 +117,22 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_definition</span> <span class="o">==</span> <span class="n">user</span><span class="p">:</span>
           <span class="k">return</span> <span class="bp">True</span>
 
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message_id</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_id</span> <span class="o">==</span> <span class="n">message_id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
     <span class="k">return</span> <span class="bp">False</span>
 </div>
 <div class="viewcode-block" id="Event.notifySubscribers"><a class="viewcode-back" href="../docs/event.html#event.Event.notifySubscribers">[docs]</a>  <span class="k">def</span> <span class="nf">notifySubscribers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="n">line</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&quot;!&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># nick is first thing on line</span>
-    <span class="c"># we&#39;re on a function line - JOIN, PART, etc</span>
+    <span class="k">if</span> <span class="s">&quot;JOIN&quot;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="s">&quot;QUIT&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;!&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+      <span class="k">pass</span>
+
     <span class="k">try</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
@@ -109,7 +141,12 @@
     <span class="n">l</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">verb</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">privmsg_index</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+      <span class="n">ind</span><span class="o">+=</span><span class="mi">1</span>
+      <span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s">&quot;PRIVMSG&quot;</span><span class="p">:</span>
+        <span class="n">privmsg_index</span> <span class="o">=</span> <span class="n">ind</span>
       <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">e</span>
         <span class="k">break</span>
@@ -117,7 +154,8 @@
       <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;JOIN&quot;</span><span class="p">,</span><span class="s">&quot;PART&quot;</span><span class="p">,</span><span class="s">&quot;QUIT&quot;</span><span class="p">,</span><span class="s">&quot;NICK&quot;</span><span class="p">,</span><span class="s">&quot;KICK&quot;</span><span class="p">,</span><span class="s">&quot;PRIVMSG&quot;</span><span class="p">,</span><span class="s">&quot;TOPIC&quot;</span><span class="p">,</span> <span class="s">&quot;NOTICE&quot;</span><span class="p">,</span> <span class="s">&quot;PING&quot;</span><span class="p">,</span> <span class="s">&quot;PONG&quot;</span><span class="p">,</span> <span class="s">&quot;MODE&quot;</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verb</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">break</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="c"># our channel is the next one from PRIVMSG</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verb</span> <span class="o">==</span> <span class="s">&quot;PRIVMSG&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">l</span><span class="p">[</span><span class="n">privmsg_index</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="p">):</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">is_pm</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subscribers</span><span class="p">:</span>
       <span class="n">s</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
@@ -160,7 +198,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

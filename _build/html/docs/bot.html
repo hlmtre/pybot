@@ -51,13 +51,35 @@
 <em class="property">class </em><tt class="descclassname">bot.</tt><tt class="descname">Bot</tt><big>(</big><em>conf=None</em>, <em>network=None</em>, <em>d=None</em><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt></p>
 <dl class="method">
-<dt id="bot.Bot.connect">
-<tt class="descname">connect</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot.connect" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="bot.Bot.commands">
+<tt class="descname">commands</tt><big>(</big><em>*command_list</em><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot.commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot.commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator. Sets a command list for a callable.</p>
+<p>This decorator can be used to add multiple commands to one callable in a
+single line. The resulting match object will have the command as the first
+group, rest of the line, excluding leading whitespace, as the second group.
+Parameters 1 through 4, seperated by whitespace, will be groups 3-6.</p>
+<p>Args:
+command: A string, which can be a regular expression.</p>
+<p>Returns:
+A function with a new command appended to the commands
+attribute. If there is no commands attribute, it is added.</p>
+<p>Example:
+&#64;command(&#8220;hello&#8221;):
+If the command prefix is &#8221;.&#8221;, this would trigger on lines starting
+with &#8221;.hello&#8221;.</p>
+<p>&#64;commands(&#8216;j&#8217;, &#8216;join&#8217;)
+If the command prefix is &#8221;.&#8221;, this would trigger on lines starting
+with either &#8221;.j&#8221; or &#8221;.join&#8221;.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bot.Bot.debug_print">
-<tt class="descname">debug_print</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot.debug_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot.debug_print" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">debug_print</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot.debug_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot.debug_print" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bot.Bot.depends">
+<tt class="descname">depends</tt><big>(</big><em>module_name</em><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot.depends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot.depends" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -97,7 +119,7 @@
 
 <dl class="method">
 <dt id="bot.Bot.worker">
-<tt class="descname">worker</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot.worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot.worker" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">worker</tt><big>(</big><em>mock=False</em><big>)</big><a class="reference internal" href="../_modules/bot.html#Bot.worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bot.Bot.worker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -146,7 +168,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

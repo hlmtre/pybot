@@ -81,6 +81,12 @@
 <div class="viewcode-block" id="ConfManager.getOwner"><a class="viewcode-back" href="../docs/confman.html#confman.ConfManager.getOwner">[docs]</a>  <span class="k">def</span> <span class="nf">getOwner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="n">net</span><span class="p">][</span><span class="s">&quot;owner&quot;</span><span class="p">]</span>
 </div>
+<div class="viewcode-block" id="ConfManager.getTimeout"><a class="viewcode-back" href="../docs/confman.html#confman.ConfManager.getTimeout">[docs]</a>  <span class="k">def</span> <span class="nf">getTimeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="n">net</span><span class="p">][</span><span class="s">&quot;timeout&quot;</span><span class="p">])</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="k">return</span> <span class="mi">120</span> 
+</div>
 <div class="viewcode-block" id="ConfManager.getIRCPass"><a class="viewcode-back" href="../docs/confman.html#confman.ConfManager.getIRCPass">[docs]</a>  <span class="k">def</span> <span class="nf">getIRCPass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="n">net</span><span class="p">][</span><span class="s">&quot;ircpass&quot;</span><span class="p">]</span>
 </div>
@@ -159,7 +165,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

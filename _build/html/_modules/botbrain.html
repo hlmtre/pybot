@@ -49,7 +49,7 @@
   <h1>Source code for botbrain</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">webwriter</span>
-<span class="kn">import</span> <span class="nn">bf3api</span>
+<span class="c">#import bf3api</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">logger</span> 
 <span class="kn">import</span> <span class="nn">datetime</span>
@@ -64,59 +64,59 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">bf3api</span><span class="o">.</span><span class="n">API</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">)</span>
+<span class="c">#api = bf3api.API(None, &#39;360&#39;)</span>
+<span class="c">#</span>
+<span class="c">#bf3players = {&#39;tarehart&#39;: (&#39;tarehart&#39;, &#39;360&#39;),</span>
+<span class="c">#              #&#39;hlmtre&#39;: (&#39;hellmitre&#39;, &#39;360&#39;),</span>
+<span class="c">#              &#39;willfro&#39;: (&#39;fro4thought&#39;, &#39;360&#39;),</span>
+<span class="c">#              &#39;BoneKin&#39;: (&#39;BoneKin&#39;, &#39;360&#39;),</span>
+<span class="c">#              &#39;Lucifer7&#39;: (&#39;Lucifer7&#39;, &#39;360&#39;),</span>
+<span class="c">#              &#39;i7&#39;: (&#39;Infinite Se7en&#39;, &#39;360&#39;)}</span>
 
-<span class="n">bf3players</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;tarehart&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;tarehart&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
-              <span class="c">#&#39;hlmtre&#39;: (&#39;hellmitre&#39;, &#39;360&#39;),</span>
-              <span class="s">&#39;willfro&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;fro4thought&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
-              <span class="s">&#39;BoneKin&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;BoneKin&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
-              <span class="s">&#39;Lucifer7&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;Lucifer7&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">),</span>
-              <span class="s">&#39;i7&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;Infinite Se7en&#39;</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">)}</span>
+<span class="c">#def getbf3stats(message, platform):</span>
+<span class="c">## global bf3players</span>
+<span class="c">#  global api</span>
+<span class="c">#</span>
+<span class="c">#  gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators</span>
+<span class="c">#  command = message.split(None, 2)[1].strip()</span>
+<span class="c">#</span>
+<span class="c">#  data = api.player(gt, platform, &quot;clear,ranking&quot;)</span>
+<span class="c">#</span>
+<span class="c">#  l = logger.Logger()</span>
+<span class="c">#  date = str(time.strftime(&quot;%Y-%m-%d %H:%M:%S&quot;))</span>
+<span class="c">#  string = &quot;getting &quot; + command + &quot; for player &quot; + gt + &quot; at &quot; + date + &#39;\n&#39;</span>
+<span class="c">#  l.write(string)</span>
+<span class="c">#</span>
+<span class="c">#  return formatbf3data(gt, command, data)</span>
+<span class="c">#    </span>
+<span class="c">#def formatbf3data(player, command, data):</span>
+<span class="c">#  if data.status == &quot;data&quot;:</span>
+<span class="c">#    if command == &quot;spm&quot;:</span>
+<span class="c">#      return [player + &quot;&#39;s SPM: &quot; + str(data.Stats.Ranking.Spm.v)[:6]]</span>
+<span class="c">#    elif command == &quot;kdr&quot;:</span>
+<span class="c">#      return [player + &quot;&#39;s KDR: &quot; + str(data.Stats.Ranking.Kdr.v)[:6]]</span>
+<span class="c">#    elif command == &quot;wlr&quot;:</span>
+<span class="c">#      return [player + &quot;&#39;s WLR: &quot; + str(data.Stats.Ranking.Wlr.v)[:6]]</span>
+<span class="c">#    elif command == &quot;stats&quot;:</span>
+<span class="c">#      l = [player+&quot;&#39;s stats: &quot;, &quot;KDR: &quot;+str(data.Stats.Ranking.Kdr.v)[:6], &quot;SPM: &quot;+str(data.Stats.Ranking.Spm.v)[:6], &quot;Headshots/kill: &quot;+str(data.Stats.Ranking.Hskillperc.v)[:6], &quot;win/loss: &quot;+str(data.Stats.Ranking.Wlr.v)[:6]]</span>
+<span class="c">#      return l</span>
+<span class="c">#      </span>
+<span class="c">#  elif data.status == &quot;notfound&quot;:</span>
+<span class="c">#    return [player + &quot; not found &quot;]</span>
+<span class="c">#  else:</span>
+<span class="c">#    return [&quot;ERROR&quot;]</span>
+<span class="c">#  </span>
+<span class="c">#</span>
+<span class="c">#def getbf3last(message):</span>
+<span class="c">#  global api</span>
+<span class="c">#  </span>
+<span class="c">#  command = message.split(None, 2)[1].strip()</span>
+<span class="c">#  gt = message.split(None, 2)[2].strip() # grab gamertag off the end and strip it of terminators</span>
+<span class="c">#  fact = battlelog.getLatestGameFact(api, gt, command)</span>
+<span class="c">#  return gt + &quot;&#39;s latest &quot; + command + &quot; is &quot; + str(fact)[:6]</span>
 
-<div class="viewcode-block" id="getbf3stats"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.getbf3stats">[docs]</a><span class="k">def</span> <span class="nf">getbf3stats</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
-<span class="c"># global bf3players</span>
-  <span class="k">global</span> <span class="n">api</span>
-
-  <span class="n">gt</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="c"># grab gamertag off the end and strip it of terminators</span>
-  <span class="n">command</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-  <span class="n">data</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">player</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="s">&quot;clear,ranking&quot;</span><span class="p">)</span>
-
-  <span class="n">l</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">Logger</span><span class="p">()</span>
-  <span class="n">date</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M:%S&quot;</span><span class="p">))</span>
-  <span class="n">string</span> <span class="o">=</span> <span class="s">&quot;getting &quot;</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s">&quot; for player &quot;</span> <span class="o">+</span> <span class="n">gt</span> <span class="o">+</span> <span class="s">&quot; at &quot;</span> <span class="o">+</span> <span class="n">date</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
-  <span class="n">l</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-
-  <span class="k">return</span> <span class="n">formatbf3data</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    </div>
-<div class="viewcode-block" id="formatbf3data"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.formatbf3data">[docs]</a><span class="k">def</span> <span class="nf">formatbf3data</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-  <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s">&quot;data&quot;</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;spm&quot;</span><span class="p">:</span>
-      <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot;&#39;s SPM: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Spm</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
-    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;kdr&quot;</span><span class="p">:</span>
-      <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot;&#39;s KDR: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Kdr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
-    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;wlr&quot;</span><span class="p">:</span>
-      <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot;&#39;s WLR: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Wlr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
-    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;stats&quot;</span><span class="p">:</span>
-      <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">player</span><span class="o">+</span><span class="s">&quot;&#39;s stats: &quot;</span><span class="p">,</span> <span class="s">&quot;KDR: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Kdr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">],</span> <span class="s">&quot;SPM: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Spm</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">],</span> <span class="s">&quot;Headshots/kill: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Hskillperc</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">],</span> <span class="s">&quot;win/loss: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Stats</span><span class="o">.</span><span class="n">Ranking</span><span class="o">.</span><span class="n">Wlr</span><span class="o">.</span><span class="n">v</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]]</span>
-      <span class="k">return</span> <span class="n">l</span>
-      
-  <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s">&quot;notfound&quot;</span><span class="p">:</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">player</span> <span class="o">+</span> <span class="s">&quot; not found &quot;</span><span class="p">]</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="k">return</span> <span class="p">[</span><span class="s">&quot;ERROR&quot;</span><span class="p">]</span>
   
-</div>
-<div class="viewcode-block" id="getbf3last"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.getbf3last">[docs]</a><span class="k">def</span> <span class="nf">getbf3last</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
-  <span class="k">global</span> <span class="n">api</span>
   
-  <span class="n">command</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-  <span class="n">gt</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="c"># grab gamertag off the end and strip it of terminators</span>
-  <span class="n">fact</span> <span class="o">=</span> <span class="n">battlelog</span><span class="o">.</span><span class="n">getLatestGameFact</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">gt</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">gt</span> <span class="o">+</span> <span class="s">&quot;&#39;s latest &quot;</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s">&quot; is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fact</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]</span>
-
-  
-  </div>
 <div class="viewcode-block" id="BotBrain"><a class="viewcode-back" href="../docs/botbrain.html#botbrain.BotBrain">[docs]</a><span class="k">class</span> <span class="nc">BotBrain</span><span class="p">:</span>
   <span class="n">BRAINDEBUG</span> <span class="o">=</span> <span class="bp">False</span>
   
@@ -200,7 +200,7 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;Yep, I&#39;m on. Idiot.&quot;</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.bf3 [spm, kdr, wlr, stats],</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="c">#self.microphone(&#39;PRIVMSG &#39; + user + &#39; :&#39; + &quot;.bf3 [spm, kdr, wlr, stats],\n&quot;)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.uptime,</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.imgs,</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">microphone</span><span class="p">(</span><span class="s">&#39;PRIVMSG &#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span> <span class="o">+</span> <span class="s">&quot;.ctof [celsius],</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
@@ -242,8 +242,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;http://pybot.zero9f9.com/img/&quot;</span><span class="p">)</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;http://zero9f9.com/~&quot;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;USER&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;/img/&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.seen&quot;</span><span class="p">):</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_seen</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">channel</span><span class="p">)</span>
+    <span class="c">#if message.startswith(&quot;.seen&quot;):</span>
+    <span class="c">#  self._seen(message.split()[-1], channel)</span>
     <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.ctof&quot;</span><span class="p">):</span>
       <span class="n">last</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
       <span class="k">if</span> <span class="n">last</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
@@ -254,25 +254,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ftoc</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">last</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> 
     <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.help&quot;</span><span class="p">):</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_help</span><span class="p">(</span><span class="n">usr</span><span class="p">)</span>     
-    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.bf3pc&quot;</span><span class="p">):</span>
-      <span class="n">stats</span> <span class="o">=</span> <span class="n">getbf3stats</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s">&#39;pc&#39;</span><span class="p">)</span>
-      <span class="k">try</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
-      <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;WOOPS&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.bf3&quot;</span><span class="p">):</span>
-      <span class="n">stats</span> <span class="o">=</span> <span class="n">getbf3stats</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s">&#39;360&#39;</span><span class="p">)</span>
-      <span class="k">try</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
-      <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s">&quot;WOOPS&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.lastbf3&quot;</span><span class="p">):</span>
-      <span class="n">last</span> <span class="o">=</span> <span class="n">getbf3last</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.uptime&quot;</span><span class="p">):</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_uptime</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+    <span class="c">#if message.startswith(&quot;.bf3pc&quot;):</span>
+    <span class="c">#  stats = getbf3stats(message, &#39;pc&#39;)</span>
+    <span class="c">#  try:</span>
+    <span class="c">#    for line in stats:</span>
+    <span class="c">#      self.say(channel, line)</span>
+    <span class="c">#  except TypeError:</span>
+    <span class="c">#    self.say(channel, &quot;WOOPS&quot;)</span>
+    <span class="c">#elif message.startswith(&quot;.bf3&quot;):</span>
+    <span class="c">#  stats = getbf3stats(message, &#39;360&#39;)</span>
+    <span class="c">#  try:</span>
+    <span class="c">#    for line in stats:</span>
+    <span class="c">#      self.say(channel, line)</span>
+    <span class="c">#  except TypeError:</span>
+    <span class="c">#    self.say(channel, &quot;WOOPS&quot;)</span>
+    <span class="c">#if message.startswith(&quot;.lastbf3&quot;):</span>
+    <span class="c">#  last = getbf3last(message)</span>
+    <span class="c">#  self.say(channel, last)</span>
+    <span class="c">#if message.startswith(&quot;.uptime&quot;):</span>
+    <span class="c">#  self._uptime(channel)</span>
     <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.onstat&quot;</span><span class="p">):</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_onstat</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;.speak&quot;</span><span class="p">):</span>
@@ -281,43 +281,43 @@
       <span class="n">msg</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_speak</span><span class="p">(</span><span class="n">usr</span><span class="p">,</span> <span class="n">chnl</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-<span class="c"># utility function</span></div>
-  <span class="k">def</span> <span class="nf">__prettyDate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">time</span><span class="p">):</span>
-    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
-      <span class="n">diff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">datetime</span><span class="p">):</span>
-      <span class="n">diff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">time</span> 
-    <span class="k">elif</span> <span class="ow">not</span> <span class="n">time</span><span class="p">:</span>
-      <span class="n">diff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">now</span>
-    <span class="n">second_diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">seconds</span>
-    <span class="n">day_diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">days</span>
-
-    <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="k">return</span> <span class="s">&#39;&#39;</span>
-
-    <span class="k">if</span> <span class="n">day_diff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s">&quot;just now&quot;</span>
-      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">second_diff</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; seconds ago&quot;</span>
-      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">120</span><span class="p">:</span>
-        <span class="k">return</span>  <span class="s">&quot;a minute ago&quot;</span>
-      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">3600</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="n">second_diff</span> <span class="o">/</span> <span class="mi">60</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&quot; minutes ago&quot;</span>
-      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">7200</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s">&quot;an hour ago&quot;</span>
-      <span class="k">if</span> <span class="n">second_diff</span> <span class="o">&lt;</span> <span class="mi">86400</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="n">second_diff</span> <span class="o">/</span> <span class="mi">3600</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&quot; hours ago&quot;</span>
-      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s">&quot;Yesterday&quot;</span>
-      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; days ago&quot;</span>
-      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">31</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="o">/</span><span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; weeks ago&quot;</span>
-      <span class="k">if</span> <span class="n">day_diff</span> <span class="o">&lt;</span> <span class="mi">365</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="o">/</span><span class="mi">30</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; months ago&quot;</span>
-      <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">day_diff</span><span class="o">/</span><span class="mi">365</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; years ago&quot;</span></div>
+<span class="c"># utility function</span>
+<span class="c">#  def __prettyDate(self,time):</span>
+<span class="c">#    now = datetime.now()</span>
+<span class="c">#    if type(time) is int:</span>
+<span class="c">#      diff = now - datetime.fromtimestamp(time)</span>
+<span class="c">#    elif isinstance(time,datetime):</span>
+<span class="c">#      diff = now - time </span>
+<span class="c">#    elif not time:</span>
+<span class="c">#      diff = now - now</span>
+<span class="c">#    second_diff = diff.seconds</span>
+<span class="c">#    day_diff = diff.days</span>
+<span class="c">#</span>
+<span class="c">#    if day_diff &lt; 0:</span>
+<span class="c">#      return &#39;&#39;</span>
+<span class="c">#</span>
+<span class="c">#    if day_diff == 0:</span>
+<span class="c">#      if second_diff &lt; 10:</span>
+<span class="c">#        return &quot;just now&quot;</span>
+<span class="c">#      if second_diff &lt; 60:</span>
+<span class="c">#        return str(second_diff) + &quot; seconds ago&quot;</span>
+<span class="c">#      if second_diff &lt; 120:</span>
+<span class="c">#        return  &quot;a minute ago&quot;</span>
+<span class="c">#      if second_diff &lt; 3600:</span>
+<span class="c">#        return str( second_diff / 60 ) + &quot; minutes ago&quot;</span>
+<span class="c">#      if second_diff &lt; 7200:</span>
+<span class="c">#        return &quot;an hour ago&quot;</span>
+<span class="c">#      if second_diff &lt; 86400:</span>
+<span class="c">#        return str( second_diff / 3600 ) + &quot; hours ago&quot;</span>
+<span class="c">#      if day_diff == 1:</span>
+<span class="c">#        return &quot;Yesterday&quot;</span>
+<span class="c">#      if day_diff &lt; 7:</span>
+<span class="c">#        return str(day_diff) + &quot; days ago&quot;</span>
+<span class="c">#      if day_diff &lt; 31:</span>
+<span class="c">#        return str(day_diff/7) + &quot; weeks ago&quot;</span>
+<span class="c">#      if day_diff &lt; 365:</span>
+<span class="c">#        return str(day_diff/30) + &quot; months ago&quot;</span>
+<span class="c">#      return str(day_diff/365) + &quot; years ago&quot;</span></div></div>
 </pre></div>
 
           </div>
@@ -357,7 +357,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

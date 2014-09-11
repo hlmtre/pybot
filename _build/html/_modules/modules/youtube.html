@@ -76,6 +76,8 @@
 <div class="viewcode-block" id="Youtube.print_video_title"><a class="viewcode-back" href="../../docs/modules.html#modules.youtube.Youtube.print_video_title">[docs]</a>  <span class="k">def</span> <span class="nf">print_video_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">video_tag</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getNick</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">network</span><span class="p">):</span> <span class="c">#ignore himself</span>
       <span class="k">return</span>
+    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;Youtube:&quot;</span><span class="p">):</span>
+      <span class="k">return</span>
     <span class="k">try</span><span class="p">:</span>
       <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&quot;https://gdata.youtube.com/feeds/api/videos/&quot;</span><span class="o">+</span><span class="n">video_tag</span><span class="o">+</span><span class="s">&quot;?v=2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">except</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
@@ -91,6 +93,9 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">mem_store</span><span class="p">[</span><span class="s">&#39;youtube&#39;</span><span class="p">][</span><span class="n">video_title</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
 </div>
 <div class="viewcode-block" id="Youtube.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.youtube.Youtube.handle">[docs]</a>  <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="c">#   prevent bot from printing youtube information if a youtube link is in the channel topic (or elsewhere that isn&#39;t a message to a channel)</span>
+    <span class="k">if</span> <span class="s">&quot;PRIVMSG&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">line</span><span class="p">:</span>
+      <span class="k">return</span>
     <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">_type</span> <span class="o">==</span> <span class="s">&quot;__.youtubes__&quot;</span><span class="p">:</span>
       <span class="n">url</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;youtube.com[\S]+&quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
       <span class="k">try</span><span class="p">:</span>
@@ -145,7 +150,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

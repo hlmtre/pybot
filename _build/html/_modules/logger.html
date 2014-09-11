@@ -51,13 +51,23 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../docs/logger.html#logger.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">:</span>
   <span class="n">CRITICAL</span><span class="p">,</span> <span class="n">WARNING</span><span class="p">,</span> <span class="n">INFO</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
   <span class="n">levels</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;CRITICAL&#39;</span><span class="p">,</span> <span class="s">&#39;WARNING&#39;</span><span class="p">,</span> <span class="s">&#39;INFO&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Logger.write"><a class="viewcode-back" href="../docs/logger.html#logger.Logger.write">[docs]</a>  <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<div class="viewcode-block" id="Logger.write"><a class="viewcode-back" href="../docs/logger.html#logger.Logger.write">[docs]</a>  <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">nick</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">location</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">l</span> <span class="o">=</span> <span class="n">location</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">l</span> <span class="o">=</span> <span class="s">&quot;~/&quot;</span>
+    <span class="k">if</span> <span class="n">nick</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">n</span> <span class="o">=</span> <span class="n">nick</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">n</span> <span class="o">=</span> <span class="s">&#39;pylog&#39;</span>
+
     <span class="k">try</span><span class="p">:</span> 
-      <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;pylog-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s">-%m-%Y&quot;</span><span class="p">))</span><span class="o">+</span><span class="s">&#39;.log&#39;</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">)</span>
+      <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">n</span> <span class="o">+</span> <span class="s">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%m-</span><span class="si">%d</span><span class="s">-%Y&quot;</span><span class="p">)))</span><span class="o">+</span><span class="s">&#39;.log&#39;</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">)</span>
       <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span><span class="o">+</span> <span class="s">&quot; (&quot;</span> <span class="o">+</span> <span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;) &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level</span><span class="p">])</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">line</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
       <span class="k">pass</span></div></div>
@@ -100,7 +110,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

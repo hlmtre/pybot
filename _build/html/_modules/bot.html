@@ -49,7 +49,7 @@
   <h1>Source code for bot</h1><div class="highlight"><pre>
 <span class="c">#!/usr/bin/env python</span>
 <span class="c">#</span>
-<span class="c"># v0.6.5</span>
+<span class="c"># v0.7.0</span>
 <span class="c"># works with python 2.6.x and 2.7.x</span>
 <span class="c">#</span>
 
@@ -70,17 +70,13 @@
 <span class="kn">import</span> <span class="nn">confman</span>
 <span class="kn">from</span> <span class="nn">event</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">import</span> <span class="nn">db</span>
+<span class="kn">import</span> <span class="nn">util</span>
 
 <span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">False</span>
 
 <div class="viewcode-block" id="Bot"><a class="viewcode-back" href="../docs/bot.html#bot.Bot">[docs]</a><span class="k">class</span> <span class="nc">Bot</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">()</span>
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; initializing bot, pid &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()))</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="n">d</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">brain</span> <span class="o">=</span> <span class="bp">None</span>
@@ -91,6 +87,12 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">conf</span> <span class="o">=</span> <span class="n">conf</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">DB</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getNick</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; initializing bot, pid &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
 
     <span class="c"># arbitrary key/value store for modules</span>
     <span class="c"># they should be &#39;namespaced&#39; like bot.mem_store.module_name</span>
@@ -105,8 +107,9 @@
 
     <span class="c"># define events here and add them to the events_list</span>
 
-    <span class="n">joins</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__joins__&quot;</span><span class="p">)</span>
-    <span class="n">joins</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;JOIN&quot;</span><span class="p">)</span>
+    <span class="n">all_lines</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;1__all_lines__&quot;</span><span class="p">)</span>
+    <span class="n">all_lines</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;.*&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">events_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_lines</span><span class="p">)</span>
 
     <span class="n">implying</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__implying__&quot;</span><span class="p">)</span>
     <span class="n">implying</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;&gt;&quot;</span><span class="p">)</span>
@@ -120,6 +123,9 @@
 
     <span class="n">dance</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__.dance__&quot;</span><span class="p">)</span>
     <span class="n">dance</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;\.dance&quot;</span><span class="p">)</span>
+
+    <span class="c">#unloads = Event(&quot;__module__&quot;)</span>
+    <span class="c">#unloads.define(&quot;^\.module&quot;)</span>
 
     <span class="n">pimp</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__pimp__&quot;</span><span class="p">)</span>
     <span class="n">pimp</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;\.pimp&quot;</span><span class="p">)</span>
@@ -142,9 +148,6 @@
     <span class="n">tell</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__privmsg__&quot;</span><span class="p">)</span>
     <span class="n">tell</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;PRIVMSG&quot;</span><span class="p">)</span>
 
-    <span class="n">unload</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__module__&quot;</span><span class="p">)</span>
-    <span class="n">unload</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;\.module&quot;</span><span class="p">)</span>
-
     <span class="n">links</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__urls__&quot;</span><span class="p">)</span>
     <span class="n">links</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="s">&quot;https?://*&quot;</span><span class="p">)</span>
 
@@ -163,13 +166,13 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">events_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">steam</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">events_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">events_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tell</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">events_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unload</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">events_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">links</span><span class="p">)</span>
+    <span class="c">#self.events_list.append(unloads)</span>
   <span class="c"># example</span>
   <span class="c">#  self.events_list.append(test)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">load_modules</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;bot initialized.&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;bot initialized.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
 
   <span class="c"># conditionally subscribe to events list or add event to listing</span>
 <div class="viewcode-block" id="Bot.register_event"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.register_event">[docs]</a>  <span class="k">def</span> <span class="nf">register_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
@@ -204,14 +207,14 @@
     <span class="n">autoloads</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c">#load autoloads if it exists</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">autoload_path</span><span class="p">):</span> 
-      <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;Found autoloads file&quot;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;Found autoloads file&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
       <span class="k">try</span><span class="p">:</span>
         <span class="n">autoloads</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">autoload_path</span><span class="p">))</span>
         <span class="c">#logging</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">autoloads</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;Autoloads found for network &quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;Autoloads found for network &quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
       <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="s">&quot;Could not load autoloads file.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="s">&quot;Could not load autoloads file.&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
     <span class="c"># create dictionary of things in the modules directory to load</span>
     <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">dir_list</span><span class="p">:</span>
       <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -223,17 +226,17 @@
           <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s">&#39;.py&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&#39;__init__&#39;</span><span class="p">:</span> 
             <span class="n">f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">descr</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">find_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="n">modules_path</span><span class="p">])</span>
             <span class="n">mods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">descr</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; loaded &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot; for network &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; loaded &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot; for network &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span> <span class="c"># follow autoload&#39;s direction</span>
           <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s">&#39;.py&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&#39;__init__&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&#39;module&#39;</span><span class="p">:</span>
               <span class="n">f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">descr</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">find_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="n">modules_path</span><span class="p">])</span>
               <span class="n">mods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">descr</span><span class="p">)</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; loaded &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot; for network &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; loaded &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot; for network &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
             <span class="k">elif</span> <span class="p">(</span><span class="s">&#39;include&#39;</span> <span class="ow">in</span> <span class="n">autoloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">]</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">autoloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">][</span><span class="s">&#39;include&#39;</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="s">&#39;exclude&#39;</span> <span class="ow">in</span> <span class="n">autoloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">]</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">autoloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">][</span><span class="s">&#39;exclude&#39;</span><span class="p">]):</span>
               <span class="n">f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">descr</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">find_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="n">modules_path</span><span class="p">])</span>
               <span class="n">mods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">descr</span><span class="p">)</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; loaded &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot; for network &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot; loaded &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot; for network &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">specific</span><span class="p">:</span> <span class="c"># we&#39;re reloading only one module</span>
           <span class="k">if</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s">&#39;.pyc&#39;</span><span class="p">:</span> <span class="c"># ignore compiled </span>
@@ -241,7 +244,7 @@
             <span class="n">mods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">descr</span><span class="p">)</span>
             <span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>
 
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">mods</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">mods</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span> 
       <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mods</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">name</span><span class="p">)</span> <span class="c"># get the object from the namespace of &#39;mods&#39;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -259,12 +262,12 @@
     </div>
 <div class="viewcode-block" id="Bot.send"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.send">[docs]</a>  <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OFFLINE</span><span class="p">:</span>
-      <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s">&quot; &gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s"> DEBUGGING OUTPUT&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
-        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;DEBUGGING OUTPUT&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">OKGREEN</span> <span class="o">+</span> <span class="s">&quot;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
 
       <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
       <span class="n">target</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
@@ -277,7 +280,7 @@
 <div class="viewcode-block" id="Bot.processline"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.processline">[docs]</a>  <span class="k">def</span> <span class="nf">processline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
       <span class="kn">import</span> <span class="nn">datetime</span>
-      <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">line</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">OKBLUE</span> <span class="o">+</span> <span class="s">&quot;&lt;&lt; &quot;</span>  <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">line</span><span class="p">)</span>
 
     <span class="n">message_number</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
 
@@ -291,8 +294,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pong</span><span class="p">(</span><span class="n">ping_response_line</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
       <span class="c"># pings we respond to directly. everything else...</span>
       <span class="k">else</span><span class="p">:</span>
-<span class="c"># if we get disconnected this should be true upon a reconnect attempt.. ideally</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">JOINED</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">and</span> <span class="n">message_number</span> <span class="o">==</span> <span class="s">&quot;376&quot;</span><span class="p">:</span> <span class="c"># wait until we receive end of MOTD before joining</span>
+<span class="c"># patch contributed by github.com/thekanbo</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">JOINED</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">and</span> <span class="p">(</span><span class="n">message_number</span> <span class="o">==</span> <span class="s">&quot;376&quot;</span> <span class="ow">or</span> <span class="n">message_number</span> <span class="o">==</span> <span class="s">&quot;422&quot;</span><span class="p">):</span> 
+          <span class="c"># wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn&#39;t exis</span>
           <span class="bp">self</span><span class="o">.</span><span class="n">chan_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getChannels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span> 
           <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chan_list</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;JOIN &#39;</span><span class="o">+</span><span class="n">c</span><span class="o">+</span><span class="s">&#39; </span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -317,7 +321,7 @@
       <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
       </div>
-<div class="viewcode-block" id="Bot.worker"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.worker">[docs]</a>  <span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Bot.worker"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.worker">[docs]</a>  <span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">HOST</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getNick</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
 
@@ -327,64 +331,137 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">REALNAME</span> <span class="o">=</span> <span class="s">&#39;s1ash&#39;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">OWNER</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getOwner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span> 
     
-    <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
     <span class="c"># connect to server</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
     <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">HOST</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PORT</span><span class="p">))</span> <span class="c"># force them into one argument</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">=</span> <span class="bp">True</span>
+      <span class="k">try</span><span class="p">:</span>
+<span class="c"># low level socket TCP/IP connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">HOST</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PORT</span><span class="p">))</span> <span class="c"># force them into one argument</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s">&quot;Connected to &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s">&quot;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="s">&quot;connected to &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+      <span class="k">except</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">FAIL</span> <span class="o">+</span> <span class="s">&quot;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="s">&quot;Could not connect! Retrying... &quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="p">()</span>
 
+    <span class="c"># core IRC protocol stuff</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;NICK &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s">&quot;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">+</span> <span class="s">&#39;: NICK &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">n&#39;</span><span class="p">)</span>
+
       <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;USER &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">IDENT</span><span class="o">+</span> <span class="s">&#39; 8 &#39;</span> <span class="o">+</span> <span class="s">&#39; bla : &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">REALNAME</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> <span class="c"># yeah, don&#39;t delete this line</span>
+
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s">&quot;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">+</span> <span class="s">&quot;: USER &quot;</span> <span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">IDENT</span><span class="o">+</span> <span class="s">&#39; 8 &#39;</span> <span class="o">+</span> <span class="s">&#39; bla : &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">REALNAME</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">n&#39;</span><span class="p">)</span>
+
       <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c"># allow services to catch up</span>
+
       <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;PRIVMSG nickserv identify &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getIRCPass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>  <span class="c"># we&#39;re registered!</span>
+
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_print</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s">&quot;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">+</span> <span class="s">&#39;: PRIVMSG nickserv identify &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getIRCPass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">n&#39;</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     
     <span class="n">read</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
     
+    <span class="n">timeout</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c">#   if we&#39;re only running a test of connecting, and don&#39;t want to loop forever</span>
+    <span class="k">if</span> <span class="n">mock</span><span class="p">:</span>
+      <span class="k">return</span>
     <span class="c"># infinite loop to keep parsing lines</span>
     <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
       <span class="k">try</span><span class="p">:</span>
+        <span class="n">timeout</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c"># if we haven&#39;t received anything for 120 seconds</span>
+        <span class="n">time_since</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getTimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timeout</span> <span class="o">&gt;</span> <span class="n">time_since</span><span class="p">:</span>
+          <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Disconnected! Retrying... &quot;</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span> <span class="s">&quot;Disconnected!&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
+<span class="c"># so that we rejoin all our channels upon reconnecting to the server</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">JOINED</span> <span class="o">=</span> <span class="bp">False</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">=</span> <span class="bp">False</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="p">()</span>
+
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+       <span class="c"># if self.CONNECTED == False:</span>
+       <span class="c">#   self.connect()</span>
         <span class="n">ready</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">],[],[],</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ready</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-          <span class="n">read</span> <span class="o">=</span> <span class="n">read</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+          <span class="k">try</span><span class="p">:</span>
+            <span class="n">read</span> <span class="o">=</span> <span class="n">read</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+          <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+              <span class="k">print</span> <span class="s">&quot;Disconnected! Retrying... &quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Logger</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span> <span class="s">&quot;Disconnected!&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">JOINED</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="p">()</span>
+
           <span class="n">lines</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
           
           <span class="c"># Important: all lines from irc are terminated with &#39;\n&#39;. lines.pop() will get you any &quot;to be continued&quot;</span>
           <span class="c"># line that couldn&#39;t fit in the socket buffer. It is stored and tacked on to the start of the next recv.</span>
           <span class="n">read</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> 
+
+          <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="mi">0</span>
+
           <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">processline</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>      
       <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot;keyboard interrupt caught&quot;</span>
+        <span class="k">print</span> <span class="s">&quot;keyboard interrupt caught; exiting ...&quot;</span>
         <span class="k">raise</span>
   <span class="c"># end worker</span>
 </div>
-<div class="viewcode-block" id="Bot.connect"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.connect">[docs]</a>  <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c"># prevent attempting to reconnect too frequently errors</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">HOST</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PORT</span><span class="p">))</span> <span class="c"># force them into one argument</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="k">try</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;NICK &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">NICK</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;USER &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">IDENT</span><span class="o">+</span> <span class="s">&#39; 8 &#39;</span> <span class="o">+</span> <span class="s">&#39; bla : &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">REALNAME</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> <span class="c"># yeah, don&#39;t delete this line</span>
-      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c"># allow services to catch up</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;PRIVMSG nickserv identify &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getIRCPass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>  <span class="c"># we&#39;re registered!</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">CONNECTED</span> <span class="o">=</span> <span class="bp">False</span>
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    </div>
-<div class="viewcode-block" id="Bot.debug_print"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.debug_print">[docs]</a>  <span class="k">def</span> <span class="nf">debug_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+<div class="viewcode-block" id="Bot.debug_print"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.debug_print">[docs]</a>  <span class="k">def</span> <span class="nf">debug_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+    <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">line</span>
 </div>
+<div class="viewcode-block" id="Bot.commands"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.commands">[docs]</a>  <span class="k">def</span> <span class="nf">commands</span><span class="p">(</span><span class="o">*</span><span class="n">command_list</span><span class="p">):</span>
+<span class="c"># stolen shamelessly from willie. damn, this is a good idea.</span>
+    <span class="sd">&quot;&quot;&quot;Decorator. Sets a command list for a callable.</span>
+
+<span class="sd">    This decorator can be used to add multiple commands to one callable in a</span>
+<span class="sd">    single line. The resulting match object will have the command as the first</span>
+<span class="sd">    group, rest of the line, excluding leading whitespace, as the second group.</span>
+<span class="sd">    Parameters 1 through 4, seperated by whitespace, will be groups 3-6.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    command: A string, which can be a regular expression.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    A function with a new command appended to the commands</span>
+<span class="sd">    attribute. If there is no commands attribute, it is added.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    @command(&quot;hello&quot;):</span>
+<span class="sd">    If the command prefix is &quot;\.&quot;, this would trigger on lines starting</span>
+<span class="sd">    with &quot;.hello&quot;.</span>
+
+<span class="sd">    @commands(&#39;j&#39;, &#39;join&#39;)</span>
+<span class="sd">    If the command prefix is &quot;\.&quot;, this would trigger on lines starting</span>
+<span class="sd">    with either &quot;.j&quot; or &quot;.join&quot;.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">add_attribute</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="s">&quot;commands&quot;</span><span class="p">):</span>
+        <span class="n">function</span><span class="o">.</span><span class="n">commands</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">function</span><span class="o">.</span><span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">command_list</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">function</span>
+    <span class="k">return</span> <span class="n">add_attribute</span>
+</div>
+<div class="viewcode-block" id="Bot.depends"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.depends">[docs]</a>  <span class="k">def</span> <span class="nf">depends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_name</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded_modules</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="n">module_name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">m</span>
+    <span class="k">return</span> <span class="bp">None</span>
+    </div>
 <div class="viewcode-block" id="Bot.run"><a class="viewcode-back" href="../docs/bot.html#bot.Bot.run">[docs]</a>  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="p">()</span>
 </div>
@@ -400,12 +477,14 @@
   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&quot;-d&quot;</span><span class="p">:</span>
       <span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
-  
+
+<span class="c"># duuude this is so old.</span>
   <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&quot;posix&quot;</span><span class="p">:</span>
     <span class="n">botslist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">DEBUG</span><span class="p">:</span>
       <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
       <span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># child</span>
+        <span class="k">print</span> <span class="s">&quot;starting bot in the background, pid &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">GREEN</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
           <span class="n">CONF</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span> <span class="n">CONF</span> <span class="o">=</span> <span class="s">&quot;~/.pybotrc&quot;</span>
@@ -422,9 +501,9 @@
           <span class="n">b</span> <span class="o">=</span> <span class="n">bot</span><span class="o">.</span><span class="n">Bot</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">net_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">DEBUG</span><span class="p">)</span>
           <span class="n">b</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
       <span class="k">elif</span> <span class="n">pid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot;forking to background...&quot;</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span> <span class="c"># don&#39;t background</span>
+      <span class="k">print</span> <span class="s">&quot;starting bot in the background, pid &quot;</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">GREEN</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span> <span class="o">+</span> <span class="n">util</span><span class="o">.</span><span class="n">bcolors</span><span class="o">.</span><span class="n">ENDC</span>
       <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;-d&quot;</span><span class="p">:</span> <span class="c"># the conf file must be first argument</span>
         <span class="n">CONF</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
@@ -498,7 +577,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

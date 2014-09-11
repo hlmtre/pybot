@@ -82,7 +82,10 @@
             <span class="k">return</span>
 
           <span class="n">parsed</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-          <span class="n">zipcode</span> <span class="o">=</span> <span class="n">parsed</span><span class="p">[</span><span class="s">&#39;RESULTS&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;zmw&#39;</span><span class="p">]</span>
+          <span class="k">try</span><span class="p">:</span>
+            <span class="n">zipcode</span> <span class="o">=</span> <span class="n">parsed</span><span class="p">[</span><span class="s">&#39;RESULTS&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;zmw&#39;</span><span class="p">]</span>
+          <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span>
           <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;http://api.wunderground.com/api/1fe31b3b4cfdab66/conditions/lang:EN/q/&#39;</span><span class="o">+</span><span class="n">zipcode</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;.json&#39;</span>
 
         <span class="c"># by zipcode</span>
@@ -143,7 +146,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

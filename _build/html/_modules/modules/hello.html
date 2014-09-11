@@ -60,7 +60,7 @@
 
     <span class="n">hello</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="s">&quot;__hello__&quot;</span><span class="p">)</span>
     <span class="n">nick</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">getNick</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
-    <span class="n">hello</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="n">msg_definition</span><span class="o">=</span><span class="s">&quot;^([H|h]ello|hi|howdy) &quot;</span> <span class="o">+</span> <span class="n">nick</span><span class="p">)</span>
+    <span class="n">hello</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="n">msg_definition</span><span class="o">=</span><span class="s">&quot;^([H|h]ello|[H|h]i|[H|h]owdy) &quot;</span> <span class="o">+</span> <span class="n">nick</span><span class="p">)</span>
     <span class="n">hello</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="c"># register ourself to our new hello event</span>
@@ -71,7 +71,6 @@
     <span class="c"># register ourself for any events that we&#39;re interested in that exist already</span>
     <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
       <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">interests</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot;registering to &quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">_type</span>
         <span class="n">event</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Hello.handle"><a class="viewcode-back" href="../../docs/modules.html#modules.hello.Hello.handle">[docs]</a>  <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
@@ -118,7 +117,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2014, hlmtre.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
