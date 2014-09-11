@@ -16,7 +16,7 @@ if successful_import is True:
       self.bot = bot
       self.say = say
 
-      self.user_agent = 'pybot 0.6.4 by /u/hlmtre; http://bits.zero9f9.com/pybot'
+      self.user_agent = 'pybot 0.7.1 by /u/hlmtre; http://bits.zero9f9.com/pybot'
 
       self.help = None
 
@@ -24,7 +24,6 @@ if successful_import is True:
       reddit.define("https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+")
       reddit.subscribe(self)
 
-      # this SHOULD replace the need to iterate below and conditionally subscribe...
       self.bot.register_event(reddit, self)
 
     def handle(self, event):
