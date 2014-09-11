@@ -14,6 +14,7 @@ in recent months he has become increasingly featureful and robust. he supports m
 contribution is highly encouraged. please -- bugs, suggestions, pull requests, complete rewrites of crappy code -- anything is useful.
 
 i am available at zero9f9(dot)com, usual IRC port, in #bots, if you have questions or would like to know how to contribute.
+pls
 
 Contents:
 
