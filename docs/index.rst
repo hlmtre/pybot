@@ -11,7 +11,6 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
-   ascii
    battlelog
    bf3api
    bot
@@ -24,7 +23,6 @@ Contents:
    logger
    modules
    stats
-   steamapi
    webwriter
 
 
