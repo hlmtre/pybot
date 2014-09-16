@@ -7,10 +7,12 @@ class BaseModule(object):
   In your module's post_init, define and register your own events, and pass your module in.
   
   .. code-block:: python
+
     def post_init(self):
       e = Event("_wee__")
       e.define("foo")
       self.bot.register_event(e,self)
+
 
   Bam, you've got the things you need (a bot handle, mostly) and you implement the right things to be called without error.
   Elzar.

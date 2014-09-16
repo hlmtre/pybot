@@ -266,8 +266,7 @@ class Bot(threading.Thread):
   def processline(self, line):
     """
     Grab newline-delineated lines sent to us, and determine what to do with them. 
-    This function handles our initial low-level IRC stuff, as well -- if we haven't joined, it waits for the MOTD message (or message indicating there isn't one)
-      and then issues our own JOIN calls.
+    This function handles our initial low-level IRC stuff, as well; if we haven't joined, it waits for the MOTD message (or message indicating there isn't one) and then issues our own JOIN calls.
 
     Also immediately passes off PING messages to PONG.
 
