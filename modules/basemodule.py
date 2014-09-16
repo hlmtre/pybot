@@ -4,12 +4,12 @@ class BaseModule(object):
   A base module class for deriving modules (anything you fine folk write, probably) to inherit from.
   The nice this is this allows you to define your own post_init and handle functions.
 
-  In your module's post_init, define and register your own events, and pass your module in.
+  In your module's post_init, define and register your own events, and pass your module in.::
 
-      ``def post_init(self):
+      def post_init(self):
         e = Event("_wee__")
         e.define("foo")
-        self.bot.register_event(e,self)``
+        self.bot.register_event(e,self)
 
   Bam, you've got the things you need (a bot handle, mostly) and you implement the right things to be called without error.
   Elzar.
