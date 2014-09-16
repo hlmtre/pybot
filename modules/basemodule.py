@@ -5,9 +5,8 @@ class BaseModule(object):
   The nice this is this allows you to define your own post_init and handle functions.
 
   In your module's post_init, define and register your own events, and pass your module in.
-
-  .. code-block:: html
-    :linenos:
+  
+  .. code-block:: python
     def post_init(self):
       e = Event("_wee__")
       e.define("foo")
