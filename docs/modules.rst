@@ -148,14 +148,6 @@ modules.shortener module
     :undoc-members:
     :show-inheritance:
 
-modules.steam module
---------------------
-
-.. automodule:: modules.steam
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 modules.tell module
 -------------------
 
