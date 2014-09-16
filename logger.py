@@ -4,9 +4,6 @@ import inspect
 import sys
 import os
 class Logger:
-"""
-Write out to the logfile.
-"""
   CRITICAL, WARNING, INFO = range(3)
   levels = ['CRITICAL', 'WARNING', 'INFO']
 
