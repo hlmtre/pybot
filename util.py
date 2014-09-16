@@ -14,16 +14,16 @@ class bcolors:
   ENDC = '\033[0m'
 
 def strip_nick(nick):
-"""
-Clean up nicks of their op levels (&Schooly_D, ~BoneKin, etc)
-"""
+  """
+  Clean up nicks of their op levels (&Schooly_D, ~BoneKin, etc)
+  """
   nick = re.sub('[@~+]', '', nick)
   return nick
 
 def __prettyDate(time):
-"""
-Similar to Rails's nice time since thing.
-"""
+  """
+  Similar to Rails's nice time since thing.
+  """
   now = datetime.now()
   if type(time) is int:
     diff = now - datetime.fromtimestamp(time)

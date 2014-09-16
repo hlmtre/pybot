@@ -8,20 +8,20 @@ class Logger:
   levels = ['CRITICAL', 'WARNING', 'INFO']
 
   def write(self, level, line, nick=None, location=None):
-  """
-  Write out to the logfile of either default location or otherwise specified.
-  Includes calling class in its logged line.
+    """
+    Write out to the logfile of either default location or otherwise specified.
+    Includes calling class in its logged line.
 
-  Args:
-  level: enumerated thing from the logger class.
-  line: string. thing to write out to the logger.
-  nick: string. determines filename.
-  location: where to write the logfile out to.
+    Args:
+    level: enumerated thing from the logger class.
+    line: string. thing to write out to the logger.
+    nick: string. determines filename.
+    location: where to write the logfile out to.
 
-  Returns: 
-  nothing.
-    
-  """
+    Returns: 
+    nothing.
+      
+    """
     if location is not None:
       l = location
     else:
