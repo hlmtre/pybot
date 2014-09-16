@@ -1,5 +1,10 @@
 import os
 class WebWriter:
+  """
+  Handles writing out to teh home folder of the running user.
+  Creates a very simple web page that just lists all the images posted in a channel the bot's in.
+  Probably in trouble for cp because of teh 4cdn links.
+  """
   def __init__(self):
     self.path = '~/public_html/img/'
 
