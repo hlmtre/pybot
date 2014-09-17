@@ -1,6 +1,25 @@
 import re
 class Event:
+  """
+  Allows event type definition. The definition accepts a regex.
+  Every event can be triggered by specific lines, messages, message_id or users.
+  Eventually (see time_event branch for proof-of-concept implementation) time-sensitive events will be triggerable as well.
+
+  Each line received by the bot is passed to each module in the modules_list. If the module determines the line matches what the event cares about,
+  the event calls each of its subscribers itself, which contains all the information the module needs to respond appropriately.
+
+  To use:
+    e = Event("__my_type__")
+    e.define("some_regex")
+    bot.register_event(e, calling_module)
+  """
   def __init__(self, _type):
+    """
+    Define your own type here. Make sure if you're making a broad event (all messages, for example) you use a sane type, as other modules that care about this kind of event can subscribe to it.
+    
+    Args:
+    _type: string. like "__youtube__" or "__weather__". Underscores are a convention.
+    """
     self._type = _type
     self.subscribers = list() # this is a list of subscribers to notify
     self.user = ""
@@ -15,9 +34,25 @@ class Event:
     self.message_id = -1
     
   def subscribe(self, e):
+    """
+    Append passed-in event to our list of subscribing modules.
+
+    Args:
+    e: event.
+    """
     self.subscribers.append(e)
 
   def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None):
+    """
+    Define ourself by general line (definition), msg_definition (what someone says in a channel or PM), user_definition (the user who said the thing), or message_id (like 376 for MOTD or 422 for no MOTD)
+    Currently, an event is defined by only one type of definition. If one were to remove the returns after each self. set, an event could be defined and triggered by any of several definitions.
+
+    Args:
+    definition: string. regex allowed.
+    msg_definition: string. regex allowed. this is what someone would say in a channel. like "hello, pybot".
+    user_definition: string. the user that said the thing. like 'hlmtre' or 'BoneKin'.
+    message_id: the numerical ID of low-level IRC protocol stuff. 376, for example, tells clients 'hey, this is the MOTD.'
+    """
     if definition is not None:
       self.definition = definition
       return
@@ -32,6 +67,14 @@ class Event:
       return
 
   def matches(self, line):
+    """
+    Fills out the event object per line, and returns True or False if the line matches one of our definitions.
+    Args:
+    line: string. The entire incoming line.
+
+    Return:
+    boolean; True or False.
+    """
     # perhaps TODO
     # first try very simply
     if len(self.definition) and self.definition in line:
@@ -75,6 +118,12 @@ class Event:
     return False
 
   def notifySubscribers(self, line):
+    """
+    Fills out the object with all necessary information, then notifies subscribers with itself (an event with all the line information parsed out) as an argument.
+    Args:
+    line: string
+    
+    """
     self.line = line
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
     if "JOIN" in line or "QUIT" in line:
