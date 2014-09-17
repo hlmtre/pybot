@@ -1,5 +1,6 @@
 [![Build Status](https://ci.zero9f9.com/job/pybot/badge/icon)](https://ci.zero9f9.com/job/pybot/)
 
+[ReadTheDocs documentation](http://pybot.readthedocs.org/en/master/ "ReadTheDocs pybot documentation")
 
 pybot is a python irc bot. he is a project.
 -------------------------------------------
