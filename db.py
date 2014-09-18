@@ -1,6 +1,10 @@
 import MySQLdb as mdb
 from datetime import datetime,timedelta
 class DB:
+  """
+  Handles connecting to the database and reading and writing data.
+  Currently supports only MySQL/mariadb, and that probably needs to change.
+  """
   age = datetime.now()
 
   def __init__(self, bot=None):

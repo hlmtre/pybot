@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.7.0
+# v0.7.1
 # works with python 2.6.x and 2.7.x
 #
 
@@ -26,6 +26,10 @@ import util
 DEBUG = False
 
 class Bot(threading.Thread):
+  """
+    bot instance. one bot gets instanciated per network, as an entirely distinct, sandboxed thread.
+    handles the core IRC protocol stuff, and passing lines to defined events, which dispatch to their subscribed modules.
+  """
   def __init__(self, conf=None, network=None, d=None):
     threading.Thread.__init__(self)
 
@@ -132,6 +136,17 @@ class Bot(threading.Thread):
 
   # conditionally subscribe to events list or add event to listing
   def register_event(self, event, module):
+    """
+      Allows for dynamic, asynchronous event creation. To be used by modules, mostly, to define their own events in their initialization.
+      Prevents multiple of the same _type of event being registered.
+
+      Args: 
+      event: an event object to be registered with the bot 
+      module: calling module; ensures the calling module can be subscribed to the event if it is not already.
+
+      Returns: 
+      nothing.
+    """
     for e in self.events_list:
       if e.definition == event.definition and e._type == event._type:
         # if our event is already in the listing, don't add it again, just have our module subscribe
@@ -143,6 +158,15 @@ class Bot(threading.Thread):
 
   # utility function for loading modules; can be called by modules themselves
   def load_modules(self, specific=None):
+    """
+      Run through the ${bot_dir}/modules directory, dynamically instantiating each module as it goes.
+
+      Args:
+      specific: string name of module. if it is specified, the function attempts to load the named module.
+
+      Returns:
+      1 if successful, 0 on failure. In keeping with the perverse reversal of UNIX programs and boolean values.
+    """
     nonspecific = False
     found = False
 
@@ -217,6 +241,14 @@ class Bot(threading.Thread):
     # end magic.
     
   def send(self, message):
+    """
+    Simply sends the specified message to the socket. Which should be our connected server.
+    We parse our own lines, as well, in case we want an event triggered by something we say.
+    If debug is True, we also print out a pretty thing to console.
+
+    Args:
+    message: string, sent directly and without manipulation (besides UTF-8ing it) to the server.
+    """
     if self.OFFLINE:
       self.debug_print(util.bcolors.YELLOW + " >> " + util.bcolors.ENDC + self.getName() + ": " + message.encode('utf-8', 'ignore'))
     else:
@@ -231,9 +263,22 @@ class Bot(threading.Thread):
         self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
 
   def pong(self, response):
+    """
+    Keepalive heartbeat for IRC protocol. Until someone changes the IRC spec, don't modify this.
+    """
     self.send('PONG ' + response + '\n')
 
   def processline(self, line):
+    """
+    Grab newline-delineated lines sent to us, and determine what to do with them. 
+    This function handles our initial low-level IRC stuff, as well; if we haven't joined, it waits for the MOTD message (or message indicating there isn't one) and then issues our own JOIN calls.
+
+    Also immediately passes off PING messages to PONG.
+
+    Args:
+    line: string. 
+
+    """
     if self.DEBUG:
       import datetime
       self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + self.getName() + ": " + line)
@@ -278,6 +323,13 @@ class Bot(threading.Thread):
 
       
   def worker(self, mock=False):
+    """
+    Open the socket, make the first incision^H^H connection and get us on the server. 
+    Handles keeping the connection alive; if we disconnect from the server, attempts to reconnect.
+
+    Args:
+    mock: boolean. If mock is true, don't loop forever -- mock is for testing.
+    """
     self.HOST = self.network
     self.NICK = self.conf.getNick(self.network)
 
@@ -379,6 +431,11 @@ class Bot(threading.Thread):
   # end worker
 
   def debug_print(self, line):
+    """
+    Prepends incoming lines with the current timestamp and the thread's name, then spits it to stdout.
+    Args:
+    line: text.
+    """
     print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
 
   def commands(*command_list):
@@ -421,9 +478,15 @@ class Bot(threading.Thread):
     return None
     
   def run(self):
+    """
+    For implementing the parent threading.Thread class. Allows the thread the be initialized with our code.
+    """
     self.worker()
 
   def say(self, channel, thing):
+    """
+    Speak, damn you!
+    """
     self.brain.say(channel, thing)
 # end class Bot
               

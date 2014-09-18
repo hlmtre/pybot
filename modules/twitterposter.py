@@ -6,7 +6,7 @@ except ImportError:
   from modules.basemodule import BaseModule
 
 """
-  to use this, you'll need to create a file in the moduels directory called 'twitter_credentials.py', and it should look like this:
+  to use this, you'll need to create a file in the modules directory called 'twitter_credentials.py', and it should look like this:
     
     class PybotTwitter:
       api_key = "<your api key (sometimes called consumer key)>"

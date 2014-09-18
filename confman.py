@@ -2,6 +2,10 @@ import os
 import json
 from conferror import ConfError
 class ConfManager:
+  """
+  Singleton class. Opens and parses a JSON-formatted conf file from (generally) the running user's home folder. Looks for .pybotrc.
+  This allows each thread to know only its own network name, and always get back the information specified for that network from the confman.
+  """
 
   def __init__(self,conf=None):
     if conf is not None:
