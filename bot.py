@@ -429,7 +429,7 @@ class Bot(threading.Thread):
     Args:
     line: text.
     """
-    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line
+    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n')
 
   def commands(*command_list):
 # stolen shamelessly from willie. damn, this is a good idea.
