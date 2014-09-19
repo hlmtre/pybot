@@ -5,3 +5,4 @@ pylog*
 *.bak
 .vagrant
 mysql_init
+modules/twitter_credentials.py
