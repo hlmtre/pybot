@@ -22,6 +22,7 @@ class TimeTest(BaseModule):
     #self.bot.register_event(custom, self)
     
   def handle(self, event):
-    for channel in self.bot.chan_list:
-      self.say(channel, "called every twenty seconds, and this is one of 'em")
+    pass
+#    for channel in self.bot.chan_list:
+#      self.say(channel, "called every twenty seconds, and this is one of 'em")
     #self.say(event.channel, "custom event caught!")

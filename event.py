@@ -53,9 +53,11 @@ class Event:
     msg_definition: string. regex allowed. this is what someone would say in a channel. like "hello, pybot".
     user_definition: string. the user that said the thing. like 'hlmtre' or 'BoneKin'.
     message_id: the numerical ID of low-level IRC protocol stuff. 376, for example, tells clients 'hey, this is the MOTD.'
+    time_event: boolean. if this is a timed event, the other definitions are irrelevant.
     """
     if time_event is not False:
       self.time_event = True
+      return
     if definition is not None:
       self.definition = definition
       return
@@ -122,6 +124,7 @@ class Event:
 
   def time_notify_subscribers(self):
     for s in self.subscribers:
+      # horrible kludge. this feels so dirty.
       if s.time_since >= int(round(s.time_delta/2) - 1):
         s.time_since = 0
         s.handle(self)
