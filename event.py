@@ -9,9 +9,13 @@ class Event:
   the event calls each of its subscribers itself, which contains all the information the module needs to respond appropriately.
 
   To use:
+
+  .. code-block:: python
+
     e = Event("__my_type__")
     e.define("some_regex")
     bot.register_event(e, calling_module)
+
   """
   def __init__(self, _type):
     """
