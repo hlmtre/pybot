@@ -53,6 +53,9 @@ cleanpyc:
 	rm *.pyc
 	rm modules/*.pyc
 
+test:
+	nosetests
+
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo

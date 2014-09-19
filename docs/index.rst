@@ -11,8 +11,6 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
-   battlelog
-   bf3api
    bot
    botbrain
    conf
