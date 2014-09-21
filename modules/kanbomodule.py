@@ -5,14 +5,11 @@ except ImportError:
   from modules.basemodule import BaseModule
 class KanboModule(BaseModule):
   def post_init(self):
-    pass
-    #custom = Event("__.custom__")
-    #custom.define(msg_definition="^\.custom")
-    #custom.subscribe(self)
+    kanbo = Event("__.custom__")
+    kanbo.define(msg_definition="^\.kanbo")
+    kanbo.subscribe(self)
 
-    # register ourself to our new custom event
-    #self.bot.register_event(custom, self)
+    self.bot.register_event(kanbo, self)
     
   def handle(self, event):
-    pass
-    #self.say(event.channel, "custom event caught!")
+    self.say(event.channel, "i am kanbo, watch me disobey simple and direct instruction")
