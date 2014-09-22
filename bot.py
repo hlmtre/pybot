@@ -45,7 +45,7 @@ class Bot(threading.Thread):
 
     if self.conf.getDBType() == "sqlite":
       self.db = lite.SqliteDB(self)
-    else: self.db = db.DB()
+    else: self.db = db.DB(self)
 
 
     self.NICK = self.conf.getNick(self.network)
