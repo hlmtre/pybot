@@ -19,5 +19,5 @@ class WebWriter:
       f.write("<html><body>\n")
       f.write("<font size=7>ANYTHING AND EVERYTHING ON THIS PAGE MAY BE NSFW. YOU HAVE BEEN WARNED.</font><br />\n")
       for line in data:
-        f.write(line[2] + " pasted link <a href=\"" + line[1] + "\">" + line[1] + "</a> at "+str(line[3])+"<br>\n")
+        f.write(line[2] + " pasted link <a href=\"" + line[1] + "\">" + line[1] + "</a> at "+str(line[3])+" UTC<br>\n")
         f.write("</html></body>\n")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.7.1
+# v0.7.2
 # works with python 2.6.x and 2.7.x
 #
 
@@ -20,8 +20,8 @@ from logger import Logger
 import db
 import confman
 from event import Event
-import db
 import util
+import lite
 
 DEBUG = False
 
@@ -40,9 +40,13 @@ class Bot(threading.Thread):
     self.CONNECTED = False
     self.JOINED = False
     self.conf = conf
-    self.db = db.DB()
     self.pid = os.getpid()
     self.logger = Logger()
+
+    if self.conf.getDBType() == "sqlite":
+      self.db = lite.SqliteDB(self)
+    else: self.db = db.DB()
+
 
     self.NICK = self.conf.getNick(self.network)
 
@@ -56,6 +60,7 @@ class Bot(threading.Thread):
     self.CHANNELINIT = conf.getChannels(self.network)
 # this will be the socket
     self.s = None # each bot thread holds its own socket open to the network
+
     self.brain = botbrain.BotBrain(self.send, self) 
 
     self.events_list = list()

@@ -1,4 +1,7 @@
 {
+  "__pybot_conf":{
+    "db_type": "sqlite"
+  },
   "zero9f9.com": {
     "channels": [
     "#bots" 

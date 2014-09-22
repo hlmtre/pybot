@@ -33,6 +33,14 @@ class ConfManager:
     
     self.parsed = json.load(self.conf_file)
 
+  def getDBType(self):
+    try:
+      db_type = self.parsed["__pybot_conf"]["db_type"]
+    except:
+      return "mysql"
+    
+    return db_type
+
   def getOwner(self, net):
     return self.parsed[net]["owner"]
 

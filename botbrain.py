@@ -8,10 +8,11 @@ import json
 from urlparse import urlparse, parse_qsl
 import re
 from xml.dom.minidom import parseString
-import db
+#import db
 from datetime import datetime, timedelta
 import sys
 import os
+import lite
 
 class BotBrain:
   BRAINDEBUG = False
@@ -26,7 +27,7 @@ class BotBrain:
     self.microphone = microphone
     self.bot = bot
     yth = dict()
-    self.db = db.DB(self.bot)
+    self.db = self.bot.db
     self.ww = webwriter.WebWriter()
 
   def _isAdmin(self, username):
@@ -121,7 +122,7 @@ class BotBrain:
   
   def respond(self, usr, channel, message):
 # this bit is not a command
-    if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message) or ("imgur.com" in message and "gallery" in message):
+    if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message or "https:" in message) or ("imgur.com" in message and "gallery" in message):
      url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
      if url:
        self._insertImg(usr, url, channel)

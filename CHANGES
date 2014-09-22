@@ -76,3 +76,11 @@ v0.7.0
 
   Features
     * Change logger functionality. Logger.write() now takes an additional (optional) argument for nickname, to distinguish logfiles.
+
+v0.7.2
+======
+  Fixes some inconsistency in botbrain (which should be removed soon).
+
+  Features:
+    * Adds sqlite functionality (yay!)
+    * DB type is set by __pybot_conf key in the conf file. Valid types are "mysql" and "sqlite".
