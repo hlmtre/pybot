@@ -74,13 +74,15 @@ class ConfManager:
   def getNetworks(self):
     l = list()
     for n in self.parsed.iterkeys():
-      l.append(n)
+      if n != "__pybot_conf":
+        l.append(n)
     return l
   
   def getNumNets(self):
     i = 0
     for n in self.parsed.iterkeys():
-      i += 1
+      if n != "__pybot_conf":
+        i += 1
     return i
 
 # deprecated
