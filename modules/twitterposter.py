@@ -46,7 +46,7 @@ class TwitterPoster(BaseModule):
       pt = self.pt
       api = twitter.Api(consumer_key=pt.api_key, consumer_secret=pt.api_secret, access_token_key=pt.access_token, access_token_secret=pt.access_token_secret)
       try:
-        status = api.PostUpdate(event.user + ": " + event.msg[:(140 - len(event.user) + 2)]) # "username: <message>" all must be <= 140 char
+        status = api.PostUpdate(event.user + ": " + event.msg[:(140 - (len(event.user) + 2))]) # "username: <message>" all must be <= 140 char
       except Exception as e:
         print e
         print len(event.msg[:(140 - len(event.user) + 2)])
