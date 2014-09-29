@@ -14,8 +14,25 @@ python versions > 3 are in the works.
 10-second TL;DR:
 ================
 
-Local Development
------------------
+Take care of dependencies. If you don't use MySQL and don't care about twitter posting or reddit info, you don't need anything but python 2.6 or 2.7 and standard libs.
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+* libmysqlclient-dev
+* pip packages:
+  - requests
+  - praw (for reddit info module)
+  - mysql-python (if you do use mysql)
+  - sphinx (for docs)
+  - python-twitter (twitterposter)
+
+Local Development (with sqlite3)
+--------------------------------
+1. Copy pybotrc to the user who will run the bot (you can probably do `cp pybotrc ~/.pybotrc`
+2. Modify ~/.pybotrc with your network, owner, and nickname.
+3. `./bot.py`
+
+Local Development (with MySQL)
+------------------------------
 1. modify pybotrc with your channels and passwords.
 2. run `sudo ./bootstrap.sh` to install pybot dependencies such as mysql.
 3. run `./setup.sh`. It will check for module dependencies and create a mysql_init file.
