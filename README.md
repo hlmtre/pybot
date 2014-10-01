@@ -26,7 +26,7 @@ Take care of dependencies. If you don't use MySQL and don't care about twitter p
 
 Local Development (with sqlite3)
 --------------------------------
-1. Copy pybotrc to the user who will run the bot (you can probably do `cp pybotrc ~/.pybotrc`
+1. Copy pybotrc to the user who will run the bot (you can probably do `cp pybotrc ~/.pybotrc`)
 2. Modify ~/.pybotrc with your network, owner, and nickname.
 3. `./bot.py`
 4. laugh at mysql guys.
