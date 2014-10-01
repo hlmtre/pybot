@@ -42,7 +42,7 @@ class Bot(threading.Thread):
     self.conf = conf
     self.pid = os.getpid()
     self.logger = Logger()
-
+    
     if self.conf.getDBType() == "sqlite":
       self.db = lite.SqliteDB(self)
     else: self.db = db.DB(self)
@@ -281,7 +281,7 @@ class Bot(threading.Thread):
     """
     if self.DEBUG:
       import datetime
-      self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + self.getName() + ": " + line)
+      self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + line)
 
     message_number = line.split()[1]
 
@@ -431,6 +431,8 @@ class Bot(threading.Thread):
   def debug_print(self, line):
     """
     Prepends incoming lines with the current timestamp and the thread's name, then spits it to stdout.
+    Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.
+
     Args:
     line: text.
     """
@@ -477,19 +479,14 @@ if __name__ == "__main__":
 
         cm = confman.ConfManager(CONF)
         net_list = cm.getNetworks()
-        i = 0
-        if cm.getNumNets() > 1:
-          for c in cm.getNetworks():
-            b = bot.Bot(cm, net_list[i], DEBUG)
-            b.start()
-            i += 1
-        else:
-          b = bot.Bot(cm, net_list[0], DEBUG)
+        for c in cm.getNetworks():
+          b = bot.Bot(cm, c, DEBUG)
           b.start()
+
       elif pid > 0:
         sys.exit(0)
     else: # don't background
-      print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
+      print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
       if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
         CONF = sys.argv[1]
         try:
@@ -501,26 +498,17 @@ if __name__ == "__main__":
 
       cm = confman.ConfManager(CONF)
       net_list = cm.getNetworks()
-      i = 0
-      if cm.getNumNets() > 1:
-        for c in cm.getNetworks():
-          try:
-            b = bot.Bot(cm, net_list[i], DEBUG)
-            b.daemon = True
-            b.start()
-            botslist.append(b)
-            i += 1
-            while True: time.sleep(5)
-          except (KeyboardInterrupt, SystemExit):
-            print "keyboard interrupt caught; exiting..."
-            sys.exit(0)
-      else:
-        try:
-          b = bot.Bot(cm, net_list[0], DEBUG)
-          b.daemon = True
-          b.start()
-          botslist.append(b)
-          while True: time.sleep(5)
-        except (KeyboardInterrupt, SystemExit):
-          print "keyboard interrupt caught; exiting..."
-          sys.exit(0)
+      for c in cm.getNetworks():
+        b = bot.Bot(cm, c, DEBUG)
+        b.daemon = True
+        b.start()
+        botslist.append(b)
+      try:
+        while True:
+          time.sleep(5)
+      except (KeyboardInterrupt, SystemExit):
+        print
+        print "keyboard interrupt caught; exiting"
+        sys.exit(1)
+        
+
