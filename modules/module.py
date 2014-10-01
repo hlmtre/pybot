@@ -21,7 +21,8 @@ class Module:
     #    event.subscribe(self)
 
   def handle(self, event):
-    if not self.bot.conf.getOwner(self.bot.network) == event.line.split()[0].split("!",1)[0].replace(":",""):
+    #if not self.bot.conf.getOwner(self.bot.network) == event.user:
+    if not self.bot.brain._isAdmin(event.user):
       return
 
     if event.msg.startswith(".module load"):

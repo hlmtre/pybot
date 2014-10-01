@@ -138,10 +138,11 @@ class DB:
   def _isAdmin(self, username):
     self._open()
     try:
-      self.cur.execute("""SELECT * FROM admins WHERE username = %s""",(username))
+      self.cur.execute("""SELECT * FROM admins WHERE username = %s""",[username])
       data = self.cur.fetchall()
       self._close()
-    except:
+    except Exception, e:
+      print  e
       self._close()
       return None
 

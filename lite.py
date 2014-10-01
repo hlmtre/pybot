@@ -12,11 +12,11 @@ class SqliteDB:
 
   def _prepare_database(self):
     self._open()
-    self.cur.execute('CREATE TABLE IF NOT EXISTS admins (id INT PRIMARY KEY, username CHAR(32) DEFAULT NULL UNIQUE)') 
-    self.cur.execute('CREATE TABLE IF NOT EXISTS img (id INT PRIMARY KEY, url CHAR(128) DEFAULT NULL, user CHAR(32) DEFAULT NULL, time DATETIME DEFAULT CURRENT_TIMESTAMP, channel CHAR(32) DEFAULT NULL)')
+    self.cur.execute('CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username CHAR(32) DEFAULT NULL UNIQUE)') 
+    self.cur.execute('CREATE TABLE IF NOT EXISTS img (id INTEGER PRIMARY KEY, url CHAR(128) DEFAULT NULL, user CHAR(32) DEFAULT NULL, time DATETIME DEFAULT CURRENT_TIMESTAMP, channel CHAR(32) DEFAULT NULL)')
     self.cur.execute('CREATE TABLE IF NOT EXISTS lastfm (lastfm_username CHAR(64) NOT NULL, nick CHAR(32) NOT NULL)')
-    self.cur.execute('CREATE TABLE IF NOT EXISTS qdb (id INT PRIMARY KEY, quote TEXT NOT NULL, date DATETIME DEFAULT CURRENT_TIMESTAMP)')
-    self.cur.execute('CREATE TABLE IF NOT EXISTS qdb_votes (vote_id PRIMARY KEY, quote_id INT NOT NULL, votes INT DEFAULT 0)')
+    self.cur.execute('CREATE TABLE IF NOT EXISTS qdb (id INTEGER PRIMARY KEY, quote TEXT NOT NULL, date DATETIME DEFAULT CURRENT_TIMESTAMP)')
+    self.cur.execute('CREATE TABLE IF NOT EXISTS qdb_votes (vote_id PRIMARY KEY, quote_id INTEGER NOT NULL, votes INTEGER DEFAULT 0)')
 
 
   def _open(self):
@@ -66,10 +66,10 @@ class SqliteDB:
   def _isAdmin(self, username):
     self._open()
     try:
-      self.cur.execute("SELECT * FROM admins WHERE username = ?",(username))
+      self.cur.execute("SELECT * FROM admins WHERE username = ?",(username,))
       data = self.cur.fetchall()
       self.con.close()
-    except:
+    except Exception,e:
       self.con.close()
       return None
 
