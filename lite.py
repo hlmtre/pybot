@@ -11,9 +11,7 @@ class SqliteDB:
 
 
   def _prepare_database(self):
-    # perhaps TODO
-    self.con = lite.connect(self.bot.conf.getNick(self.bot.network) + ".db", check_same_thread=False)
-    self.cur = self.con.cursor()
+    self._open()
     self.cur.execute('CREATE TABLE IF NOT EXISTS admins (id INT PRIMARY KEY, username CHAR(32) DEFAULT NULL UNIQUE)') 
     self.cur.execute('CREATE TABLE IF NOT EXISTS img (id INT PRIMARY KEY, url CHAR(128) DEFAULT NULL, user CHAR(32) DEFAULT NULL, time DATETIME DEFAULT CURRENT_TIMESTAMP, channel CHAR(32) DEFAULT NULL)')
     self.cur.execute('CREATE TABLE IF NOT EXISTS lastfm (lastfm_username CHAR(64) NOT NULL, nick CHAR(32) NOT NULL)')
@@ -22,6 +20,7 @@ class SqliteDB:
 
 
   def _open(self):
+    # perhaps TODO
     self.con = lite.connect(self.bot.conf.getNick(self.bot.network) + ".db", check_same_thread=False)
     self.cur = self.con.cursor()
 
