@@ -38,3 +38,6 @@ class Logger:
       f.write(str(datetime.datetime.now())+ " (" + inspect.stack()[1][3] + ") " + str(Logger.levels[level]) + ": " + line + '\n')
     except IOError:
       pass
+    except OSError:
+      print "probably permission denied."
+      pass
