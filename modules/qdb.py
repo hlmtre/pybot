@@ -130,7 +130,7 @@ class QDB:
         end_index = -1
         #finds oldest matching string for beginning line
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
-            if start_msg.decode('utf-8','ignore').lower() in line.decode('utf-8','ignore').lower():
+            if start_msg.encode('utf-8','ignore').lower() in line.encode('utf-8','ignore').lower():
                 start_index = index
         #finds newest matching string for ending line
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
