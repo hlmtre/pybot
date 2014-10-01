@@ -29,6 +29,9 @@ Local Development (with sqlite3)
 1. Copy pybotrc to the user who will run the bot (you can probably do `cp pybotrc ~/.pybotrc`
 2. Modify ~/.pybotrc with your network, owner, and nickname.
 3. `./bot.py`
+4. laugh at mysql guys.
+5. continue laughing.
+6. for debugging purposes, `./bot.py -d.`
 
 Local Development (with MySQL)
 ------------------------------
