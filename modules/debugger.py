@@ -32,20 +32,25 @@ class Debugger(BaseModule):
           self.say(event.user,'\t' * (indent+1) + value.encode('utf-8','ignore'))
     
   def handle(self, event):
+    if not self.bot.brain._isAdmin(event.user):
+      return
     try:
       key = event.msg.split()[1]
       keyslist = []
       for thing in event.msg.split()[1:]:
         keyslist.append(thing)
-        #print self.bot.mem_store[thing]
+      #  print self.bot.mem_store[thing]
 
       if len(keyslist) > 1:
         neststring = ""
         for k in keyslist:
           neststring = neststring+'[\''+k+'\']'
-        print neststring
+      #  print neststring
 
-      self.pretty(self.bot.mem_store[key], event)
+      try:
+        self.pretty(self.bot.mem_store[key], event)
+      except KeyError:
+        self.say(event.user, "no key by name " + key)
         # HIGHLY insecure; TODO
         #self.pretty(self.bot.mem_store[eval(neststring)])
         
