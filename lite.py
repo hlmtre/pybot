@@ -41,7 +41,7 @@ class SqliteDB:
       self.con.close()
       return None
 
-  def _insertImg(self, user, url, channel):
+  def insertImg(self, user, url, channel):
     self._open()
     if user == "" or user == None:
       user = "nobody"
@@ -51,7 +51,7 @@ class SqliteDB:
 
     self.con.close()
 
-  def _getImgs(self):
+  def getImgs(self):
     self._open()
     try:
       self.cur.execute("SELECT * FROM img ORDER BY time DESC")
@@ -63,7 +63,7 @@ class SqliteDB:
 
     return data
 
-  def _isAdmin(self, username):
+  def isAdmin(self, username):
     self._open()
     try:
       self.cur.execute("SELECT * FROM admins WHERE username = ?",(username,))

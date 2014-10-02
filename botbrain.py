@@ -33,7 +33,7 @@ class BotBrain:
   def _isAdmin(self, username):
     if self.bot.conf.getOwner(self.bot.network) == username:
       return True
-    if self.db._isAdmin(username):
+    if self.db.isAdmin(username):
       return True
     return False
 
@@ -44,7 +44,7 @@ class BotBrain:
     self.db.updateSeen(user, statement, event)
   
   def _insertImg(self, user, url, channel):
-    self.db._insertImg(user, url, channel)
+    self.db.insertImg(user, url, channel)
 
   def __bareSay(self, thing):
     self.microphone(thing + '\n')
@@ -132,7 +132,7 @@ class BotBrain:
     if message.strip() == ".quit":
       self.__quit(usr)
     if message.startswith(".imgs"):
-      self.ww._generate(self.db._getImgs())
+      self.ww._generate(self.db.getImgs())
       # hackish TODO
       if os.getenv('USER') == 'pybot':
         self.say(channel, "http://pybot.zero9f9.com/img/")

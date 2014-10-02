@@ -1,5 +1,5 @@
 lite module
-=========
+===========
 
 .. automodule:: lite
     :members:
