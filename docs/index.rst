@@ -18,6 +18,7 @@ Contents:
    confman
    db
    event
+   lite
    logger
    modules
    stats

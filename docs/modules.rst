@@ -164,14 +164,6 @@ modules.told module
     :undoc-members:
     :show-inheritance:
 
-modules.twitter_credentials module
-----------------------------------
-
-.. automodule:: modules.twitter_credentials
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 modules.twitterposter module
 ----------------------------
 
