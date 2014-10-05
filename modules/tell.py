@@ -42,7 +42,7 @@ class Tell:
         if "tell" in self.bot.mem_store:
           for n in self.bot.mem_store["tell"]:
             if event.user.lower() == n.obj.lower():
-              self.printer("PRIVMSG " + event.channel + " :Hey " + n.obj + ", " + n.subject + " says \""+ " ".join(n.message).encode('utf-8', 'ignore')+ '\"\n')
+              self.printer("PRIVMSG " + event.channel + " :Hey " + n.obj + ", " + n.subject + " says \""+ " ".join(n.message.encode('utf-8', 'ignore'))+ '\"\n')
               # we've said it, now delete it.
               if n in self.bot.mem_store["tell"]: self.bot.mem_store["tell"].remove(n)
             
