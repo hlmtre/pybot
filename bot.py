@@ -17,11 +17,9 @@ import threading
 
 import botbrain
 from logger import Logger
-import db
 import confman
 from event import Event
 import util
-import lite
 
 DEBUG = False
 
@@ -44,8 +42,11 @@ class Bot(threading.Thread):
     self.logger = Logger()
     
     if self.conf.getDBType() == "sqlite":
+      import lite
       self.db = lite.SqliteDB(self)
-    else: self.db = db.DB(self)
+    else: 
+      import db
+      self.db = db.DB(self)
 
 
     self.NICK = self.conf.getNick(self.network)
@@ -281,7 +282,11 @@ class Bot(threading.Thread):
     """
     if self.DEBUG:
       import datetime
-      self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + line)
+      if os.name == "posix": # because windows doesn't like the color codes.
+        self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + line)
+      else:
+        self.debug_print("<< " + ": " + line)
+
 
     message_number = line.split()[1]
 
@@ -467,48 +472,53 @@ if __name__ == "__main__":
       DEBUG = True
 
 # duuude this is so old.
-  if os.name == "posix":
-    botslist = list()
-    if not DEBUG:
-      pid = os.fork()
-      if pid == 0: # child
+  #if os.name == "posix":
+  botslist = list()
+  if not DEBUG:
+    pid = os.fork()
+    if pid == 0: # child
+      if os.name == "posix":
         print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
-        if len(sys.argv) > 1:
-          CONF = sys.argv[1]
-        else: CONF = "~/.pybotrc"
-
-        cm = confman.ConfManager(CONF)
-        net_list = cm.getNetworks()
-        for c in cm.getNetworks():
-          b = bot.Bot(cm, c, DEBUG)
-          b.start()
-
-      elif pid > 0:
-        sys.exit(0)
-    else: # don't background
-      print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
-      if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
+      else:
+        print "starting bot in the background, pid " + str(os.getpid())
+      if len(sys.argv) > 1:
         CONF = sys.argv[1]
-        try:
-          f = open(CONF)
-        except IOError:
-          print "Could not open conf file " + sys.argv[1]
-          sys.exit(1)
       else: CONF = "~/.pybotrc"
 
       cm = confman.ConfManager(CONF)
       net_list = cm.getNetworks()
       for c in cm.getNetworks():
         b = bot.Bot(cm, c, DEBUG)
-        b.daemon = True
         b.start()
-        botslist.append(b)
+
+    elif pid > 0:
+      sys.exit(0)
+  else: # don't background
+    print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
+    if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
+      CONF = sys.argv[1]
       try:
-        while True:
-          time.sleep(5)
-      except (KeyboardInterrupt, SystemExit):
-        print
-        print "keyboard interrupt caught; exiting"
+        f = open(CONF)
+      except IOError:
+        print "Could not open conf file " + sys.argv[1]
         sys.exit(1)
-        
+    else: CONF = "~/.pybotrc"
+
+    cm = confman.ConfManager(CONF)
+    net_list = cm.getNetworks()
+    for c in cm.getNetworks():
+      b = bot.Bot(cm, c, DEBUG)
+      b.daemon = True
+      b.start()
+      botslist.append(b)
+    try:
+      while True:
+        time.sleep(5)
+    except (KeyboardInterrupt, SystemExit):
+      for b in botslist:
+        b.s.send("QUIT :because I got killed\n")
+      print
+      print "keyboard interrupt caught; exiting"
+      sys.exit(1)
+      
 

@@ -1,6 +1,11 @@
 from event import Event
 import json
-import requests
+try:
+  print "Warning: forecast module requires requests"
+  import requests
+except ImportError:
+  requests = object
+
 
 class Forecast:
     def __init__(self, events=None, printer_handle=None, bot=None, say=None):

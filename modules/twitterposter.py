@@ -1,5 +1,8 @@
 from event import Event
-import twitter
+try:
+  import twitter
+except ImportError:
+  twitter = object
 try:
   from basemodule import BaseModule
 except ImportError:

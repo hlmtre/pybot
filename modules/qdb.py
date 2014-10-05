@@ -1,5 +1,10 @@
 from event import Event
-import requests
+try:
+  import requests
+except ImportError:
+  print "Warning: QDB module requires requests."
+  requests = object
+
 import difflib
 
 class QDB:

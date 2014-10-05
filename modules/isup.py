@@ -1,5 +1,9 @@
 from event import Event
-import requests
+try:
+  print "Warning: isup module requires requests."
+  import requests
+except ImportError:
+  requests = object
 from xml.dom.minidom import parseString
 try:
   from basemodule import BaseModule
