@@ -8,3 +8,4 @@ mysql_init
 modules/twitter_credentials.py
 docs/_build
 _build
+*.db
