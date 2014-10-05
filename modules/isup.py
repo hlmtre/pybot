@@ -1,8 +1,8 @@
 from event import Event
 try:
-  print "Warning: isup module requires requests."
   import requests
 except ImportError:
+  print "Warning: isup module requires requests."
   requests = object
 from xml.dom.minidom import parseString
 try:

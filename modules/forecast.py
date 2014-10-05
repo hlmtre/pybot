@@ -1,9 +1,9 @@
 from event import Event
 import json
 try:
-  print "Warning: forecast module requires requests"
   import requests
 except ImportError:
+  print "Warning: forecast module requires requests"
   requests = object
 
 
