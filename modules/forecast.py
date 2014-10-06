@@ -13,6 +13,7 @@ class Forecast:
         self.printer = printer_handle
         self.interests = ['__.forecast__']
         self.bot = bot
+        self.say = say
 
         forecast = Event("__.forecast__")
         forecast.define(msg_definition="^\.forecast")
@@ -92,16 +93,15 @@ class Forecast:
         return conditions
 
     def handle(self, event):
-        _z = str.split(event.msg, None, 1)
+        _z = event.msg.split(None, 1)
         #print "Debugging: Reached stage 1 of handle()"
-        if _z[1] != '':
+        try:
+          if _z[1] != '':
             cur = ''
             loc = self.get_location(_z[1])
             if len(loc) == 3: #if there are 3 items, valid data retrieved. if not, it didn't work
-                cur = ': ' + self.current(self.get_forecast(loc[1], loc[2])['currently'])
-            try:
-                self.printer("PRIVMSG " + event.channel + ' :' + loc[0] + cur + '\n')
-            except TypeError:
-                print "DEBUG: TypeError: ",
-                print event.channel,
-                print event.user
+              cur = ': ' + self.current(self.get_forecast(loc[1], loc[2])['currently'])
+            self.say(event.channel, loc[0] + cur + '\n')
+        except IndexError:
+          self.say(event.channel, "zip needed.")
+
