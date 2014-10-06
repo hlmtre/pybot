@@ -25,7 +25,7 @@ DEBUG = False
 
 class Bot(threading.Thread):
   """
-    bot instance. one bot gets instanciated per network, as an entirely distinct, sandboxed thread.
+    bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
     handles the core IRC protocol stuff, and passing lines to defined events, which dispatch to their subscribed modules.
   """
   def __init__(self, conf=None, network=None, d=None):
@@ -288,6 +288,7 @@ class Bot(threading.Thread):
         self.debug_print("<< " + ": " + line)
 
 
+    #print type(line)
     message_number = line.split()[1]
 
     try:
@@ -407,8 +408,9 @@ class Bot(threading.Thread):
         ready = select.select([self.s],[],[], 1)
         if ready[0]:
           try:
-            read = read + self.s.recv(1024)
-          except:
+            read = read + self.s.recv(1024).decode('utf8')
+          except Exception, e:
+            print e
             if self.DEBUG:
               print "Disconnected! Retrying... "
             self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
@@ -416,7 +418,9 @@ class Bot(threading.Thread):
             self.CONNECTED = False
             self.worker()
 
+
           lines = read.split('\n')
+
           
           # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
           # line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
@@ -427,7 +431,7 @@ class Bot(threading.Thread):
 
           for line in lines:
             line = line.rstrip()
-            self.processline(line)      
+            self.processline(line)
       except KeyboardInterrupt:
         print "keyboard interrupt caught; exiting ..."
         raise
