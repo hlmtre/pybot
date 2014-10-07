@@ -497,6 +497,8 @@ if __name__ == "__main__":
     elif pid > 0:
       sys.exit(0)
   else: # don't background; either we're in debug (foreground) mode, or on windows TODO
+    if os.name == 'nt':
+      print 'in debug mode; backgrounding currently unsupported on windows.'
     DEBUG = True
     print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
     if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
