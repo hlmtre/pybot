@@ -476,9 +476,8 @@ if __name__ == "__main__":
       DEBUG = True
 
 # duuude this is so old.
-  #if os.name == "posix":
   botslist = list()
-  if not DEBUG:
+  if not DEBUG and hasattr(os, 'fork'):
     pid = os.fork()
     if pid == 0: # child
       if os.name == "posix":
@@ -497,7 +496,7 @@ if __name__ == "__main__":
 
     elif pid > 0:
       sys.exit(0)
-  else: # don't background
+  else: # don't background; either we're in debug (foreground) mode, or on windows TODO
     print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
     if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
       CONF = sys.argv[1]
