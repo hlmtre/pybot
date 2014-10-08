@@ -14,6 +14,7 @@ import time
 import select
 import traceback
 import threading
+import inspect
 
 import botbrain
 from logger import Logger
@@ -178,11 +179,25 @@ class Bot(threading.Thread):
     
     modules_path = 'modules'
     autoload_path = 'modules/autoloads'
+    snippets_path = modules_path + '/snippets'
 
     # this is magic.
 
-    import inspect
     import os, imp, json
+
+    self.snippets_list = set()
+# load up snippets first
+    for filename in os.listdir(snippets_path):
+      name, ext = os.path.splitext(filename)
+      try:
+        if ext == ".py":
+          snippet = imp.load_source(name, snippets_path + '/' + filename)
+          self.snippets_list.add(snippet)
+      except Exception, e:
+        print e
+        print name, filename
+
+
     dir_list = os.listdir(modules_path)
     mods = {}
     autoloads = {}
@@ -287,9 +302,27 @@ class Bot(threading.Thread):
       else:
         self.debug_print("<< " + ": " + line)
 
-
-    #print type(line)
     message_number = line.split()[1]
+
+    for obj in self.snippets_list:
+      #print obj
+      #print inspect.ismodule(obj)
+      for i in inspect.getmembers(obj):
+        if inspect.isfunction(i):
+          print i
+      # if it's a function and has a 'command' attribute
+      #print hasattr(obj, 'commands')
+      #print type(obj.commands)
+      #if hasattr(obj, 'command_list'):
+      #  try:
+      #    message = line.split(":",2)[2]
+      #    print message
+      #    #for command in obj.commands:
+      #    #  print command
+      #    #  if message.startswith(command):
+      #    #    obj(self, message)
+      #  except IndexError:
+      #    print "AAAAA"
 
     try:
       for e in self.events_list:
@@ -447,11 +480,6 @@ class Bot(threading.Thread):
     """
     print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n')
 
-  def depends(self, module_name):
-    for m in self.loaded_modules:
-      if m.__class__.__name__ == module_name:
-        return m
-    return None
     
   def run(self):
     """

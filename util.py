@@ -20,6 +20,20 @@ def strip_nick(nick):
   nick = re.sub('[@~+]', '', nick)
   return nick
 
+def depends(self, module_name):
+  for m in self.loaded_modules:
+    if m.__class__.__name__ == module_name:
+      return m
+  return None
+
+def commands(*command_list):
+  def add_attribute(function):
+    if not hasattr(function, "command_list"):
+      function.command_list = []
+    function.command_list.extend(command_list)
+    return function
+  return add_attribute
+
 def __prettyDate(time):
   """
   Similar to Rails's nice time since thing.
