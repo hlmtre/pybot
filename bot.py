@@ -191,6 +191,7 @@ class Bot(threading.Thread):
       name, ext = os.path.splitext(filename)
       try:
         if ext == ".py":
+# snippet is a module
           snippet = imp.load_source(name, snippets_path + '/' + filename)
           self.snippets_list.add(snippet)
       except Exception, e:
@@ -304,11 +305,11 @@ class Bot(threading.Thread):
 
     message_number = line.split()[1]
 
+    # check each module for a function with a list of commands in it
     for obj in self.snippets_list:
-      for k,v in inspect.getmembers(obj):
+      for k,v in inspect.getmembers(obj, inspect.isfunction):
         if inspect.isfunction(v):
           print k + ": " 
-          print inspect.getmembers(v)
           #print k + " is a function!"
       # if it's a function and has a 'command' attribute
       #print hasattr(obj, 'commands')

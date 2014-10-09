@@ -28,9 +28,9 @@ def depends(self, module_name):
 
 def commands(*command_list):
   def add_attribute(function):
-    if not hasattr(function, "command_list"):
-      function.command_list = []
-    function.command_list.extend(command_list)
+    if not hasattr(function, "commands"):
+      function.commands = []
+    function.commands.extend(command_list)
     return function
   return add_attribute
 

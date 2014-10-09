@@ -158,4 +158,7 @@ class Event:
     if self.verb == "PRIVMSG" and not l[privmsg_index].startswith("#"):
       self.is_pm = True
     for s in self.subscribers:
-      s.handle(self)
+      try:
+        s.handle(self)
+      except AttributeError:
+        pass
