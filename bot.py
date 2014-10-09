@@ -305,11 +305,11 @@ class Bot(threading.Thread):
     message_number = line.split()[1]
 
     for obj in self.snippets_list:
-      #print obj
-      #print inspect.ismodule(obj)
-      for i in inspect.getmembers(obj):
-        if inspect.isfunction(i):
-          print i
+      for k,v in inspect.getmembers(obj):
+        if inspect.isfunction(v):
+          print k + ": " 
+          print inspect.getmembers(v)
+          #print k + " is a function!"
       # if it's a function and has a 'command' attribute
       #print hasattr(obj, 'commands')
       #print type(obj.commands)
