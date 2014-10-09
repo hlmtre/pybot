@@ -59,7 +59,7 @@ class Bonk:
         return "\001ACTION " + bonk_action 
 
     def handle(self, event):
-        _z = str.split(event.msg, None, 1)
+        _z = event.msg.split(None, 1)
         if len(_z) == 1:
             self.printer("PRIVMSG " + event.channel + " :You must specify who you want me to bonk!\n")
             return
