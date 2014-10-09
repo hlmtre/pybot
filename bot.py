@@ -41,6 +41,8 @@ class Bot(threading.Thread):
     self.conf = conf
     self.pid = os.getpid()
     self.logger = Logger()
+#   to be a dict of dicts
+    self.command_function_map = dict()
     
     if self.conf.getDBType() == "sqlite":
       import lite
@@ -158,6 +160,18 @@ class Bot(threading.Thread):
     self.events_list.append(event)
     return
 
+  def load_snippets(self):
+    # check each module for a function with a list of commands in it
+    # create a big ol list of dictionaries, commands mapping to the functions to call if the command is encountered
+    for obj in self.snippets_list:
+      for k,v in inspect.getmembers(obj, inspect.isfunction):
+        if inspect.isfunction(v) and hasattr(v, 'commands'):
+          for c in v.commands:
+            if not c in self.command_function_map:
+              self.command_function_map[c] = dict()
+            self.command_function_map[c] = v
+
+
   # utility function for loading modules; can be called by modules themselves
   def load_modules(self, specific=None):
     """
@@ -198,6 +212,7 @@ class Bot(threading.Thread):
         print e
         print name, filename
 
+    self.load_snippets()
 
     dir_list = os.listdir(modules_path)
     mods = {}
@@ -272,7 +287,7 @@ class Bot(threading.Thread):
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "DEBUGGING OUTPUT", self.NICK)
         self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'), self.NICK)
-        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'))
+        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + self.getName() + " " + message.encode('utf-8', 'ignore'))
 
       self.s.send(message.encode('utf-8', 'ignore'))
       target = message.split()[1]
@@ -305,25 +320,14 @@ class Bot(threading.Thread):
 
     message_number = line.split()[1]
 
-    # check each module for a function with a list of commands in it
-    for obj in self.snippets_list:
-      for k,v in inspect.getmembers(obj, inspect.isfunction):
-        if inspect.isfunction(v):
-          print k + ": " 
-          #print k + " is a function!"
-      # if it's a function and has a 'command' attribute
-      #print hasattr(obj, 'commands')
-      #print type(obj.commands)
-      #if hasattr(obj, 'command_list'):
-      #  try:
-      #    message = line.split(":",2)[2]
-      #    print message
-      #    #for command in obj.commands:
-      #    #  print command
-      #    #  if message.startswith(command):
-      #    #    obj(self, message)
-      #  except IndexError:
-      #    print "AAAAA"
+    try:
+      first_word = line.split(":", 2)[2]
+      channel = line.split()[2]
+    except IndexError:
+      pass
+    else:
+      if first_word in self.command_function_map:
+        self.command_function_map[first_word](self, line, channel)
 
     try:
       for e in self.events_list:
