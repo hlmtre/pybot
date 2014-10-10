@@ -84,3 +84,15 @@ v0.7.2
   Features:
     * Adds sqlite functionality (yay!)
     * DB type is set by __pybot_conf key in the conf file. Valid types are "mysql" and "sqlite".
+
+v0.8.0
+======
+  Add ability to write simple functions in modules/snippets and register a command with a new decorator!
+
+  Features:
+    * Commands decorator in util.py (@commands(".somecommand"))
+    * Entire bot now operates on unicode everything.
+    * Runs on Windows. No backgrounding, though.
+    
+  Bugfixes:
+    * Fixes a few bugs in modules now that the bot is all unicode internally.

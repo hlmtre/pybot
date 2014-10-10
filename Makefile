@@ -52,6 +52,7 @@ clean: cleanpyc
 cleanpyc:
 	rm *.pyc
 	rm modules/*.pyc
+	rm modules/snippets/*.pyc
 
 test:
 	nosetests
