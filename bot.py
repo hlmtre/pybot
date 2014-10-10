@@ -161,6 +161,22 @@ class Bot(threading.Thread):
     return
 
   def load_snippets(self):
+    import imp
+    snippets_path = self.modules_path + '/snippets'
+    self.snippets_list = set()
+# load up snippets first
+    for filename in os.listdir(snippets_path):
+      name, ext = os.path.splitext(filename)
+      try:
+        if ext == ".py":
+# snippet is a module
+          snippet = imp.load_source(name, snippets_path + '/' + filename)
+          self.snippets_list.add(snippet)
+      except Exception, e:
+        print e
+        print name, filename
+
+  def set_snippets(self):
     """ 
     check each snippet for a function with a list of commands in it
     create a big ol list of dictionaries, commands mapping to the functions to call if the command is encountered
@@ -193,28 +209,18 @@ class Bot(threading.Thread):
     modules_dir_list = list()
     tmp_list = list()
     
+    self.modules_path = 'modules'
     modules_path = 'modules'
+    self.autoload_path = 'modules/autoloads'
     autoload_path = 'modules/autoloads'
-    snippets_path = modules_path + '/snippets'
 
     # this is magic.
 
     import os, imp, json
 
-    self.snippets_list = set()
-# load up snippets first
-    for filename in os.listdir(snippets_path):
-      name, ext = os.path.splitext(filename)
-      try:
-        if ext == ".py":
-# snippet is a module
-          snippet = imp.load_source(name, snippets_path + '/' + filename)
-          self.snippets_list.add(snippet)
-      except Exception, e:
-        print e
-        print name, filename
 
     self.load_snippets()
+    self.set_snippets()
 
     dir_list = os.listdir(modules_path)
     mods = {}
@@ -323,7 +329,7 @@ class Bot(threading.Thread):
     message_number = line.split()[1]
 
     try:
-      first_word = line.split(":", 2)[2]
+      first_word = line.split(":", 2)[2].split()[0]
       channel = line.split()[2]
     except IndexError:
       pass

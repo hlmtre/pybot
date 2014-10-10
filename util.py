@@ -34,6 +34,37 @@ def commands(*command_list):
     return function
   return add_attribute
 
+def parse_line(line):
+  """
+  returns an object with a nice set of line-pulled-apart members
+  """
+  class Parsed():
+    def __init(self):
+      self.first_word = None
+      self.message = None
+      self.channel = None
+      self.user = None
+
+    def startswith(self, thing):
+      if self.message.startswith(thing):
+        return True
+      return False
+
+  parsed = Parsed()
+
+  try:
+    parsed.first_word = line.split(":", 2)[2]
+    parsed.message = line.split(":",2)[2]
+    parsed.channel = line.split()[2]
+    if "JOIN" in line or "QUIT" in line:
+      parsed.user = line.split("!")[0].replace(":","")
+    else:
+      parsed.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
+  except IndexError:
+    return None
+  else:
+    return parsed
+
 def __prettyDate(time):
   """
   Similar to Rails's nice time since thing.
