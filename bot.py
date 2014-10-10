@@ -161,8 +161,10 @@ class Bot(threading.Thread):
     return
 
   def load_snippets(self):
-    # check each module for a function with a list of commands in it
-    # create a big ol list of dictionaries, commands mapping to the functions to call if the command is encountered
+    """ 
+    check each snippet for a function with a list of commands in it
+    create a big ol list of dictionaries, commands mapping to the functions to call if the command is encountered
+    """
     for obj in self.snippets_list:
       for k,v in inspect.getmembers(obj, inspect.isfunction):
         if inspect.isfunction(v) and hasattr(v, 'commands'):
