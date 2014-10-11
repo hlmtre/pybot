@@ -294,8 +294,8 @@ class Bot(threading.Thread):
     else:
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "DEBUGGING OUTPUT", self.NICK)
-        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + ": " + message.encode('utf-8', 'ignore'), self.NICK)
-        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + self.getName() + " " + message.encode('utf-8', 'ignore'))
+        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + message.encode('utf-8', 'ignore'), self.NICK)
+        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + " " + message.encode('utf-8', 'ignore'))
 
       self.s.send(message.encode('utf-8', 'ignore'))
       target = message.split()[1]
@@ -322,7 +322,7 @@ class Bot(threading.Thread):
     if self.DEBUG:
       import datetime
       if os.name == "posix": # because windows doesn't like the color codes.
-        self.debug_print(util.bcolors.OKBLUE + "<< "  + util.bcolors.ENDC + ": " + line)
+        self.debug_print(util.bcolors.OKBLUE + "<< " + util.bcolors.ENDC + line)
       else:
         self.debug_print("<< " + ": " + line)
 
