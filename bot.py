@@ -406,6 +406,7 @@ class Bot(threading.Thread):
         time.sleep(1)
         self.worker()
 
+      time.sleep(1)
     # core IRC protocol stuff
       self.s.send('NICK '+self.NICK+'\n')
 
@@ -441,7 +442,7 @@ class Bot(threading.Thread):
         time_since = self.conf.getTimeout(self.network)
         if timeout > time_since:
           if self.DEBUG:
-            print "Disconnected! Retrying... "
+            self.debug_print("Disconnected! Retrying... ")
           self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
 # so that we rejoin all our channels upon reconnecting to the server
           self.JOINED = False
@@ -455,10 +456,13 @@ class Bot(threading.Thread):
         if ready[0]:
           try:
             read = read + self.s.recv(1024).decode('utf8')
+          except UnicodeDecodeError, e:
+            self.debug_print("Unicode decode error; " + e.__str__())
+            pass
           except Exception, e:
             print e
             if self.DEBUG:
-              print "Disconnected! Retrying... "
+              self.debug_print("Disconnected! Retrying... ")
             self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
             self.JOINED = False
             self.CONNECTED = False
@@ -491,7 +495,7 @@ class Bot(threading.Thread):
     Args:
     line: text.
     """
-    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n')
+    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
 
     
   def run(self):
