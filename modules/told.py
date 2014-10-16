@@ -71,7 +71,7 @@ class Told:
         return random.choice(exclamation) + " %s\'s told status: [X] " % target + random.choice(status)
 
     def handle(self, event):
-        _z = str.split(event.msg, None, 1)
+        _z = event.msg.split(None, 1)
         try:
             self.say(event.channel, self.get_told_status(_z[1]))
         except IndexError:

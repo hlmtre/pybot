@@ -47,7 +47,7 @@ class Jimmies:
         return "[X] " + random.choice(status)
 
     def handle(self, event):
-        _z = str.split(event.msg, None, 1)
+        _z = event.msg.split(None, 1)
         jimmies_status = self.get_jimmies_status()
         try:
             self.say(event.channel, "Jimmies status for " + _z[1]+ ": " + jimmies_status)
