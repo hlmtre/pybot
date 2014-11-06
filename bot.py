@@ -402,7 +402,9 @@ class Bot(threading.Thread):
         if self.DEBUG:
           self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + "connected to " + self.network)
       except:
-        self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect! Retrying... ")
+        if self.DEBUG:
+          self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect! Retrying... ")
+        self.logger.write(Logger.CRITICAL, "Could not connect! Retrying...")
         time.sleep(1)
         self.worker()
 
@@ -458,6 +460,7 @@ class Bot(threading.Thread):
             read = read + self.s.recv(1024).decode('utf8')
           except UnicodeDecodeError, e:
             self.debug_print("Unicode decode error; " + e.__str__())
+            self.debug_print("Offending recv: " + read)
             pass
           except Exception, e:
             print e

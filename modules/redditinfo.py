@@ -29,7 +29,10 @@ if successful_import is True:
     def handle(self, event):
       url = re.search("https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+", event.line).group(0)
       me = praw.Reddit(self.user_agent)
-      s = me.get_submission(url)
+      try:
+        s = me.get_submission(url)
+      except TypeError:
+        return
       message = '[REDDIT] ' + s.title
       if s.is_self:
           message = message + ' (self.' + s.subreddit.display_name + ')'
