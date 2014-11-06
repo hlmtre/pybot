@@ -31,6 +31,9 @@ class Module:
       if retval == 0:
         self.bot.logger.write(Logger.INFO, " loaded " + event.msg.split()[2])
         self.bot.brain.notice(event.channel, "loaded " + event.msg.split()[2])
+      elif retval == 2:
+        self.bot.logger.write(Logger.INFO, " load failed; " + event.msg.split()[2] + " is already loaded")
+        self.bot.brain.notice(event.channel, "load failed; " + event.msg.split()[2] + " is already loaded")
       else:
         self.bot.logger.write(Logger.WARNING, " failed to load " + event.msg.split()[2], self.bot.NICK)
         self.bot.brain.notice(event.channel, "failed to load " + event.msg.split()[2])
@@ -78,4 +81,13 @@ class Module:
       
 
   def load(self, modulename):
+# this may seem redundant, but modules may become unloaded in between calls.
+    modules_set = set()
+    for m in self.bot.events_list:
+      for s in m.subscribers:
+        modules_set.add(s.__class__.__name__.lower())
+
+    if modulename in modules_set:
+      return 2
+
     return self.bot.load_modules(specific=modulename)
