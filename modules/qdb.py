@@ -94,7 +94,7 @@ class QDB:
                         line = self.format_line(event)
                         if line:
                             self.bot.mem_store['qdb'][chan].insert(0, line)
-            except KeyError, IndexError:
+            except (KeyError, IndexError):
                 print "QDB add_buffer() error when no event channel"
         #now we continue with normal, per channel line addition
         #create a dictionary associating the channel with an empty list if it doesn't exist yet
