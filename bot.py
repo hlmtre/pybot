@@ -457,10 +457,10 @@ class Bot(threading.Thread):
         ready = select.select([self.s],[],[], 1)
         if ready[0]:
           try:
-            read = read + self.s.recv(1024).decode('utf8')
+            read = read + self.s.recv(1024).decode('utf8', 'ignore')
           except UnicodeDecodeError, e:
             self.debug_print("Unicode decode error; " + e.__str__())
-            self.debug_print("Offending recv: " + read)
+            self.debug_print("Offending recv: " + self.s.recv)
             pass
           except Exception, e:
             print e

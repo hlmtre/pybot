@@ -1,3 +1,4 @@
+import requests
 try:
   import praw
   successful_import = True
@@ -31,6 +32,8 @@ if successful_import is True:
       me = praw.Reddit(self.user_agent)
       try:
         s = me.get_submission(url)
+      except requests.exceptions.MissingSchema:
+        s = me.get_submission('http://'+url)
       except TypeError:
         return
       message = '[REDDIT] ' + s.title
