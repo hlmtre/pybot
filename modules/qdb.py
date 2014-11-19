@@ -115,6 +115,10 @@ class QDB:
 
     def format_line(self, event):
         """Takes an event and formats a string appropriate for quotation from it"""
+
+        # first strip out printout urls and replace them with imgur mirrors
+        event.msg = self._detect_url(event.msg)
+
         #format all strings based on the verb
         if event.verb == "":
             return ''
@@ -190,7 +194,7 @@ class QDB:
             print "QDB get_qdb_submission() error when accessing list index"
 
 
-        return self._detect_url(submission)
+        return submission
 
     def submit(self, qdb_submission, debug=False):
         """Given a string, qdb_submission, this function will upload the string to hlmtre's qdb
