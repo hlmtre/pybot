@@ -1,4 +1,6 @@
 from event import Event
+import re
+import imgurpython
 try:
   import requests
 except ImportError:
@@ -14,6 +16,8 @@ class QDB:
         self.interests = ['__.qdb__', '1__all_lines__']  # should be first event in the listing.. so lines being added is a priority
         self.bot = bot
         self.say = say
+        self.imgur_client_id = "6f4e468a474bb6e"
+        self.imgur_client_secret = "22f791df5569e7964a1ca78637125c94cba6f312"
 
         self.bot.mem_store['qdb'] = {}
         #define a key for _recent since that will not be a potential channel name
@@ -26,6 +30,37 @@ class QDB:
         self.help = ".qdb <search string of first line> | <search string of last line>"
         self.MAX_BUFFER_SIZE = 200 
         self.MAX_HISTORY_SIZE = 10
+
+    def _imgurify(self, url):
+     client = imgurpython.ImgurClient(self.imgur_client_id, self.imgur_client_secret)
+
+     replacement_values = list()
+
+     if type(url) is list:
+       for u in url:
+         resp = client.upload_from_url(u)
+         replacement_values.append(resp)
+     else:
+       resp = client.upload_from_url(url)
+       replacement_values.append(resp)
+
+     return replacement_values
+      
+    def _detect_url(self, quote):
+     """
+     right now this is strictly for tsdbot's printout functionality
+     follows this format:
+     http://irc.teamschoolyd.org/printouts/8xnK5DmfMz.jpg
+     """
+     try:
+       url = re.search("(?P<url>http://irc.teamschoolyd.org/printouts/.+\.jpg)", quote).group("url")
+     except AttributeError: # we didn't find anything
+       return quote
+
+     repl = self._imgurify(url)
+     new_quote = re.sub('(?P<url>http://irc.teamschoolyd.org/printouts/.+\.jpg)',repl[0]['link'], quote)
+     return new_quote
+
 
     def add_buffer(self, event=None, debug=False): 
         """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
@@ -153,7 +188,9 @@ class QDB:
                 submission += self.bot.mem_store['qdb'][channel][i]
         except IndexError:
             print "QDB get_qdb_submission() error when accessing list index"
-        return submission
+
+
+        return self._detect_url(submission)
 
     def submit(self, qdb_submission, debug=False):
         """Given a string, qdb_submission, this function will upload the string to hlmtre's qdb
