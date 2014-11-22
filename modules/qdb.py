@@ -1,11 +1,12 @@
 from event import Event
 import re
-import imgurpython
 try:
   import requests
+  import imgurpython
 except ImportError:
-  print "Warning: QDB module requires requests."
+  print "Warning: QDB module requires requests and imgurpython."
   requests = object
+  imgurpython = object
 
 import difflib
 
