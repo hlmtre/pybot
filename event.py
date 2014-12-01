@@ -154,8 +154,8 @@ class Event:
       if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE", "PING", "PONG", "MODE"]:
         self.verb = v
         break
-    # our channel is the next one from PRIVMSG
-    if self.verb == "PRIVMSG" and not l[privmsg_index].startswith("#"):
+    # channel is unset if it does not begin with #
+    if self.verb == "PRIVMSG" and len(self.channel):
       self.is_pm = True
     for s in self.subscribers:
       try:

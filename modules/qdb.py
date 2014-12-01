@@ -215,7 +215,9 @@ class QDB:
         #check for any HTTP errors and return False if there were any
         try:
             qdb.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError, e:
+            self.bot.debug_print('HTTPError: ')
+            self.bot.debug_print(str(e))
             return "HTTPError encountered when submitting to QDB"
         try:
             q_url = qdb.json()
@@ -234,7 +236,9 @@ class QDB:
         #check for any HTTP errors and return False if there were any
         try:
             deletion.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError, e:
+            self.bot.debug_print('HTTPError: ')
+            self.bot.debug_print(str(e))
             return "HTTPError encountered when accessing QDB"
         try:
             del_status = deletion.json()
