@@ -65,12 +65,12 @@ class QDB:
      http://irc.teamschoolyd.org/printouts/8xnK5DmfMz.jpg
      """
      try:
-       url = re.search("(?P<url>http://irc.teamschoolyd.org/printouts/.+\.jpg)", quote).group("url")
+       url = re.search("(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))", quote).group("url")
      except AttributeError: # we didn't find anything
        return quote
 
      repl = self._imgurify(url)
-     new_quote = re.sub('(?P<url>http://irc.teamschoolyd.org/printouts/.+\.jpg)',repl[0]['link'], quote)
+     new_quote = re.sub('(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))',repl[0]['link'], quote)
      return new_quote
 
 
@@ -129,7 +129,8 @@ class QDB:
         """Takes an event and formats a string appropriate for quotation from it"""
 
         # first strip out printout urls and replace them with imgur mirrors
-        event.msg = self._detect_url(event.msg)
+        # commenting out for now to avoid uploading to imgur so often
+        #event.msg = self._detect_url(event.msg)
 
         #format all strings based on the verb
         if event.verb == "":
@@ -177,7 +178,7 @@ class QDB:
         if end_msg == '':
             for line in self.bot.mem_store['qdb'][channel]:
                 if start_msg.lower() in line.lower():
-                    return line
+                    return self._detect_url(line) #removing temporary printout urls and replacing with imgur
             #making sure we get out of the function if no matching strings were found
             #don't want to search for a nonexistent second string later
             return None
@@ -201,7 +202,7 @@ class QDB:
         try:
             for i in reversed(range(end_index, start_index + 1)):
                 #print 'Index number is ' + str(i) + ' and current submission is ' + submission
-                submission += self.bot.mem_store['qdb'][channel][i]
+                submission += self._detect_url(self.bot.mem_store['qdb'][channel][i]) #detect temporary printout urls and replace with imgur
         except IndexError:
             print "QDB get_qdb_submission() error when accessing list index"
 
