@@ -42,8 +42,19 @@ class QDB:
          resp = client.upload_from_url(u)
          replacement_values.append(resp)
      else:
-       resp = client.upload_from_url(url)
-       replacement_values.append(resp)
+       try:
+         resp = client.upload_from_url(url)
+         replacement_values.append(resp)
+       except imgurpython.helpers.error.ImgurClientError, e:
+         self.bot.debug_print("ImgurClientError: ") 
+         self.bot.debug_print(str(e))
+       except UnboundLocalError, e:
+         self.bot.debug_print("UnboundLocalError: ")
+         self.bot.debug_print(str(e))
+       except requests.ConnectionError, e:
+         self.bot.debug_print("ConnectionError: ")
+         self.bot.debug_print(str(e))
+        
 
      return replacement_values
       
@@ -211,7 +222,11 @@ class QDB:
         #accessing hlmtre's qdb api
         url = 'http://qdb.zero9f9.com/api.php'
         payload = {'q':'new', 'quote': qdb_submission.rstrip('\n')}
-        qdb = requests.post(url, payload)
+        try:
+          qdb = requests.post(url, payload)
+        except ConnectionError, e:
+          self.bot.debug_print("ConnectionError: ")
+          self.bot.debug_print(str(e))
         #check for any HTTP errors and return False if there were any
         try:
             qdb.raise_for_status()
