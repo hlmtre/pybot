@@ -68,7 +68,7 @@ class QDB:
             return quote
 
         repl = self._imgurify(url)
-         new_quote = re.sub('(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))',repl[0]['link'], quote)
+        new_quote = re.sub('(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))',repl[0]['link'], quote)
         return new_quote
 
 
