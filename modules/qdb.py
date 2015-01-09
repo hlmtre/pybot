@@ -33,45 +33,45 @@ class QDB:
         self.MAX_HISTORY_SIZE = 10
 
     def _imgurify(self, url):
-     client = imgurpython.ImgurClient(self.imgur_client_id, self.imgur_client_secret)
+        client = imgurpython.ImgurClient(self.imgur_client_id, self.imgur_client_secret)
 
-     replacement_values = list()
+        replacement_values = list()
 
-     if type(url) is list:
-       for u in url:
-         resp = client.upload_from_url(u)
-         replacement_values.append(resp)
-     else:
-       try:
-         resp = client.upload_from_url(url)
-         replacement_values.append(resp)
-       except imgurpython.helpers.error.ImgurClientError, e:
-         self.bot.debug_print("ImgurClientError: ") 
-         self.bot.debug_print(str(e))
-       except UnboundLocalError, e:
-         self.bot.debug_print("UnboundLocalError: ")
-         self.bot.debug_print(str(e))
-       except requests.ConnectionError, e:
-         self.bot.debug_print("ConnectionError: ")
-         self.bot.debug_print(str(e))
+        if type(url) is list:
+            for u in url:
+                resp = client.upload_from_url(u)
+                replacement_values.append(resp)
+        else:
+            try:
+                resp = client.upload_from_url(url)
+                replacement_values.append(resp)
+            except imgurpython.helpers.error.ImgurClientError, e:
+                self.bot.debug_print("ImgurClientError: ") 
+                self.bot.debug_print(str(e))
+            except UnboundLocalError, e:
+                self.bot.debug_print("UnboundLocalError: ")
+                self.bot.debug_print(str(e))
+            except requests.ConnectionError, e:
+                self.bot.debug_print("ConnectionError: ")
+                self.bot.debug_print(str(e))
         
 
      return replacement_values
       
     def _detect_url(self, quote):
-     """
-     right now this is strictly for tsdbot's printout functionality
-     follows this format:
-     http://irc.teamschoolyd.org/printouts/8xnK5DmfMz.jpg
-     """
-     try:
-       url = re.search("(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))", quote).group("url")
-     except AttributeError: # we didn't find anything
-       return quote
+        """
+        right now this is strictly for tsdbot's printout functionality
+        follows this format:
+        http://irc.teamschoolyd.org/printouts/8xnK5DmfMz.jpg
+        """
+        try:
+            url = re.search("(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))", quote).group("url")
+        except AttributeError: # we didn't find anything
+            return quote
 
-     repl = self._imgurify(url)
-     new_quote = re.sub('(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))',repl[0]['link'], quote)
-     return new_quote
+        repl = self._imgurify(url)
+         new_quote = re.sub('(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))',repl[0]['link'], quote)
+        return new_quote
 
 
     def add_buffer(self, event=None, debug=False): 
@@ -163,7 +163,7 @@ class QDB:
             #no matching verbs found. just ignore the line
             return ''
 
-    def get_qdb_submission(self, channel=None, start_msg='', end_msg=''):
+    def get_qdb_submission(self, channel=None, start_msg='', end_msg='', strict=False):
         """Given two strings, start_msg and end_msg, this function will assemble a submission for the QDB.
         start_msg is a substring to search for and identify a starting line. end_msg similarly is used
         to search for the last desired line in the submission. This function returns a string ready
@@ -185,10 +185,15 @@ class QDB:
         #search for a matching start and end string and get the buffer index for the start and end message
         start_index = -1
         end_index = -1
-        #finds oldest matching string for beginning line
+        """Finds matching string for beginning line. Buffer is traversed in reverse-chronological order
+        .qdb -> strict = False -> earliest occurence
+        .qdbs -> strict = True -> latest occurence
+        """
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
             if start_msg.encode('utf-8','ignore').lower() in line.encode('utf-8','ignore').lower():
                 start_index = index
+                if strict:
+                    break
         #finds newest matching string for ending line
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
             if end_msg.lower() in line.lower():
@@ -306,15 +311,22 @@ class QDB:
             except IndexError:
                 self.say(event.user, "Not enough parameters provided for deletion.")
             return
-        #we see if we're going to generate a qdb submission, or just add the line to the buffer
+        """
+        See if we're going to generate a qdb submission, or just add the line to the buffer.
+        .qdb is the standard, generous implementation selected after hours of testing and ideal for a significant number of situations where lines are repeated. Use specific search strings. the start_index of the submission will be the EARLIEST occurrence of the substring in the buffer.
+        .qdbs is the strict implementation. The start_index will be the LATEST occurrence of the substring.
+        """
+
         if event.msg.startswith(".qdb "):
+            #determine if using strict mode
+            strict_mode = event.msg.startwith(".qdbs")
             #split the msg with '.qdb ' stripped off beginning and divide into 1 or 2 search strings
             string_token = event.msg[5:].split('|', 1)
             start_msg = string_token[0].rstrip()
             #see if we only have a one line submission
             if len(string_token) == 1:
                 #s is the string to submit
-                s = self.get_qdb_submission(event.channel, start_msg)
+                s = self.get_qdb_submission(event.channel, start_msg, strict=strict_mode)
                 recent = self.recently_submitted(s)
                 if recent > 0:
                     q_url = "http://qdb.zero9f9.com/quote.php?id=" + str(recent)
@@ -328,7 +340,7 @@ class QDB:
                 return
             #We should only get here if there are two items in string_token
             end_msg = string_token[1].lstrip()
-            s = self.get_qdb_submission(event.channel, start_msg, end_msg)
+            s = self.get_qdb_submission(event.channel, start_msg, end_msg, strict_mode)
             recent = self.recently_submitted(s)
             if recent > 0:
                 q_url = "http://qdb.zero9f9.com/quote.php?id=" + str(recent)
