@@ -54,9 +54,7 @@ class QDB:
             except requests.ConnectionError, e:
                 self.bot.debug_print("ConnectionError: ")
                 self.bot.debug_print(str(e))
-        
-
-     return replacement_values
+        return replacement_values
       
     def _detect_url(self, quote):
         """
