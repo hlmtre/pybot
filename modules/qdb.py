@@ -315,16 +315,16 @@ class QDB:
         .qdbs is the strict implementation. The start_index will be the LATEST occurrence of the substring.
         """
 
-        if event.msg.startswith(".qdb "):
+        if event.msg.startswith(".qdb ") or event.msg.startswith(".qdbs "):
             #determine if using strict mode
             strict_mode = event.msg.startwith(".qdbs")
             #split the msg with '.qdb ' stripped off beginning and divide into 1 or 2 search strings
-            string_token = event.msg[5:].split('|', 1)
+            string_token = event.msg.split(None,1)[1].split('|', 1)
             start_msg = string_token[0].rstrip()
             #see if we only have a one line submission
             if len(string_token) == 1:
                 #s is the string to submit
-                s = self.get_qdb_submission(event.channel, start_msg, strict=strict_mode)
+                s = self.get_qdb_submission(event.channel, start_msg)
                 recent = self.recently_submitted(s)
                 if recent > 0:
                     q_url = "http://qdb.zero9f9.com/quote.php?id=" + str(recent)
