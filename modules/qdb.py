@@ -188,13 +188,17 @@ class QDB:
         .qdbs -> strict = True -> latest occurence
         """
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
+            #print "evaluating line for beginning: {}".format(line)
             if start_msg.encode('utf-8','ignore').lower() in line.encode('utf-8','ignore').lower():
+                #print "found match, start_index={}".format(index)
                 start_index = index
                 if strict:
                     break
         #finds newest matching string for ending line
         for index, line in enumerate(self.bot.mem_store['qdb'][channel]):
+            #print "evaluating line for end: {}".format(line)
             if end_msg.lower() in line.lower():
+                #print "found match, end_index={}".format(index)
                 end_index = index
                 break
         #check to see if index values are positive. if not, string was not found and we're done
@@ -316,10 +320,17 @@ class QDB:
         """
 
         if event.msg.startswith(".qdb ") or event.msg.startswith(".qdbs "):
+            #split the msg with '.qdb[s] ' stripped off beginning and divide into 1 or 2 search strings
+            #e.g. ".qdb string1|string2" -> [".qdb", "string1|string2"] 
+            cmd_parts = event.msg.split(None,1)
+            if len(cmd_parts) < 2:
+                #do something here to handle '.qdb[s]'
+                return
             #determine if using strict mode
-            strict_mode = event.msg.startwith(".qdbs")
-            #split the msg with '.qdb ' stripped off beginning and divide into 1 or 2 search strings
-            string_token = event.msg.split(None,1)[1].split('|', 1)
+            strict_mode = cmd_parts[0] == ".qdbs"
+            #split the search parameter(s)
+            #e.g. "string1|string2" -> ["string1", "string2"]
+            string_token = cmd_parts[1].split('|', 1)
             start_msg = string_token[0].rstrip()
             #see if we only have a one line submission
             if len(string_token) == 1:
