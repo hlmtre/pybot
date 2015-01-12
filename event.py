@@ -155,7 +155,7 @@ class Event:
         self.verb = v
         break
     # channel is unset if it does not begin with #
-    if self.verb == "PRIVMSG" and len(self.channel):
+    if self.verb == "PRIVMSG" and not len(self.channel):
       self.is_pm = True
     for s in self.subscribers:
       try:
