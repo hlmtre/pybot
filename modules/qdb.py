@@ -68,14 +68,17 @@ class QDB:
         http://irc.teamschoolyd.org/printouts/8xnK5DmfMz.jpg
         """
         try:
-            url = re.search("(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))", quote).group("url")
+            url = re.search("(?P<url>http://irc\.teamschoolyd\.org/printouts/.+\.(jpg|png))", quote).group("url")
         except AttributeError: # we didn't find anything
             return quote
 
         repl = self._imgurify(url)
-        new_quote = re.sub('(?P<url>http:\/\/irc\.teamschoolyd\.org\/printouts\/.+\.(jpg|png))',repl[0]['link'], quote)
+        new_quote = re.sub('(?P<url>http://irc\.teamschoolyd\.org/printouts/.+\.(jpg|png))',repl[0]['link'], quote)
         return new_quote
-
+    
+    def strip_formatting(self, msg):
+        """Uses regex to replace any special formatting in IRC (bold, colors) with nothing"""
+        return re.sub('([\x02\x1D\x1F\x16\x0F]|\x03([0-9]{2})?)', '', msg)
 
     def add_buffer(self, event=None, debug=False): 
         """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
@@ -144,7 +147,7 @@ class QDB:
                 #strip out the word ACTION from the msg
                 return ' * %s %s\n' % (event.user, event.msg[7:])
             else:
-                return '<%s> %s\n' % (event.user, event.msg)
+                return '<%s> %s\n' % (event.user, self.strip_formatting(event.msg))
         elif event.verb == "JOIN":
             return ' --> %s has joined channel %s\n' % (event.user, event.channel)
         elif event.verb == "PART":
