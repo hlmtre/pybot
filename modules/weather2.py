@@ -10,7 +10,7 @@ class Weather2(BaseModule):
 
     def post_init(self):
         weather2 = Event('__.weather2__')
-        weather2.define(msg_definition='^\.weather2')
+        weather2.define(msg_definition='^\.weather')
         weather2.subscribe(self)
         self.bot.register_event(weather2, self)
         self.api_key = "1fe31b3b4cfdab66"
@@ -21,27 +21,32 @@ class Weather2(BaseModule):
         appropriate API call"""
         #note for future: if wanted, add further detection of conditions or forecast searching
         query = None
-        zipcode = re.match('[0-9]{5}', location)
-        if zipcode:
-            #create zipcode based search query
-            query = '/q/'+zipcode
-        else:
-            #create autocomplete search
-            q = requests.get('http://autocomplete.wunderground.com/aq', params={'query':location})
-            try:
-                q.raise_for_status()
-            except request.exceptions.HTTPError:
-                self.say(channel, "Encountered an error contacting the WUnderground API")
-                return None
-            results = q.json()
-            try:
-                #attempt to grab the 'l' field from the first result
-                #assuming it exists, this field will be what we use to search the conditions api
-                query = results['RESULTS'][0]['l']
-            except (IndexError, KeyError):
-                #in case there were no results, let channel know
-                self.say(channel, "No results found")
-                return None
+        try:
+          # test if is a zipcode or a single city name
+          a = float(location.split()[0])
+          if a and len(location.split()[0]) < 5:
+            self.say(channel,"valid zipcode required, numbnuts")
+            return None
+          zipcode = re.match('[0-9]{5}', location)
+          query = '/q/'+zipcode.string
+        except ValueError: # it's a city name (or broken encoding on numbers or something)
+          #create autocomplete search
+          q = requests.get('http://autocomplete.wunderground.com/aq', params={'query':location})
+          try:
+              q.raise_for_status()
+          except request.exceptions.HTTPError:
+              self.say(channel, "Encountered an error contacting the WUnderground API")
+              return None
+          results = q.json()
+          try:
+              #attempt to grab the 'l' field from the first result
+              #assuming it exists, this field will be what we use to search the conditions api
+              query = results['RESULTS'][0]['l']
+          except (IndexError, KeyError):
+              #in case there were no results, let channel know
+              self.say(channel, "No results found")
+              return None
+
         if query:
             #return the full URL of the query we want to make
             return 'http://api.wunderground.com/api/'+self.api_key+'/conditions'+query+'.json'
