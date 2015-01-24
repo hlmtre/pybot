@@ -42,10 +42,13 @@ class Nicklist(BaseModule):
     if event.message_id == 353:
       self.update_nicklist(event)
 
+    if event.msg.startswith(".nicklist"):
+      self.say(event.channel, str(self.bot.mem_store['nicklist'][event.channel]))
+
     if event._type == "__.nicklisting_other_join__":
-      if len(event.channel):
-        self.bot.send("NAMES " + event.channel + '\n')
-        # calling "NAMES" adds them to the channel listing
+      channel = event.msg.split(":")[0]
+      self.bot.send("NAMES " + channel + '\n')
+      # calling "NAMES" adds them to the channel listing
 
     if event._type == "__.nicklisting_part__":
       try:
