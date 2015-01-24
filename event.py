@@ -30,6 +30,7 @@ class Event:
     self.line = ""
     self.msg = ""
     self.verb = ""
+    self.mode = ""
     self.is_pm = False
     self.message_id = -1
     
@@ -42,7 +43,7 @@ class Event:
     """
     self.subscribers.append(e)
 
-  def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None):
+  def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None, mode=None):
     """
     Define ourself by general line (definition), msg_definition (what someone says in a channel or PM), user_definition (the user who said the thing), or message_id (like 376 for MOTD or 422 for no MOTD)
     Currently, an event is defined by only one type of definition. If one were to remove the returns after each self. set, an event could be defined and triggered by any of several definitions.
@@ -55,16 +56,17 @@ class Event:
     """
     if definition is not None:
       self.definition = definition
-      return
     if msg_definition is not None:
       self.msg_definition = msg_definition
-      return
     if user_definition is not None:
       self.user_definition = user_definition
-      return
     if message_id is not None:
       self.message_id = message_id
-      return
+    if mode is not None:
+      self.mode = mode
+
+    return
+
 
   def matches(self, line):
     """
@@ -84,6 +86,15 @@ class Event:
       temp = line.split(":")[1].split(" ")[1]
     except IndexError:
       pass
+
+    if len(self.mode):
+      try:
+        split_line = line.split()
+        temp_verb = split_line[1] # first nick, then verb
+        if self.mode == temp_verb.strip():
+          return True
+      except IndexError:
+        pass
 
     try:
       message_id = int(temp)
@@ -151,7 +162,7 @@ class Event:
         self.channel = e
         break
     for v in l:
-      if v in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE", "PING", "PONG", "MODE"]:
+      if v.strip() in ["JOIN","PART","QUIT","NICK","KICK","PRIVMSG","TOPIC", "NOTICE", "PING", "PONG", "MODE"]:
         self.verb = v
         break
     # channel is unset if it does not begin with #
