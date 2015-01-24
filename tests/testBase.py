@@ -16,7 +16,6 @@ class TestBase():
   def testBotSocket(self):
     import bot
     import confman
-    from subprocess import call
     b = bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com", True)
     b.worker(mock=True)
     assert b.s is not None
@@ -30,3 +29,10 @@ class TestBase():
     e.define(msg_definition="^test")
     assert e.msg_definition == "^test"
     assert e.matches(":hlmtre!~hlmtre@bxr.bxr.bxr PRIVMSG #bots :test") == True
+
+  def testLoad(self):
+    import bot
+    import confman
+    b = bot.Bot(confman.ConfManager("pybotrc"), "zero9f9.com", True)
+    b.load_modules()
+    assert len(b.loaded_modules) > 0
