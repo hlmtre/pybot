@@ -298,7 +298,11 @@ class Bot(threading.Thread):
         self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + " " + message.encode('utf-8', 'ignore'))
 
       self.s.send(message.encode('utf-8', 'ignore'))
-      target = message.split()[1]
+      try:
+        target = message.split()[1]
+      except IndexError:
+        self.debug_print("Programmatic error: ")
+        self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + ": " + " " + message.encode('utf-8', 'ignore'))
       if target.startswith("#"):
         self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
 

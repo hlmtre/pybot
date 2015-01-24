@@ -4,6 +4,10 @@ try:
   from basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
+
+"""
+  Utility module for tracking the users in a channel. Tracks usermodes as well.
+"""
 class Nicklist(BaseModule):
   def post_init(self):
     nicklisting_self_join = Event("__.nicklisting_self_join__")
@@ -36,26 +40,41 @@ class Nicklist(BaseModule):
 
   def handle(self, event):
     if event.message_id == 353:
-      self.bot.mem_store['nicklist'][event.channel] = event.line.split(":")[2].split()
+      self.update_nicklist(event)
     
-    if event.msg.startswith(".nicklist"):
-      print self.bot.mem_store['nicklist'][event.channel]
+#    if event.msg.startswith(".nicklist"):
+#        self.bot.send("NAMES " + event.channel + '\n')
+#        self.say(event.channel, str(self.bot.mem_store['nicklist'][event.channel]))
 
     if event._type == "__.nicklisting_other_join__":
-      try:
-        self.bot.mem_store['nicklist'][event.channel].append(strip_nick(event.user))
-      except KeyError:
-        self.bot.mem_store['nicklist'][event.channel] = list()
+      print "someone joined"
+      print event.user
+      if len(event.channel):
+        self.bot.send("NAMES " + event.channel + '\n')
+        # calling "NAMES" adds them to the channel listing
 
     if event._type == "__.nicklisting_part__":
+      print "someone parted"
+      print event.user
       try:
-        self.bot.mem_store['nicklist'][event.channel].remove(strip_nick(event.user))
+        self.remove_nick(event.user, event.channel)
+        #self.bot.mem_store['nicklist'][event.channel].remove(event.user)
       except ValueError:
         pass
 
     if event._type == "__.nicklisting_quit__":
+      print "someone quit"
       try:
         for name, chan in self.bot.mem_store['nicklist'].iteritems():
-          chan.remove(strip_nick(event.user))
+          self.remove_nick(event.user, chan)
       except ValueError:
         pass
+
+  def update_nicklist(self, event):
+    self.bot.mem_store['nicklist'][event.channel] = event.line.split(":")[2].split()
+ 
+# nickname is passed in from the event, and lacks usermode.
+  def remove_nick(self, nickname, channel):
+    for nick in self.bot.mem_store['nicklist'][channel]:
+      if nickname == strip_nick(nick):
+        self.bot.mem_store['nicklist'][channel].remove(nickname)
