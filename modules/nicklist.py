@@ -41,29 +41,19 @@ class Nicklist(BaseModule):
   def handle(self, event):
     if event.message_id == 353:
       self.update_nicklist(event)
-    
-#    if event.msg.startswith(".nicklist"):
-#        self.bot.send("NAMES " + event.channel + '\n')
-#        self.say(event.channel, str(self.bot.mem_store['nicklist'][event.channel]))
 
     if event._type == "__.nicklisting_other_join__":
-      print "someone joined"
-      print event.user
       if len(event.channel):
         self.bot.send("NAMES " + event.channel + '\n')
         # calling "NAMES" adds them to the channel listing
 
     if event._type == "__.nicklisting_part__":
-      print "someone parted"
-      print event.user
       try:
         self.remove_nick(event.user, event.channel)
-        #self.bot.mem_store['nicklist'][event.channel].remove(event.user)
       except ValueError:
         pass
 
     if event._type == "__.nicklisting_quit__":
-      print "someone quit"
       try:
         for name, chan in self.bot.mem_store['nicklist'].iteritems():
           self.remove_nick(event.user, chan)
