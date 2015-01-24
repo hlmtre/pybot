@@ -84,6 +84,7 @@ class BotBrain:
     self.say(channel, str(c) + "* C")
 
   def _uptime(self, channel):
+    print timedelta(seconds=time.time() - self.starttime)
     self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
   def _speak(self, user, target, message):
