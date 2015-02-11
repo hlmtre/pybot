@@ -65,15 +65,15 @@ class QDB:
         """
         right now this is strictly for tsdbot's printout functionality
         follows this format:
-        http://irc.teamschoolyd.org/printouts/8xnK5DmfMz.jpg
+        http://irc.teamschoolyd.org/printouts/8xnK5DmfMz
         """
         try:
-            url = re.search("(?P<url>http://irc\.teamschoolyd\.org/printouts/.+\.(jpg|png))", quote).group("url")
+            url = re.search("(?P<url>http://irc\.teamschoolyd\.org/printouts/\w+)", quote).group("url")
         except AttributeError: # we didn't find anything
             return quote
 
         repl = self._imgurify(url)
-        new_quote = re.sub('(?P<url>http://irc\.teamschoolyd\.org/printouts/.+\.(jpg|png))',repl[0]['link'], quote)
+        new_quote = re.sub('(?P<url>http://irc\.teamschoolyd\.org/printouts/\w+)',repl[0]['link'], quote)
         return new_quote
     
     def strip_formatting(self, msg):
