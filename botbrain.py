@@ -85,7 +85,7 @@ class BotBrain:
 
   def _uptime(self, channel):
     print timedelta(seconds=time.time() - self.starttime)
-    self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.starttime))[:7] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
+    self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.starttime)).split(".")[0] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
   def _speak(self, user, target, message):
     if target.startswith("#"):
@@ -123,7 +123,9 @@ class BotBrain:
   
   def respond(self, usr, channel, message):
 # this bit is not a command
-    if (".png" in message or ".gif" in message or ".jpg" in message or ".jpeg" in message) and ("http:" in message or "https:" in message) or ("imgur.com" in message and "gallery" in message):
+# TODO (pull this out into a module)
+    if any(k in message for k in (".png",".gif",".jpg",".jpeg", ".gifv")) and ("http:" in message or "https:" in message) or ("imgur.com" in message and "gallery" in message):
+     print "found gifv (or other image)"
      url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
      if url:
        self._insertImg(usr, url, channel)
