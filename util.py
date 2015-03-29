@@ -1,4 +1,6 @@
 import re
+import os
+import sys
 class bcolors:
   """
   Allows for prettyprinting to the console for debugging.
@@ -12,6 +14,40 @@ class bcolors:
   YELLOW = '\033[33m'
   FAIL = '\033[91m'
   ENDC = '\033[0m'
+
+def set_exit_handler(func):
+  import signal
+  signal.signal(signal.SIGTERM, func)
+
+def on_exit(sig, frame):
+  print "caught '%s'" % sig
+  rmPid()
+  global botslist
+  for b in botslist:
+    b.kill_received = True
+  os.killpg(0,sig)
+  sys.exit(0)
+
+def writePid(pid):
+  """
+    Writes out a pidfile to /tmp/pybot/run. Does not touch /tmp/pybot; you can use this for other things that are temporary but needed.
+  """
+  nick = "pybot" # perhaps TODO? do we want a pidfile always named pybot.pid, or $YOUR_CHOSEN_NICK.pid?
+  path = "/tmp/" + nick + "/run/"
+  if not os.path.exists(path):
+    os.makedirs(path)
+  #if os.path.isdir(path):
+  #  if os.path.exists(path): # pidfile already exists, simply (truncate and) update its contents
+  pidfile = open(path + nick + ".pid", "w")
+  pidfile.write(pid)
+
+def rmPid():
+  nick = "pybot"
+  try:
+    os.remove("/tmp/" + nick + "/run/" + nick + ".pid")    
+  except OSError:
+    print "WARNING: could not remove " + nick + ".pid. This may or may not be startling."
+    return
 
 def strip_nick(nick):
   """

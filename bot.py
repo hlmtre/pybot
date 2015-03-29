@@ -31,7 +31,9 @@ class Bot(threading.Thread):
   """
   def __init__(self, conf=None, network=None, d=None):
     threading.Thread.__init__(self)
+    util.set_exit_handler(util.on_exit)
 
+    self.kill_received = False
     self.DEBUG = d
     self.brain = None
     self.network = network
@@ -309,6 +311,7 @@ class Bot(threading.Thread):
     self.send('PONG ' + response + '\n')
 
   def processline(self, line):
+    print self.kill_received
     """
     Grab newline-delineated lines sent to us, and determine what to do with them. 
     This function handles our initial low-level IRC stuff, as well; if we haven't joined, it waits for the MOTD message (or message indicating there isn't one) and then issues our own JOIN calls.
@@ -437,7 +440,7 @@ class Bot(threading.Thread):
     if mock:
       return
     # infinite loop to keep parsing lines
-    while True:
+    while not self.kill_received:
       try:
         timeout += 1
         # if we haven't received anything for 120 seconds
@@ -449,6 +452,7 @@ class Bot(threading.Thread):
 # so that we rejoin all our channels upon reconnecting to the server
           self.JOINED = False
           self.CONNECTED = False
+#         did you mean *recursion*?
           self.worker()
 
         time.sleep(1)
@@ -498,25 +502,29 @@ class Bot(threading.Thread):
     Args:
     line: text.
     """
-    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
+    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip() 
+#   prints stripped of newlines and whitespace on either side
 
     
   def run(self):
     """
     For implementing the parent threading.Thread class. Allows the thread the be initialized with our code.
     """
-    self.worker()
+    while not self.kill_received:
+      self.worker()
 
   def say(self, channel, thing):
     """
     Speak, damn you!
     """
     self.brain.say(channel, thing)
+
 # end class Bot
               
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
+
   import bot
   DEBUG = False
   for i in sys.argv:
@@ -537,6 +545,7 @@ if __name__ == "__main__":
       else: CONF = "~/.pybotrc"
 
       cm = confman.ConfManager(CONF)
+      util.writePid(str(os.getpid()))
       net_list = cm.getNetworks()
       for c in cm.getNetworks():
         b = bot.Bot(cm, c, DEBUG)
@@ -544,6 +553,7 @@ if __name__ == "__main__":
 
     elif pid > 0:
       sys.exit(0)
+
   else: # don't background; either we're in debug (foreground) mode, or on windows TODO
     if os.name == 'nt':
       print 'in debug mode; backgrounding currently unsupported on windows.'
@@ -562,11 +572,11 @@ if __name__ == "__main__":
     net_list = cm.getNetworks()
     for c in cm.getNetworks():
       b = bot.Bot(cm, c, DEBUG)
-      b.daemon = True
+#      b.setDaemon(True)
       b.start()
       botslist.append(b)
     try:
-      while True:
+      while 1:
         time.sleep(5)
     except (KeyboardInterrupt, SystemExit):
       for b in botslist:
