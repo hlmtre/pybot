@@ -22,9 +22,6 @@ def set_exit_handler(func):
 def on_exit(sig, frame):
   print "caught '%s'" % sig
   rmPid()
-  global botslist
-  for b in botslist:
-    b.kill_received = True
   os.killpg(0,sig)
   sys.exit(0)
 

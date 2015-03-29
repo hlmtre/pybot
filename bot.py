@@ -31,9 +31,7 @@ class Bot(threading.Thread):
   """
   def __init__(self, conf=None, network=None, d=None):
     threading.Thread.__init__(self)
-    util.set_exit_handler(util.on_exit)
 
-    self.kill_received = False
     self.DEBUG = d
     self.brain = None
     self.network = network
@@ -311,7 +309,6 @@ class Bot(threading.Thread):
     self.send('PONG ' + response + '\n')
 
   def processline(self, line):
-    print self.kill_received
     """
     Grab newline-delineated lines sent to us, and determine what to do with them. 
     This function handles our initial low-level IRC stuff, as well; if we haven't joined, it waits for the MOTD message (or message indicating there isn't one) and then issues our own JOIN calls.
@@ -440,7 +437,7 @@ class Bot(threading.Thread):
     if mock:
       return
     # infinite loop to keep parsing lines
-    while not self.kill_received:
+    while 1:
       try:
         timeout += 1
         # if we haven't received anything for 120 seconds
@@ -510,8 +507,7 @@ class Bot(threading.Thread):
     """
     For implementing the parent threading.Thread class. Allows the thread the be initialized with our code.
     """
-    while not self.kill_received:
-      self.worker()
+    self.worker()
 
   def say(self, channel, thing):
     """
@@ -534,6 +530,7 @@ if __name__ == "__main__":
 # duuude this is so old.
   botslist = list()
   if not DEBUG and hasattr(os, 'fork'):
+    util.set_exit_handler(util.on_exit)
     pid = os.fork()
     if pid == 0: # child
       if os.name == "posix":
