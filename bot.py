@@ -294,7 +294,7 @@ class Bot(threading.Thread):
     else:
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "DEBUGGING OUTPUT", self.NICK)
-        self.logger.write(Logger.INFO, str(datetime.datetime.now()) + ": " + self.getName() + " " + message.encode('utf-8', 'ignore'), self.NICK)
+        self.logger.write(Logger.INFO, self.getName() + " " + message.encode('utf-8', 'ignore'), self.NICK)
         self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + " " + message.encode('utf-8', 'ignore'))
 
       self.s.send(message.encode('utf-8', 'ignore'))
