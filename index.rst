@@ -18,7 +18,7 @@ i am available at zero9f9(dot)com, usual IRC port, in #bots, if you have questio
 
 pls
 
-.. Source: http://bits.zero9f9.com/pybot/
+.. Source: http://bitbucket.org/hlmtre/pybot/
 
 Contents:
 

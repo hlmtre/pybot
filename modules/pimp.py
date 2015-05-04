@@ -14,4 +14,4 @@ class Pimp:
         event.subscribe(self)
 
   def handle(self, event):
-    self.say(event.channel, "http://bits.zero9f9.com/pybot")
+    self.say(event.channel, "http://bitbucket.org/hlmtre/pybot")

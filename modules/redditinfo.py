@@ -1,9 +1,10 @@
 import requests
+import version
 try:
   import praw
   successful_import = True
 except ImportError:
-  print "WARNING: redditinfo requires praw (https://github.com/praw-dev/praw/)."
+  print "WARNING: redditinfo requires praw (https://github.com/praw-dev/praw/, or pip install praw)."
   successful_import = False
 
 if successful_import is True:
@@ -17,7 +18,7 @@ if successful_import is True:
       self.bot = bot
       self.say = say
 
-      self.user_agent = 'pybot 0.7.1 by /u/hlmtre; http://bits.zero9f9.com/pybot'
+      self.user_agent = 'pybot ' + version.__version__ + ' by /u/hlmtre; http://bitbucket.org/hlmtre/pybot'
 
       self.help = None
 

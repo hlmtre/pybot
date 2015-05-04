@@ -18,11 +18,6 @@ class BotBrain:
   BRAINDEBUG = False
   
   def __init__(self, microphone, bot=None):             
-# get time for uptime start
-    self.starttime = time.time()
-# get time for current length of uptime
-    self.localtime = time.localtime()
-# get handle on output
 
     self.microphone = microphone
     self.bot = bot
@@ -82,10 +77,6 @@ class BotBrain:
     f = float(f_temp)
     c = (f - 32)*(.5555)
     self.say(channel, str(c) + "* C")
-
-  def _uptime(self, channel):
-    print timedelta(seconds=time.time() - self.starttime)
-    self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.starttime)).split(".")[0] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.localtime))
 
   def _speak(self, user, target, message):
     if target.startswith("#"):
