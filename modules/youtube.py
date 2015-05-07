@@ -1,5 +1,6 @@
 import re
 import urllib2
+import json
 from urlparse import urlparse, parse_qsl
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
@@ -24,24 +25,35 @@ class Youtube(BaseModule):
 
     self.bot.mem_store['youtube'] = OrderedDict()
 
+
+    # for the new v3 google api >:(
+    self.api_key = "AIzaSyDwzB3Sf_E-7VyKZYWXP9DjjlnPBs5kSfc"
+    self.api_url = "https://www.googleapis.com/youtube/v3/videos?id="
+    #self.api_url = "https://www.googleapis.com/youtube/v3/videos?id=2k_9mXpNdgU&key=&part=snippet"
+
   def print_video_title(self, event, url, video_tag):
     if event.user == self.bot.conf.getNick(self.bot.network): #ignore himself
       return
-    if event.msg.startswith("Youtube:"):
+    if event.msg.startswith("YouTube:"):
       return
     try:
-      response = urllib2.urlopen("https://gdata.youtube.com/feeds/api/videos/"+video_tag+"?v=2").read()
+      response = urllib2.urlopen(self.api_url+video_tag+"&key="+self.api_key+"&part=contentDetails,snippet").read()
     except urllib2.HTTPError:
       return
-    xml_response = parseString(response)
-    duration = xml_response.getElementsByTagName('yt:duration')
-    ulength = duration[0].getAttribute("seconds")
-    alength = ulength.encode('ascii', 'ignore')
-    length = str(timedelta(seconds=int(alength)))
-    titletag = xml_response.getElementsByTagName('title')[0]
-    video_title = titletag.childNodes[0].nodeValue
-    self.say(event.channel, "Youtube: " + video_title + " ("+length+")")
-    self.bot.mem_store['youtube'][video_title] = url
+
+    jsonified = json.loads(response)["items"][0]
+    duration_string = jsonified['contentDetails']['duration']
+    title = jsonified['snippet']['title']
+
+    # duration is returned like so: "PT6M50S". why the fuck that is, i dunno.
+    seconds = duration_string[-3:-1]
+    tmp = duration_string[2:]
+    tmp = tmp[:-3]
+    #print duration_string
+    sec = seconds.replace("S","")
+    m = tmp.replace("M","")
+    self.say(event.channel, "YouTube: \"" + title + "\" (" + m + ":" + sec + ")")
+    return 
 
   def handle(self, event):
 #   prevent bot from printing youtube information if a youtube link is in the channel topic (or elsewhere that isn't a message to a channel)
