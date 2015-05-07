@@ -5,7 +5,14 @@ from urlparse import urlparse, parse_qsl
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
 from collections import OrderedDict
+import time
+import logger
 from event import Event
+
+try:
+  import isodate
+except ImportError:
+  print "WARNING: youtube module now requires isodate (thanks, ISO8601)"
 
 try:
   from modules.basemodule import BaseModule
@@ -41,18 +48,23 @@ class Youtube(BaseModule):
     except urllib2.HTTPError:
       return
 
-    jsonified = json.loads(response)["items"][0]
+    try:
+      jsonified = json.loads(response)["items"][0]
+    except IndexError, e:
+      self.bot.logger.write(Logger.WARNING, "IndexError pulling youtube videos. Zero results for: ")
+      self.bot.logger.write(Logger.WARNING, url)
+      return
+
     duration_string = jsonified['contentDetails']['duration']
     title = jsonified['snippet']['title']
 
-    # duration is returned like so: "PT6M50S". why the fuck that is, i dunno.
-    seconds = duration_string[-3:-1]
-    tmp = duration_string[2:]
-    tmp = tmp[:-3]
-    #print duration_string
-    sec = seconds.replace("S","")
-    m = tmp.replace("M","")
-    self.say(event.channel, "YouTube: \"" + title + "\" (" + m + ":" + sec + ")")
+    if isodate:
+      duration = isodate.parse_duration(duration_string)
+    else:
+      duration = dict()
+      duration['seconds'] = 00
+
+    self.say(event.channel, "YouTube: \"" + title + "\" (" + time.strftime("%H:%M:%S", time.gmtime(duration.seconds)) + ")")
     return 
 
   def handle(self, event):
@@ -70,6 +82,8 @@ class Youtube(BaseModule):
       url = re.search("youtu\.be[\S]+", event.line).group(0)
       if url: 
         video_tag = url.split("/")[-1]
+        if "?" in video_tag:
+          video_tag = video_tag.split("?")[0]
       else:
         return
     if url and video_tag.__len__() > 1:
