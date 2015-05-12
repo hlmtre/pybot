@@ -51,8 +51,8 @@ class Youtube(BaseModule):
     try:
       jsonified = json.loads(response)["items"][0]
     except IndexError, e:
-      self.bot.logger.write(Logger.WARNING, "IndexError pulling youtube videos. Zero results for: ")
-      self.bot.logger.write(Logger.WARNING, url)
+      self.bot.logger.write(logger.Logger.WARNING, "IndexError pulling youtube videos. Zero results for: ")
+      self.bot.logger.write(logger.Logger.WARNING, url)
       return
 
     duration_string = jsonified['contentDetails']['duration']
