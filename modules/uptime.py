@@ -19,9 +19,8 @@ class Uptime(BaseModule):
 
     if 'uptime' not in self.bot.mem_store:
       self.bot.mem_store['uptime'] = dict()
-
-    self.bot.mem_store['uptime']['localtime'] = localtime
-    self.bot.mem_store['uptime']['starttime'] = starttime 
+      self.bot.mem_store['uptime']['localtime'] = localtime
+      self.bot.mem_store['uptime']['starttime'] = starttime 
     
   def handle(self, event):
     self._uptime(event.channel)
