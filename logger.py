@@ -36,8 +36,9 @@ class Logger:
         os.makedirs(os.path.expanduser(l + '/logs'))
       f = open(os.path.expanduser(l + '/logs/' + n + '-'+str(time.strftime("%m-%d-%Y")))+'.log', "a")
       f.write(str(datetime.datetime.now())+ " (" + inspect.stack()[1][3] + ") " + str(Logger.levels[level]) + ": " + line + '\n')
-    except IOError:
-      pass
+    except IOError, e:
+      print "IO Error!"
+      print e
     except OSError:
       print "probably permission denied."
       pass
