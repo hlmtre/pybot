@@ -14,7 +14,7 @@ class KanboModule(BaseModule):
     kanbo.subscribe(self)
 
     self.bot.register_event(kanbo, self)
-    self.messages = [u'( ͡° ͜ʖ ͡°)', 'i am kanbo, watch me disobey simple and direct instruction']
+    self.messages = [u'( ͡° ͜ʖ ͡°)', u'( ͡0 ͜ʖ ͡0)', u'|╲/( ͡° ͡° ͜ʖ ͡° ͡°)/\╱\\']
     
   def handle(self, event):
     self.say(event.channel, random.choice(self.messages))

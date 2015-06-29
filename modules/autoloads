@@ -1,7 +1,13 @@
 { 
   "irc.teamschoolyd.org": { 
     "exclude": [
-      "shortener"
+      "shortener",
+      "redditinfo"
       ]
-  }
+  },
+  "prod-srv": {
+    "exclude": [
+      "redditinfo"
+      ]
+    }
 }

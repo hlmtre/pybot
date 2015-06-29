@@ -21,7 +21,7 @@ class Event:
     _type: string. like "__youtube__" or "__weather__". Underscores are a convention.
     """
     self._type = _type
-    self.subscribers = list() # this is a list of subscribers to notify
+    self.subscribers = [] # this is a list of subscribers to notify
     self.user = ""
     self.definition = ""
     self.msg_definition = ""
@@ -136,6 +136,10 @@ class Event:
     
     """
     self.line = line
+    if line == "null":
+      for s in self.subscribers:
+        s.handle(self)
+      return
     self.user = line.split(":")[1].rsplit("!")[0] # nick is first thing on line
     if "JOIN" in line or "QUIT" in line:
       self.user = line.split("!")[0].replace(":","")
