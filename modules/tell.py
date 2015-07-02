@@ -28,7 +28,7 @@ class Tell:
   def handle(self, event):
     if event.msg.startswith(".tell"):
       target = event.msg.split()[1]
-      if target == self.bot.conf.getNick(self.bot.network):
+      if target.lower() == self.bot.conf.getNick(self.bot.network).lower():
         self.say(event.channel, "I can't tell myself; gtfo")
         return
       thing = event.msg.split()[2:] # all the way to the end
