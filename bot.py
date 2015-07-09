@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.8.0
+# v0.8.2
 # works with python 2.6.x and 2.7.x
 #
 
@@ -23,6 +23,8 @@ from event import Event
 import util
 
 DEBUG = False
+global RETRY_COUNTER
+RETRY_COUNTER = 0
 
 class Bot(threading.Thread):
   """
@@ -406,6 +408,14 @@ class Bot(threading.Thread):
           self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect! Retrying... ")
         self.logger.write(Logger.CRITICAL, "Could not connect! Retrying...")
         time.sleep(1)
+
+        print RETRY_COUNTER
+        if RETRY_COUNTER > 10:
+          self.debug_print("Failed to reconnect after 10 tries. Giving up...")
+          sys.exit(1)
+
+        RETRY_COUNTER+=1
+
         self.worker()
 
       time.sleep(1)
@@ -433,6 +443,8 @@ class Bot(threading.Thread):
     
     timeout = 0
 
+#   does not require a definition -- it will be invoked specifically when the bot notices it has been disconnected
+    disconnect_event = Event("__.disconnection__")
 #   if we're only running a test of connecting, and don't want to loop forever
     if mock:
       return
@@ -445,10 +457,18 @@ class Bot(threading.Thread):
         if timeout > time_since:
           if self.DEBUG:
             self.debug_print("Disconnected! Retrying... ")
+          disconnect_event.notifySubscribers("null")
           self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
 # so that we rejoin all our channels upon reconnecting to the server
           self.JOINED = False
           self.CONNECTED = False
+
+          print RETRY_COUNTER
+          if RETRY_COUNTER > 10:
+            self.debug_print("Failed to reconnect after 10 tries. Giving up...")
+            sys.exit(1)
+
+          RETRY_COUNTER+=1
           self.worker()
 
         time.sleep(1)
@@ -466,6 +486,7 @@ class Bot(threading.Thread):
             print e
             if self.DEBUG:
               self.debug_print("Disconnected! Retrying... ")
+            disconnect_event.notifySubscribers("null")
             self.logger.write(Logger.CRITICAL, "Disconnected!", self.NICK)
             self.JOINED = False
             self.CONNECTED = False
@@ -522,6 +543,10 @@ if __name__ == "__main__":
   for i in sys.argv:
     if i == "-d":
       DEBUG = True
+    if i == "-h" or i == "--help":
+      print "usage: ./bot.py [ -d ] <conf file>"
+      print " * -d : debug (don't background)"
+      sys.exit(0)
 
 # duuude this is so old.
   botslist = list()

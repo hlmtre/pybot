@@ -2,25 +2,13 @@
   "__pybot_conf":{
     "db_type": "sqlite"
   },
-  "zero9f9.com": {
+  "localhost": {
     "channels": [
     "#bots" 
     ], 
-    "port":"6667",
+    "port":"7000",
     "nick": "testohai", 
     "ircpass": "password",
-    "owner": "hlmtre",
-    "dbusername": "pybot",
-    "dbpass": "password",
-    "dbname": "pybot"
-  },
-  "network2": {
-    "channels": [
-      "#somechannel"
-     ],
-    "port":"6667",
-    "nick": "othernick", 
-    "ircpass": "otherpass",
     "owner": "hlmtre",
     "dbusername": "pybot",
     "dbpass": "password",

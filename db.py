@@ -125,10 +125,12 @@ class DB:
       user = "nobody"
     try:
       self.cur.execute("""INSERT INTO img (user, url, channel) VALUES (%s, %s, %s)""", (user, url, channel))
-      sys.stderr = stored_stderr
       if not self.dry_run:
         self.con.commit()
     except:
+      self.bot.logger(logger.Logger.WARNING, 'failed to insert ' + url)
+      print "failure"
+      print "Unexpected error:", sys.exc_info()[0]
       if not self.dry_run:
         self.con.rollback()
 

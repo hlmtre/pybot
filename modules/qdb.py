@@ -274,6 +274,9 @@ class QDB:
         try:
             del_status = deletion.json()
             if del_status['success'] == "true":
+              for quote in self.bot.mem_store['qdb']['_recent']: # they're a list of dicts
+                if int(post_id) in quote:
+                  self.bot.mem_store['qdb']['_recent'].remove(quote)
               return "QDB deletion succeeded."
             return "QDB deletion failed."
         except (KeyError, UnicodeDecodeError):
