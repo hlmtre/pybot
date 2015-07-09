@@ -124,7 +124,7 @@ class Replace:
     #Searches from most recent to oldest.
     found_index = -1
     for index, line in enumerate(self.bot.mem_store['replace'][channel]):
-      message = line.decode('utf-8','ignore')
+      message = line
       msg_index = message.find(">")
       message = message[msg_index:]
       #print line

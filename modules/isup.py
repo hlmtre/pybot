@@ -22,7 +22,10 @@ class Isup(BaseModule):
     
   def handle(self, event):
     if len(event.msg.split()) == 2:
-      r = requests.get(self.url + event.msg.split()[1])
+      try:
+        r = requests.get(self.url + event.msg.split()[1])
+      except requests.ConnectionError:
+        self.say("Connection error.")
       # we get back plain HTML. hopefully the phrases don't change.
       up = "It's just you."
       down = "looks down from here"
