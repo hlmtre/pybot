@@ -594,6 +594,8 @@ if __name__ == "__main__":
       while True:
         time.sleep(5)
     except (KeyboardInterrupt, SystemExit):
+      l = Logger()
+      l.write(Logger.INFO, "killed by ctrl+c or term signal")
       for b in botslist:
         b.s.send("QUIT :because I got killed\n")
       print
