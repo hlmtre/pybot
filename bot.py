@@ -554,7 +554,7 @@ if __name__ == "__main__":
       else:
         print "starting bot in the background, pid " + str(os.getpid())
 
-      cm = confman.ConfManager(CONF)
+      cm = confman.ConfManager(config)
       net_list = cm.getNetworks()
       for c in cm.getNetworks():
         b = bot.Bot(cm, c, DEBUG)
