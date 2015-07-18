@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# v0.8.2
+# see version.py for version
 # works with python 2.6.x and 2.7.x
 #
 
@@ -15,6 +15,7 @@ import select
 import traceback
 import threading
 import inspect
+import argparse
 
 import botbrain
 from logger import Logger
@@ -23,8 +24,6 @@ from event import Event
 import util
 
 DEBUG = False
-global RETRY_COUNTER
-RETRY_COUNTER = 0
 
 class Bot(threading.Thread):
   """
@@ -409,13 +408,6 @@ class Bot(threading.Thread):
         self.logger.write(Logger.CRITICAL, "Could not connect! Retrying...")
         time.sleep(1)
 
-        print RETRY_COUNTER
-        if RETRY_COUNTER > 10:
-          self.debug_print("Failed to reconnect after 10 tries. Giving up...")
-          sys.exit(1)
-
-        RETRY_COUNTER+=1
-
         self.worker()
 
       time.sleep(1)
@@ -538,17 +530,21 @@ class Bot(threading.Thread):
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
-  import bot
   DEBUG = False
-  for i in sys.argv:
-    if i == "-d":
-      DEBUG = True
-    if i == "-h" or i == "--help":
-      print "usage: ./bot.py [ -d ] <conf file>"
-      print " * -d : debug (don't background)"
-      sys.exit(0)
+  import bot
 
-# duuude this is so old.
+  parser = argparse.ArgumentParser(description="a python irc bot that does stuff")
+  parser.add_argument('config', nargs='?')
+  parser.add_argument('-d', help='debug (foreground) mode', action='store_true')
+
+  args = parser.parse_args()
+  if args.d:
+    DEBUG = True
+  if args.config:
+    config = args.config
+  else:
+    config = "~/.pybotrc"
+
   botslist = list()
   if not DEBUG and hasattr(os, 'fork'):
     pid = os.fork()
@@ -557,9 +553,6 @@ if __name__ == "__main__":
         print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
       else:
         print "starting bot in the background, pid " + str(os.getpid())
-      if len(sys.argv) > 1:
-        CONF = sys.argv[1]
-      else: CONF = "~/.pybotrc"
 
       cm = confman.ConfManager(CONF)
       net_list = cm.getNetworks()
@@ -574,16 +567,13 @@ if __name__ == "__main__":
       print 'in debug mode; backgrounding currently unsupported on windows.'
     DEBUG = True
     print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
-    if len(sys.argv) > 1 and sys.argv[1] != "-d": # the conf file must be first argument
-      CONF = sys.argv[1]
-      try:
-        f = open(CONF)
-      except IOError:
-        print "Could not open conf file " + sys.argv[1]
-        sys.exit(1)
-    else: CONF = "~/.pybotrc"
+    try:
+      f = open(config)
+    except IOError:
+      print "Could not open conf file " + config 
+      sys.exit(1)
 
-    cm = confman.ConfManager(CONF)
+    cm = confman.ConfManager(config)
     net_list = cm.getNetworks()
     for c in cm.getNetworks():
       b = bot.Bot(cm, c, DEBUG)
