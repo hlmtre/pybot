@@ -47,5 +47,4 @@ class Tell:
           if event.user.lower() == n.obj.lower():
             self.say(event.channel, "Hey " + n.obj + ", " + n.subject + " says \""+ u" ".join(n.message)+"\"")
             # we've said it, now delete it.
-            if n in self.bot.mem_store["tell"]: self.bot.mem_store["tell"].remove(n)
-          
+            self.bot.mem_store["tell"].remove(n)
