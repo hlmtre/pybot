@@ -38,23 +38,24 @@ class meme:
         url = "https://api.imgflip.com/get_memes"
         try:
             top_memes = requests.get(url)
+            self.bot.debug_print("got top memes")
         except ConnectionError, e:
-            print "ConnectionError in get_top_memes(): "
-            print str(e)
+            self.bot.debug_print("ConnectionError in get_top_memes(): ")
+            self.bot.debug_print(str(e))
         #check for HTTP errors
         try:
             top_memes.raise_for_status()
         except requests.exceptions.HTTPError, e:
-            print "HTTPError in get_top_memes(): "
-            print str(e)
+            self.bot.debug_print("HTTPError in get_top_memes(): ")
+            self.bot.debug_print(str(e))
             return
         #return list if successful
         try:
             top_memes_list = top_memes.json()['data']['memes']
             return top_memes_list
         except KeyError, e:
-            print "KeyError in get_top_memes(): "
-            print str(e)
+            self.bot.debug_print("KeyError in get_top_memes(): ")
+            self.bot.debug_print(str(e))
             return
 
     def get_random_meme_id(self):
@@ -62,8 +63,8 @@ class meme:
         try:
             return random.choice(self.top_memes_list)['id']
         except KeyError, e:
-            print "KeyError in get_random_meme_id(): "
-            print str(e)
+            self.bot.debug_print("KeyError in get_random_meme_id(): ")
+            self.bot.debug_print(str(e))
             return
 
     def get_random_line(self, channel):
@@ -81,15 +82,15 @@ class meme:
                 if formatted_line.startswith(".") or line.startswith("<"+self.bot.NICK+">"):
                     line = ""
         except KeyError, e:
-            print "KeyError in get_random_line(): "
-            print str(e)
+            self.bot.debug_print("KeyError in get_random_line(): ")
+            self.bot.debug_print(str(e))
             return
         #format the string for use in the meme and return it
         return formatted_line
 
     def format_string(self, line):
         """Given an appropriate line from the QDB history buffer, strip out <nick>"""
-        print line
+        self.bot.debug_print(line)
         if line.startswith("<"):
             return line.split("> ", 1)[1]
         else:
@@ -104,21 +105,21 @@ class meme:
         try:
             meme = requests.post(url, payload)
         except ConnectionError, e:
-            print "ConnectionError in create_meme(): "
-            print str(e)
+            self.bot.debug_print("ConnectionError in create_meme(): ")
+            self.bot.debug_print(str(e))
             return
         #check for HTTP errors
         try:
             meme.raise_for_status()
         except request.exceptions.HTTPError, e:
-            print "HTTPError in create_meme(): "
-            print str(e)
+            self.bot.debug_print("HTTPError in create_meme(): ")
+            self.bot.debug_print(str(e))
             return
         try:
             return meme.json()['data']['url']
         except KeyError, e:
-            print "KeyError in create_meme(): "
-            print str(e)
+            self.bot.debug_print("KeyError in create_meme(): ")
+            self.bot.debug_print(str(e))
             return
       
     def handle(self, event):
