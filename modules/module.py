@@ -65,10 +65,13 @@ class Module:
       # first unload
       for m in self.bot.events_list:
         for s in m.subscribers:
-          if event.msg.split()[2].lower() == s.__class__.__name__.lower():
-            #self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
-            # the events themselves hold onto the subscribing modules, so just remove that one.
-            m.subscribers.remove(s)
+          try: 
+            if event.msg.split()[2].lower() == s.__class__.__name__.lower():
+              #self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
+              # the events themselves hold onto the subscribing modules, so just remove that one.
+              m.subscribers.remove(s)
+          except IndexError:
+            return
       # then load
       #self.bot.logger.write(Logger.INFO, " loading " + event.msg.split()[2] + "...")
       retval = self.load(event.msg.split()[2])

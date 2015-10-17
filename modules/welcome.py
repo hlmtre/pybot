@@ -9,17 +9,24 @@ class Welcome:
 
     self.response = ['np', 'you\'re welcome', 'no problem']
 
+    nick = self.bot.conf.getNick(self.bot.network)
+
     thanks = Event("__thanks__")
     thankyou = Event("__thankyou__")
-    nick = self.bot.conf.getNick(self.bot.network)
+    ty = Event("__ty__")
+
     thanks.define(msg_definition="^([T|t]hanks) " + nick)
     thankyou.define(msg_definition="^([T|t]hank you) " + nick)
+    ty.define(msg_definition="^ty " + nick)
+
     thanks.subscribe(self)
     thankyou.subscribe(self)
+    ty.subscribe(self)
 
     # register ourself to our new hello event
     self.bot.register_event(thanks, self)
     self.bot.register_event(thankyou, self)
+    self.bot.register_event(ty, self)
 
     self.help = None
 

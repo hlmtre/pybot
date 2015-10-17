@@ -24,6 +24,7 @@ from event import Event
 import util
 
 DEBUG = False
+RETRY_COUNTER = 0
 
 class Bot(threading.Thread):
   """
@@ -455,7 +456,7 @@ class Bot(threading.Thread):
           self.JOINED = False
           self.CONNECTED = False
 
-          print RETRY_COUNTER
+          global RETRY_COUNTER
           if RETRY_COUNTER > 10:
             self.debug_print("Failed to reconnect after 10 tries. Giving up...")
             sys.exit(1)
@@ -568,7 +569,7 @@ if __name__ == "__main__":
     DEBUG = True
     print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
     try:
-      f = open(config)
+      f = open(os.path.expanduser(config))
     except IOError:
       print "Could not open conf file " + config 
       sys.exit(1)
