@@ -38,7 +38,6 @@ class meme:
         url = "https://api.imgflip.com/get_memes"
         try:
             top_memes = requests.get(url)
-            self.bot.debug_print("got top memes")
         except ConnectionError, e:
             self.bot.debug_print("ConnectionError in get_top_memes(): ")
             self.bot.debug_print(str(e))
