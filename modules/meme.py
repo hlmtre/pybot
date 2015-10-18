@@ -188,6 +188,9 @@ class meme:
                     meme_id = self.get_random_meme_id()
                 if len(args) > 1:
                     line_array = self.get_user_lines(event.channel, args[1].strip())
+                    if not line_array:
+                        self.say(event.channel, "That memer hasn't spoken or doesn't exist. Using randoms.")
+                        line_array = self.bot.mem_store['qdb'][event.channel]
                 else:
                     line_array = self.bot.mem_store['qdb'][event.channel]
                 top_line = self.get_line(line_array)
