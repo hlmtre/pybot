@@ -34,7 +34,7 @@ class QDB:
             event.subscribe(self)
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
-        self.MAX_BUFFER_SIZE = 200 
+        self.MAX_BUFFER_SIZE = 500
         self.MAX_HISTORY_SIZE = 10
 
     def _imgurify(self, url):

@@ -129,7 +129,6 @@ class meme:
 
     def format_string(self, line):
         """Given an appropriate line, strip out <nick>"""
-        self.bot.debug_print(line)
         if line.startswith("<"):
             return line.split("> ", 1)[1]
         else:
