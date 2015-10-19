@@ -23,8 +23,8 @@ class meme:
         self.interests = ['__privmsg__']# should be first event in the listing.. so lines being added is a priority
         self.bot = bot
         self.say = say
-        self.imgflip_userid = ""
-        self.imgflip_password = ""
+        self.imgflip_userid = "BoneKin"
+        self.imgflip_password = "Djl07jnfe"
         self.top_memes_list = self.get_top_memes()
         self.cmd = ".meme"
         self.help = ".meme [[meme name] [| nick to use for history]]"
@@ -79,8 +79,8 @@ class meme:
     def compare_description(self, meme_name, user_description):
         """compares two strings. if greater than 67% similarity, returns true"""
         comparison = difflib.SequenceMatcher()
-        comparison.set_seq1(meme_name)
-        comparison.set_seq2(user_description)
+        comparison.set_seq1(meme_name.lower())
+        comparison.set_seq2(user_description.lower())
         if comparison.ratio() >= 0.67:
             return True
         return False
@@ -122,7 +122,7 @@ class meme:
         """Given a specific nick and channel, create a list of all their lines in the buffer"""
         line_list = []
         for line in self.bot.mem_store['qdb'][channel]:
-            if line.startswith("<"+nick+">"):
+            if line.lower().startswith("<"+nick.lower()+">"):
                 line_list.append(line)
         return line_list
 
