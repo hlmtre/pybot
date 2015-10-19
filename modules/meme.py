@@ -161,7 +161,6 @@ class meme:
             return
       
     def handle(self, event):
-        #to begin with, all memes are random. this will change later
         if event.msg.startswith(".meme"):
             #just a random meme please
             if event.msg == ".meme":
