@@ -1,5 +1,6 @@
 import requests 
 import re
+import json
 from event import Event
 try:
     from basemodule import BaseModule
@@ -12,10 +13,37 @@ class Weather2(BaseModule):
         weather2 = Event('__.weather2__')
         weather2.define(msg_definition='^\.weather')
         weather2.subscribe(self)
+
+        forecast = Event('__.forecast__')
+        forecast.define(msg_definition='^\.forecast')
+        forecast.subscribe(self)
+
+        self.bot.register_event(forecast, self)
         self.bot.register_event(weather2, self)
         self.api_key = "1fe31b3b4cfdab66"
     
-    def api_request(self, location, channel):
+    def forecast(self, url, channel):
+      q = requests.get(url)
+      try:
+        q.raise_for_status()
+      except requests.exceptions.HTTPError:
+        self.say(channel, "Encountered an error with the WUnderground API")
+        return None
+      results = q.json()
+      print results
+      # we're only doing two days for now
+      counter = 0
+      phrase = ""
+      for item in results['forecast']['txt_forecast']['forecastday']:
+        if counter > 3:
+          break
+        phrase = phrase + item['title'] + ": " + item['fcttext'] + " "
+        counter += 1
+
+      return phrase[:-1] # super hackish way to remove the trailing comma
+
+
+    def api_request(self, location, channel, command="conditions"):
         """location is a search string after the .weather command. This function
         will determine whether it is a zip code or a named location and return an
         appropriate API call"""
@@ -34,7 +62,7 @@ class Weather2(BaseModule):
           q = requests.get('http://autocomplete.wunderground.com/aq', params={'query':location})
           try:
               q.raise_for_status()
-          except request.exceptions.HTTPError:
+          except requests.exceptions.HTTPError:
               self.say(channel, "Encountered an error contacting the WUnderground API")
               return None
           results = q.json()
@@ -49,7 +77,7 @@ class Weather2(BaseModule):
 
         if query:
             #return the full URL of the query we want to make
-            return 'http://api.wunderground.com/api/'+self.api_key+'/conditions'+query+'.json'
+            return 'http://api.wunderground.com/api/'+self.api_key+'/' + command + query+'.json'
         return None
 
     def get_conditions(self, query, channel):
@@ -79,6 +107,10 @@ class Weather2(BaseModule):
         #split the line beginning with .weather into 2 parts, the command and the search string
         weather_line = event.msg.split(None, 1)
         if len(weather_line) > 1:
+            if event.msg.startswith(".forecast"):
+              self.say(event.channel, "forecast " + weather_line[1] + ": " + self.forecast(self.api_request(weather_line[1], event.channel, "forecast"), event.channel))
+              return
+
             #if we're sure there's actually a search string, then continue
             query = self.api_request(weather_line[1], event.channel)
             if not query:
