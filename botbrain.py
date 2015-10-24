@@ -72,12 +72,12 @@ class BotBrain:
   def _ctof(self, channel, c_temp):
     c = float(c_temp)
     f = (c * 1.8)+32
-    self.say(channel, str(f) + "r° F")
+    self.say(channel, str(f) + u"° F")
 
   def _ftoc(self, channel, f_temp):
     f = float(f_temp)
     c = (f - 32)*(.5555)
-    self.say(channel, str(c) + "° C")
+    self.say(channel, str(c) + u"° C")
 
   def _speak(self, user, target, message):
     if target.startswith("#"):
