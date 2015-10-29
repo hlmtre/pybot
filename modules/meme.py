@@ -1,13 +1,8 @@
 from event import Event
 import random
 import difflib
-
-"""try:
-  import imgurpython
-except ImportError:
-  print "Warning: meme module requires imgurpython."
-  imgurpython = object
-"""
+import time
+import re
 
 try:
   import requests
@@ -30,6 +25,8 @@ class meme:
         self.help = ".meme [[meme name] [| nick to use for history]]"
         self.ignore_list = [self.bot.NICK, 'TSDBot']
         self.ignore_nicks = self.create_ignore_nicks_tuple()
+        self.RATE_LIMIT = 300 #rate limit in seconds
+        self.bot.mem_store['meme'] = {}
 
         for event in events:
           if event._type in self.interests:
@@ -109,7 +106,8 @@ class meme:
                 line = random.choice(array_of_lines)
                 formatted_line = self.format_string(line)
                 #discard any lines with .commands or said by ignored nicks. those aren't any fun
-                if formatted_line.startswith(".") or line.startswith(self.ignore_nicks):
+                #also discard lines that contain a URL
+                if formatted_line.startswith(".") or line.startswith(self.ignore_nicks) or self.contains_url(line):
                     line = ""
         except KeyError, e:
             self.bot.debug_print("KeyError in get_random_line(): ")
@@ -159,43 +157,97 @@ class meme:
             self.bot.debug_print("KeyError in create_meme(): ")
             self.bot.debug_print(str(e))
             return
+
+    def get_last_meme_time(self, nick):
+        """Given a channel name, return the last time .meme was called in that channel, return 0 if never used"""
+        try:
+            return self.bot.mem_store['meme'][nick]
+        except KeyError:
+            self.set_last_meme_time(nick)
+            return 0
+
+    def set_last_meme_time(self, nick):
+        """Upon calling meme, set the last time it was used by that nick"""
+        self.bot.mem_store['meme'][nick] = int(time.time())
+        return
+
+    def contains_url(self, line):
+        """Given a string, returns True if there is a url present"""
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+        if urls:
+            return True
+        return False
+
+    def check_rate(self, nick):
+        """Check to see if the given nick has allowed enough time to pass before calling meme again. Return True and set
+           the new last meme time if true. Warn nick and return False if not."""
+        time_diff = int(time.time()) - self.get_last_meme_time(nick)
+        if time_diff > self.RATE_LIMIT:
+            self.set_last_meme_time(nick)
+            return True
+        else:
+            self.say(nick, "WOOP WOOP! Meme Police! You must wait " + str(self.RATE_LIMIT - time_diff) + " seconds to use .meme again.")
+            return False
       
+    def get_random_flavor(self):
+        """Change up the flavor text when returning memes. It got boring before"""
+        flavors = ["Tip top: ",
+                   "Only the dankest: ",
+                   "It's a trap!: ",
+                   "[10] outta 10: ",
+                   "A mastapeece: ",
+                   "Not sure if want: ",
+                   "*holds up spork*: ",
+                   "Da Fuq?: "
+                  ]
+        return random.choice(flavors)
+
+
+
     def handle(self, event):
         if event.msg.startswith(".meme"):
-            #just a random meme please
-            if event.msg == ".meme":
-                line_array = self.bot.mem_store['qdb'][event.channel]
-                top_line = self.get_line(line_array)
-                bottom_line = self.get_line(line_array)
-                meme_id = self.get_random_meme_id()
-                meme_url = self.create_meme(meme_id, top_line, bottom_line)
-                if(meme_url):
-                    self.say(event.channel, "Tip top meme: " + meme_url)
-                else:
-                    self.say(event.channel, "Error making memes. What a bummer.")
+            #just return help. we won't bother people with rate limits for this
+            if event.msg == ".meme help":
+                self.say(event.channel, "Top meme descriptions here: https://api.imgflip.com/popular_meme_ids")
+                self.say(event.channel, "Usage: .meme [[description of meme image] [| nick of user to pull lines from]]")
                 return
-            #more detail requested
-            else:
-                args = event.msg[5:].split("|",1)
-                if args[0].strip():
-                    meme_id = self.get_specific_meme_id(args[0])
-                    if not meme_id:
-                        self.say(event.channel, "Bruh, I couldn't find that meme. We'll do a rando.")
-                        meme_id = self.get_random_meme_id()
-                else:
-                    meme_id = self.get_random_meme_id()
-                if len(args) > 1:
-                    line_array = self.get_user_lines(event.channel, args[1].strip())
-                    if not line_array:
-                        self.say(event.channel, "That memer hasn't spoken or doesn't exist. Using randoms.")
-                        line_array = self.bot.mem_store['qdb'][event.channel]
-                else:
+            
+            #check the rate first, then continue with processing
+            if self.check_rate(event.user):
+                #just a random meme please
+                if event.msg == ".meme":
                     line_array = self.bot.mem_store['qdb'][event.channel]
-                top_line = self.get_line(line_array)
-                bottom_line = self.get_line(line_array)
-                meme_url = self.create_meme(meme_id, top_line, bottom_line)
-                if meme_url:
-                    self.say(event.channel, "Only the dankest memes: " + meme_url)
+                    top_line = self.get_line(line_array)
+                    bottom_line = self.get_line(line_array)
+                    meme_id = self.get_random_meme_id()
+                    meme_url = self.create_meme(meme_id, top_line, bottom_line)
+                    if(meme_url):
+                        self.say(event.channel, self.get_random_flavor() + meme_url)
+                    else:
+                        self.say(event.channel, "Error making memes. What a bummer.")
+                    return
+                #more detail requested
                 else:
-                    self.say(event.channel, "It's all ogre. Memery broken.")
-                return
+                    args = event.msg[5:].split("|",1)
+                    if args[0].strip():
+                        meme_id = self.get_specific_meme_id(args[0])
+                        if not meme_id:
+                            self.say(event.channel, "Bruh, I couldn't find that meme. We'll do a rando.")
+                            meme_id = self.get_random_meme_id()
+                    else:
+                        meme_id = self.get_random_meme_id()
+                    if len(args) > 1:
+                        line_array = self.get_user_lines(event.channel, args[1].strip())
+                        if not line_array:
+                            self.say(event.channel, "That memer hasn't spoken or doesn't exist. Using randoms.")
+                            line_array = self.bot.mem_store['qdb'][event.channel]
+                    else:
+                        line_array = self.bot.mem_store['qdb'][event.channel]
+                    top_line = self.get_line(line_array)
+                    bottom_line = self.get_line(line_array)
+                    meme_url = self.create_meme(meme_id, top_line, bottom_line)
+                    if meme_url:
+                        self.say(event.channel, self.get_random_flavor() + meme_url)
+                    else:
+                        self.say(event.channel, "It's all ogre. Memery broken.")
+                    return
