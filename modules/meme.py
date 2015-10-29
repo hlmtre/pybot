@@ -1,4 +1,5 @@
 from event import Event
+import meme_credentials
 import random
 import difflib
 import time
@@ -10,6 +11,15 @@ except ImportError:
   print "Warning: meme module requires requests."
   requests = object
 
+"""
+the imgflip api requires credentials, which are bad to put directly into source code. in order to use this module, you will need a file in modules/ called meme_credentials, whose content follows this pattern:
+
+class MemeCredentials:
+  imgflip_userid = "YOUR_USERID"
+  imgflip_password = "YOUR_PASSWORD"
+
+Dassit.
+"""
 
 class meme:
     def __init__(self, events=None, printer_handle=None, bot=None, say=None):
@@ -18,8 +28,8 @@ class meme:
         self.interests = ['__privmsg__']# should be first event in the listing.. so lines being added is a priority
         self.bot = bot
         self.say = say
-        self.imgflip_userid = ""
-        self.imgflip_password = ""
+        self.imgflip_userid = meme_credentials.MemeCredentials.imgflip_userid
+        self.imgflip_password = meme_credentials.MemeCredentials.imgflip_password
         self.top_memes_list = self.get_top_memes()
         self.cmd = ".meme"
         self.help = ".meme [[meme name] [| nick to use for history]]"
