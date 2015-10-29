@@ -30,7 +30,6 @@ class Weather2(BaseModule):
         self.say(channel, "Encountered an error with the WUnderground API")
         return None
       results = q.json()
-      print results
       # we're only doing two days for now
       counter = 0
       phrase = ""
