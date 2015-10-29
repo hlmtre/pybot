@@ -23,7 +23,7 @@ class meme:
         self.top_memes_list = self.get_top_memes()
         self.cmd = ".meme"
         self.help = ".meme [[meme name] [| nick to use for history]]"
-        self.ignore_list = [self.bot.NICK, 'TSDBot']
+        self.ignore_list = [self.bot.NICK, 'TSDBot', 'Bonk-Bot']
         self.ignore_nicks = self.create_ignore_nicks_tuple()
         self.RATE_LIMIT = 300 #rate limit in seconds
         self.bot.mem_store['meme'] = {}
