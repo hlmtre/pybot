@@ -11,16 +11,14 @@ except ImportError:
   requests = object
 
 try: 
-  import meme_credentials
+  from meme_credentials import MemeCredentials as mc
 except ImportError:
   print "Warning: meme module requires ceredentials in modules/meme_credentials.py"
-  meme_credentials = object
-  meme_credentials.MemeCredentials = lambda: None
-  meme_credentials.MemeCredentials.imgflip_userid = lambda: None
-  meme_credentials.MemeCredentials.imgflip_password = lambda: None
-  meme_credentials.MemeCredentials.imgflip_userid = "None"
-  meme_credentials.MemeCredentials.imgflip_password = "None"
+  class PhonyMc:
+    imgflip_userid = "None"
+    imgflip_password = "None"
 
+  mc = PhonyMc()
 
 """
 the imgflip api requires credentials, which are bad to put directly into source code. in order to use this module, you will need a file in modules/ called meme_credentials, whose content follows this pattern:
