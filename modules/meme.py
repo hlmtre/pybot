@@ -1,5 +1,4 @@
 from event import Event
-import meme_credentials
 import random
 import difflib
 import time
@@ -10,6 +9,18 @@ try:
 except ImportError:
   print "Warning: meme module requires requests."
   requests = object
+
+try: 
+  import meme_credentials
+except ImportError:
+  print "Warning: meme module requires ceredentials in modules/meme_credentials.py"
+  meme_credentials = object
+  meme_credentials.MemeCredentials = lambda: None
+  meme_credentials.MemeCredentials.imgflip_userid = lambda: None
+  meme_credentials.MemeCredentials.imgflip_password = lambda: None
+  meme_credentials.MemeCredentials.imgflip_userid = "None"
+  meme_credentials.MemeCredentials.imgflip_password = "None"
+
 
 """
 the imgflip api requires credentials, which are bad to put directly into source code. in order to use this module, you will need a file in modules/ called meme_credentials, whose content follows this pattern:
