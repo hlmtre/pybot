@@ -37,8 +37,8 @@ class meme:
         self.interests = ['__privmsg__']# should be first event in the listing.. so lines being added is a priority
         self.bot = bot
         self.say = say
-        self.imgflip_userid = meme_credentials.MemeCredentials.imgflip_userid
-        self.imgflip_password = meme_credentials.MemeCredentials.imgflip_password
+        self.imgflip_userid = mc.imgflip_userid
+        self.imgflip_password = mc.imgflip_password
         self.top_memes_list = self.get_top_memes()
         self.cmd = ".meme"
         self.help = ".meme [[meme name] [| nick to use for history]]"
