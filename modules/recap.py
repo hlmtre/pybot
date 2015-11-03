@@ -3,14 +3,14 @@ import random
 import time
 import re
 
+try:
+  from basemodule import BaseModule
+except ImportError:
+  from modules.basemodule import BaseModule
 
-class recap:
-    def __init__(self, events=None, printer_handle=None, bot=None, say=None):
-        self.events = events
-        self.printer = printer_handle
+class recap(BaseModule):
+    def post_init(self):
         self.interests = ['__privmsg__']# should be first event in the listing.. so lines being added is a priority
-        self.bot = bot
-        self.say = say
         self.cmd = ".recap"
         self.help = ".recap"
         self.ignore_list = [self.bot.NICK, 'TSDBot', 'Bonk-Bot']
@@ -20,7 +20,7 @@ class recap:
         self.RECAP_LENGTH = 4 #number of lines to include in recap
         self.bot.mem_store['recap'] = {}
 
-        for event in events:
+        for event in self.events:
           if event._type in self.interests:
             event.subscribe(self)
 
