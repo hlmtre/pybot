@@ -1,5 +1,6 @@
 from event import Event
 import random
+import string
 import time
 import re
 
@@ -59,13 +60,22 @@ class recap(BaseModule):
         """Given a valid line, scramble a vowel in the nick to avoid beeping the user"""
         try:
             nick = list(line.split()[0][1:-1]) #grab the nick from between <> and conver to a list to make changes
-            index1 = random.randint(0,len(nick) - 1)
-            if index1 in range(0, len(nick) - 1):
-                index2 = index1 + 1
+            #index1 = random.randint(0,len(nick) - 1)
+            #if index1 in range(0, len(nick) - 1):
+                #index2 = index1 + 1
+            #else:
+                #index2 = index1 - 1
+            #nick[index1], nick[index2] = nick[index2], nick[index1]
+            repl =  ''
+            if nick[0].isupper():
+                repl = random.choice(string.ascii_uppercase)
+                while repl == nick[0]:
+                    repl = random.choice(string.ascii_uppercase)
             else:
-                index2 = index1 - 1
-            #swap the two letters in the nick
-            nick[index1], nick[index2] = nick[index2], nick[index1]
+                repl = random.choice(string.ascii_lowercase)
+                while repl == nick[0]:
+                    repl = random.choice(string.ascii_lowercase)
+            nick[0] = repl
             nick = '<' + ''.join(nick) + '>'  #convert back from list to string and add <>
             return ' '.join([nick, line.split(None,1)[1]]) #replace the old nick with scrambled nick
         except:
@@ -154,6 +164,8 @@ class recap(BaseModule):
                     "Where's Schooly?",
                     "Heavy Is the BanHammer",
                     "Sunbreaker or Sunbroken?",
+                    "Testing in Production",
+                    "BoneKin Codes a New Module and Forgets How to Use Git",
                     "Dr. GV, PhD, although I guess if he was a medical doctor he wouldn't have a PhD? Or maybe they can, I don't know. I know he'd be called 'Dr.' though. I think they should make that clearer, like in the dictionary or wherever they spell things out like that. But I guess it wouldn't be an English thing it'd be a medical licensing and terminology thing? Uuuuuuugggggghhhh it's already so late and I was supposed to go to bed 23 minutes ago but then t"
                     ]
                     
