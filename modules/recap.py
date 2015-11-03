@@ -4,7 +4,7 @@ import time
 import re
 
 
-class meme:
+class recap:
     def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
@@ -109,7 +109,8 @@ class meme:
                   "Tex's Tricks",
                   "Top Fun",
                   "Big Anime Robots",
-                  "The Meme Machine"
+                  "The Meme Machine",
+                  "The Botpocalypse"
                   ]
         episodes = ["The Mystery of DeeJ",
                     "Paddy's Big Goodbye",
@@ -132,8 +133,8 @@ class meme:
                     "High School Drama",
                     "TD Moves Out",
                     "TDSpiral Paints a Picture",
-                    "kapowaz Wins",
-                    "banana Gets High",
+                    "Kapowaz Wins",
+                    "Banana Gets High",
                     "Dragon's Laird",
                     "StarLaird",
                     "Kanboface",
@@ -148,6 +149,11 @@ class meme:
                     "IRC Forgets to Set Their Holiday Nicks",
                     "Hot Diggety Dorj",
                     "Yapok Talks",
+                    "Hellmitre Argues With His Bot",
+                    "Pybot Strikes Back",
+                    "Where's Schooly?",
+                    "Heavy Is the BanHammer",
+                    "Sunbreaker or Sunbroken?",
                     "Dr. GV, PhD, although I guess if he was a medical doctor he wouldn't have a PhD? Or maybe they can, I don't know. I know he'd be called 'Dr.' though. I think they should make that clearer, like in the dictionary or wherever they spell things out like that. But I guess it wouldn't be an English thing it'd be a medical licensing and terminology thing? Uuuuuuugggggghhhh it's already so late and I was supposed to go to bed 23 minutes ago but then t"
                     ]
                     
