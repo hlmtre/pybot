@@ -60,11 +60,11 @@ class recap:
         try:
             nick = list(line.split()[0][1:-1]) #grab the nick from between <> and conver to a list to make changes
             index1 = random.randint(0,len(nick) - 1)
-            if index1 in range(0, len(nick) - 2):
+            if index1 in range(0, len(nick) - 1):
                 index2 = index1 + 1
             else:
                 index2 = index1 - 1
-            #swap the two random letters in the nick
+            #swap the two letters in the nick
             nick[index1], nick[index2] = nick[index2], nick[index1]
             nick = '<' + ''.join(nick) + '>'  #convert back from list to string and add <>
             return ' '.join([nick, line.split(None,1)[1]]) #replace the old nick with scrambled nick
@@ -81,7 +81,7 @@ class recap:
         return False
 
     def check_rate(self, channel):
-        """Check to see if the given channel has allowed enough time to pass before calling meme again. Return True 
+        """Check to see if the given channel has allowed enough time to pass before calling recap again. Return True 
            and set the new time limit if true. Return False if not."""
         try:
             if int(time.time()) >= self.bot.mem_store['recap'][channel]:
