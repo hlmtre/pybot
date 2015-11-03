@@ -5,6 +5,12 @@
       "redditinfo"
       ]
   },
+  "grizzly.bearcopter.com": { 
+    "exclude": [
+      "shortener",
+      "redditinfo"
+      ]
+  },
   "prod-srv": {
     "exclude": [
       "redditinfo"

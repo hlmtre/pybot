@@ -3,20 +3,16 @@
 
 from event import Event
 import requests
-import difflib
 
-class Replace:
-  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
-    self.events = events
-    self.printer = printer_handle
-    self.interests = ['__.replace__'] 
-    self.bot = bot
-    self.say = say
+try:
+  from basemodule import BaseModule
+except ImportError:
+  from modules.basemodule import BaseModule
+
+class Replace(BaseModule):
+  def post_init(self):
 
     self.bot.mem_store['replace'] = {}
-    #define a key for _recent since that will not be a potential channel name
-    self.bot.mem_store['replace']['_recent'] = []
-
     replace = Event("__.r__")
     replace.define(msg_definition=".*")
     replace.subscribe(self)
@@ -53,16 +49,16 @@ class Replace:
         return
       try:
         for chan in self.bot.mem_store['replace'].keys():
-          if chan != '_recent':
-            if len(self.bot.mem_store['replace'][chan]) >= self.MAX_BUFFER_SIZE:
-              self.bot.mem_store['replace'][chan].pop()
-            line = self.format_line(event)
-            if line:
-              self.bot.mem_store['replace'][chan].insert(0, line)
+          if len(self.bot.mem_store['replace'][chan]) >= self.MAX_BUFFER_SIZE:
+            self.bot.mem_store['replace'][chan].pop()
+          line = self.format_line(event)
+          if line:
+            self.bot.mem_store['replace'][chan].insert(0, line)
       except KeyError, IndexError:
         print "Replace add_buffer() error when no event channel"
     #now we continue with normal, per channel line addition
     #create a dictionary associating the channel with an empty list if it doesn't exist yet
+    # END if not event.channel:
     else:
       if event.channel not in self.bot.mem_store['replace']:
         self.bot.mem_store['replace'][event.channel] = []
@@ -90,23 +86,6 @@ class Replace:
         return ' * %s %s\n' % (event.user, event.msg[7:])
       else:
         return '<%s> %s\n' % (event.user, event.msg)
-    elif event.verb == "JOIN":
-      return ' --> %s has joined channel %s\n' % (event.user, event.channel)
-    elif event.verb == "PART":
-      return ' <-- %s has left channel %s\n' % (event.user, event.channel)
-    elif event.verb == "NICK":
-      return ' -- %s has changed their nick to %s\n' % (event.user, event.msg)
-    elif event.verb == "TOPIC":
-      return ' -- %s has changed the topic for %s to "%s"\n' % (event.user, event.channel, event.msg)
-    elif event.verb == "QUIT":
-      return ' <-- %s has quit (%s)\n' % (event.user, event.msg)
-    elif event.verb == "KICK":
-      #this little bit of code finds the kick target by getting the last
-      #thing before the event message begins
-      target = event.line.split(":", 2)[1].split()[-1]
-      return ' <--- %s has kicked %s from %s (%s)\n' % (event.user, target, event.channel, event.msg)
-    elif event.verb == "NOTICE": 
-      return ' --NOTICE from %s: %s\n' % (event.user, event.msg)
     else:
       #no matching verbs found. just ignore the line
       return ''
@@ -160,6 +139,6 @@ class Replace:
       message = message.replace(find_msg, replace_msg)
       user = newString[1:msg_index]
       #pybot sends the new replacement message to the chat
-      self.printer("PRIVMSG " + event.channel + ' :' + user + " MEANT to say: " + message + '\n')
+      self.say(event.channel, user + " MEANT to say: " + message)
     if event.user != self.bot.NICK :
       self.add_buffer(event)
