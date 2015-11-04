@@ -104,7 +104,7 @@ class recap(BaseModule):
         """Check to see if the given channel has allowed enough time to pass before calling recap again. Return True 
            and set the new time limit if true. Return False if not."""
         try:
-            if int(time.time()) >= self.bot.mem_store['recap'][channel]:
+            if self.get_timediff() <= 0: 
                 self.bot.mem_store['recap'][channel] = int(time.time()) + self.RATE_LIMIT
                 return True
             else:
