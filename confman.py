@@ -7,31 +7,35 @@ class ConfManager:
   This allows each thread to know only its own network name, and always get back the information specified for that network from the confman.
   """
 
-  def __init__(self,conf=None):
-    if conf is not None:
-      try:
-        self.conf_file = open(os.path.expanduser(conf))
-      except IOError:
-        raise ConfError("could not open conf file '"+os.path.expanduser(conf)+"'")
-    if conf is None:
-      if os.environ.has_key('HOME'):
+  def __init__(self,conf=None, string=False):
+    if string:
+      self.parsed = json.loads(conf)
+
+    else:
+      if conf is not None:
         try:
-          self.conf_path = os.environ['HOME'] + '/.pybotrc'
-          self.conf_file = open(self.conf_path)
+          self.conf_file = open(os.path.expanduser(conf))
         except IOError:
-          raise ConfError("could not open conf file '"+self.conf_path+"'")
-      else: # lines of with os.environ.has_key
-        try:
-          self.conf_file = open('.pybotrc')
-        except IOError:
-          self.conf_path = os.environ['HOME'] + '/.pybotrc'
+          raise ConfError("could not open conf file '"+os.path.expanduser(conf)+"'")
+      if conf is None:
+        if os.environ.has_key('HOME'):
           try:
-            #self.conf_path = os.environ['HOME'] + conf
+            self.conf_path = os.environ['HOME'] + '/.pybotrc'
             self.conf_file = open(self.conf_path)
           except IOError:
             raise ConfError("could not open conf file '"+self.conf_path+"'")
-    
-    self.parsed = json.load(self.conf_file)
+        else: # lines of with os.environ.has_key
+          try:
+            self.conf_file = open('.pybotrc')
+          except IOError:
+            self.conf_path = os.environ['HOME'] + '/.pybotrc'
+            try:
+              #self.conf_path = os.environ['HOME'] + conf
+              self.conf_file = open(self.conf_path)
+            except IOError:
+              raise ConfError("could not open conf file '"+self.conf_path+"'")
+      
+      self.parsed = json.load(self.conf_file)
 
   def getDBType(self):
     try:
