@@ -89,7 +89,7 @@ class recap(BaseModule):
             nick = '<' + ''.join(nick) + '>'  
             #take the old nick out of the submitted line and replace it with the new scramble one
             return ' '.join([nick, line.split(None,1)[1]])
-        except:
+        except IndexError:
             self.debug_print("Error scrambling nick. Just moving on")
             return line #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
 
@@ -104,7 +104,7 @@ class recap(BaseModule):
         """Check to see if the given channel has allowed enough time to pass before calling recap again. Return True 
            and set the new time limit if true. Return False if not."""
         try:
-            if self.get_timediff() <= 0: 
+            if self.get_timediff(channel) <= 0: 
                 self.bot.mem_store['recap'][channel] = int(time.time()) + self.RATE_LIMIT
                 return True
             else:
@@ -113,6 +113,10 @@ class recap(BaseModule):
             self.bot.mem_store['recap'][channel] = int(time.time()) + self.RATE_LIMIT
             return True
     
+    def reset_timer(self, channel):
+        """If there's an error getting a recap, call this to reset lockdown timer"""
+            self.bot.mem_store['recap'][channel] = int(time.time())
+
     def get_timediff(self, channel):
         """Return how much time remains in the function lockdown"""
         return self.bot.mem_store['recap'][channel] - int(time.time())
@@ -190,6 +194,7 @@ class recap(BaseModule):
                 episode = self.get_episode()
                 recap = self.get_lines(event.channel)
                 if not recap:
+                    self.reset_timer(event.channel)
                     self.say(event.channel, "Error processing recap request")
                     return
                 self.say(event.channel, "Previously on " + episode[0] + ": ")
