@@ -35,7 +35,8 @@ class Bot(threading.Thread):
 # init would not allow me to add another named variable -- or even positional, with *args. got a completely unrelated error. had to use **kwargs.
   def __init__(self, conf=None, network=None, d=None, **kwargs):
     threading.Thread.__init__(self)
-    self.debug_print("thread init complete")
+    if d:
+      self.debug_print("thread init complete")
 
     self.DEBUG = d
     self.brain = None
@@ -400,7 +401,6 @@ class Bot(threading.Thread):
     Args:
     mock: boolean. If mock is true, don't loop forever -- mock is for testing.
     """
-    print 'inside worker!' 
     self.HOST = self.network
     self.NICK = self.conf.getNick(self.network)
 
@@ -541,7 +541,6 @@ class Bot(threading.Thread):
     """
     For implementing the parent threading.Thread class. Allows the thread the be initialized with our code.
     """
-    print "inside run!"
     self.worker()
 
   def say(self, channel, thing):
