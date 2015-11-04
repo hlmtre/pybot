@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # see version.py for version
-# works with python 2.6.x and 2.7.x
+# works with python 2.7.x
 #
 
 
@@ -16,6 +16,7 @@ import traceback
 import threading
 import inspect
 import argparse
+import Queue
 
 import botbrain
 from logger import Logger
@@ -31,12 +32,18 @@ class Bot(threading.Thread):
     bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
     handles the core IRC protocol stuff, and passing lines to defined events, which dispatch to their subscribed modules.
   """
-  def __init__(self, conf=None, network=None, d=None):
+# init would not allow me to add another named variable -- or even positional, with *args. got a completely unrelated error. had to use **kwargs.
+  def __init__(self, conf=None, network=None, d=None, **kwargs):
     threading.Thread.__init__(self)
+    self.debug_print("thread init complete")
 
     self.DEBUG = d
     self.brain = None
-    self.network = network
+    if type(network) is list and len(network):
+      self.network = network[0]
+    else:
+      self.network = network
+
     self.OFFLINE = False
     self.CONNECTED = False
     self.JOINED = False
@@ -45,6 +52,13 @@ class Bot(threading.Thread):
     self.logger = Logger()
 #   to be a dict of dicts
     self.command_function_map = dict()
+
+    """
+      blist contains a queue, which is thread-safe. inside that queue should be a single list -- the list of bots the main function owns. so that we can later add another bot obj.
+    """
+    self.blist = None
+    if kwargs['blist']:
+      self.blist = kwargs['blist']
     
     if self.conf.getDBType() == "sqlite":
       import lite
@@ -52,7 +66,6 @@ class Bot(threading.Thread):
     else: 
       import db
       self.db = db.DB(self)
-
 
     self.NICK = self.conf.getNick(self.network)
 
@@ -70,6 +83,7 @@ class Bot(threading.Thread):
     self.brain = botbrain.BotBrain(self.send, self) 
 
     self.events_list = list()
+
 
     # define events here and add them to the events_list
 
@@ -384,6 +398,7 @@ class Bot(threading.Thread):
     Args:
     mock: boolean. If mock is true, don't loop forever -- mock is for testing.
     """
+    print 'inside worker!' 
     self.HOST = self.network
     self.NICK = self.conf.getNick(self.network)
 
@@ -517,13 +532,14 @@ class Bot(threading.Thread):
     if not error:
       print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
     else:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.RED + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.FAIL + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
 
     
   def run(self):
     """
     For implementing the parent threading.Thread class. Allows the thread the be initialized with our code.
     """
+    print "inside run!"
     self.worker()
 
   def say(self, channel, thing):
@@ -551,6 +567,7 @@ if __name__ == "__main__":
   else:
     config = "~/.pybotrc"
 
+  global botslist 
   botslist = list()
   if not DEBUG and hasattr(os, 'fork'):
     pid = os.fork()
@@ -562,13 +579,17 @@ if __name__ == "__main__":
 
       cm = confman.ConfManager(config)
       net_list = cm.getNetworks()
+      q = Queue.Queue()
+      q.put(botslist)
       for c in cm.getNetworks():
-        b = bot.Bot(cm, c, DEBUG)
+        b = bot.Bot(conf=cm, network=c, d=DEBUG)
+        b.daemon =True
         b.start()
+        botslist.append(b)
 
     elif pid > 0:
       sys.exit(0)
-  else: # don't background; either we're in debug (foreground) mode, or on windows TODO
+  else: # don't background; either we're in debug (foreground) mode, or on windows 
     if os.name == 'nt':
       print 'in debug mode; backgrounding currently unsupported on windows.'
     DEBUG = True
@@ -581,8 +602,10 @@ if __name__ == "__main__":
 
     cm = confman.ConfManager(config)
     net_list = cm.getNetworks()
+    q = Queue.Queue()
     for c in cm.getNetworks():
-      b = bot.Bot(cm, c, DEBUG)
+      b = bot.Bot(conf=cm, network=c, d=DEBUG, blist=q)
+      q.put(botslist)
       b.daemon = True
       b.start()
       botslist.append(b)
@@ -598,4 +621,3 @@ if __name__ == "__main__":
       print "keyboard interrupt caught; exiting"
       sys.exit(1)
       
-
