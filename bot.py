@@ -56,9 +56,11 @@ class Bot(threading.Thread):
     """
       blist contains a queue, which is thread-safe. inside that queue should be a single list -- the list of bots the main function owns. so that we can later add another bot obj.
     """
-    self.blist = None
-    if kwargs['blist']:
-      self.blist = kwargs['blist']
+    try:
+      if kwargs['blist']:
+        self.blist = kwargs['blist']
+    except KeyError:
+      self.blist = None
     
     if self.conf.getDBType() == "sqlite":
       import lite
