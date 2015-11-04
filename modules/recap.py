@@ -35,21 +35,28 @@ class recap(BaseModule):
     def get_lines(self, channel):
         """Given a channel, searches the qdb buffer for 4 random, suitable lines."""
         try:
+            #create a copy of the channel buffer
             lines = list(self.bot.mem_store['qdb'][channel])
+            #shuffle that copy up randomly
             random.shuffle(lines)
             recap = []
             while len(lines)>0 and len(recap) < self.RECAP_LENGTH:
+                #as long as we have lines in the buffer and haven't chosen the desired number
+                #keep popping lines off the top of the scrambled buffer
+                #this ensures no duplicates ever are chosen
                 line = lines.pop()
+                #test for validity and add to our array of valid lines
                 if self.valid_line(line):
                     recap.append(self.scramble_nick(line))
             return recap
         except:
-            self.debug_print("Error getting channel buffer in get_lines")
+            self.bot.debug_print("Error getting channel buffer in get_lines")
             return False
 
     def valid_line(self, line):
         """Returns True if a given line matches all requirements for validity:
            Not an action line, longer than minimum length, not spoken by ignored nicks, no URLs"""
+        #easy check to see if it's a line of someone speaking
         if line.startswith("<"):
             if not (line.startswith(self.ignore_nicks) or self.contains_url(line) or len(line.split()) < self.MIN_WORDS):
                 return True
@@ -59,30 +66,33 @@ class recap(BaseModule):
     def scramble_nick(self, line):
         """Given a valid line, scramble a vowel in the nick to avoid beeping the user"""
         try:
+            vowels = 'aeiou'
+            nick_vowels = []
             nick = list(line.split()[0][1:-1]) #grab the nick from between <> and conver to a list to make changes
-            #index1 = random.randint(0,len(nick) - 1)
-            #if index1 in range(0, len(nick) - 1):
-                #index2 = index1 + 1
-            #else:
-                #index2 = index1 - 1
-            #nick[index1], nick[index2] = nick[index2], nick[index1]
-            repl =  ''
-            if nick[0].isupper():
-                repl = random.choice(string.ascii_uppercase)
-                while repl == nick[0]:
-                    repl = random.choice(string.ascii_uppercase)
+            #create a list of tuples. each tuple is (index of a vowel in nick, the vowel at that index)
+            for i,v in enumerate(nick):
+                if v in vowels:
+                    nick_vowels.append((i,v))
+            #randomly choose one of the vowels in the nick to replace
+            sel = random.choice(nick_vowels)
+            #randomly select any vowel
+            repl = random.choice(vowels)
+            #keep doing the previous line until we get something different from what we're replacing
+            while repl == sel[1].lower():
+                repl = random.choice(vowels)
+            #if the chosen letter to be replaced is upper case, make sure the replacement is too
+            if nick[sel[0]].isupper():
+                nick[sel[0]] = repl.upper()
             else:
-                repl = random.choice(string.ascii_lowercase)
-                while repl == nick[0]:
-                    repl = random.choice(string.ascii_lowercase)
-            nick[0] = repl
-            nick = '<' + ''.join(nick) + '>'  #convert back from list to string and add <>
-            return ' '.join([nick, line.split(None,1)[1]]) #replace the old nick with scrambled nick
-        except:
-            self.debug_print("Error scrambling nick. Just moving on")
-            return line #if there's any problems, just don't scramble the nick
-            
-    
+                nick[sel[0]] = repl
+            #take that list of individual characters and slam it all back together into a string surrounded by <>
+            nick = '<' + ''.join(nick) + '>'  
+            #take the old nick out of the submitted line and replace it with the new scramble one
+            return ' '.join([nick, line.split(None,1)[1]])
+        except IndexError:
+            self.bot.debug_print("Error scrambling nick. Just moving on")
+            return line #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
+
     def contains_url(self, line):
         """Given a string, returns True if there is a url present"""
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
@@ -94,7 +104,7 @@ class recap(BaseModule):
         """Check to see if the given channel has allowed enough time to pass before calling recap again. Return True 
            and set the new time limit if true. Return False if not."""
         try:
-            if int(time.time()) >= self.bot.mem_store['recap'][channel]:
+            if self.get_timediff(channel) <= 0: 
                 self.bot.mem_store['recap'][channel] = int(time.time()) + self.RATE_LIMIT
                 return True
             else:
@@ -103,6 +113,10 @@ class recap(BaseModule):
             self.bot.mem_store['recap'][channel] = int(time.time()) + self.RATE_LIMIT
             return True
     
+    def reset_timer(self, channel):
+        """If there's an error getting a recap, call this to reset lockdown timer"""
+        self.bot.mem_store['recap'][channel] = int(time.time())
+
     def get_timediff(self, channel):
         """Return how much time remains in the function lockdown"""
         return self.bot.mem_store['recap'][channel] - int(time.time())
@@ -180,6 +194,7 @@ class recap(BaseModule):
                 episode = self.get_episode()
                 recap = self.get_lines(event.channel)
                 if not recap:
+                    self.reset_timer(event.channel)
                     self.say(event.channel, "Error processing recap request")
                     return
                 self.say(event.channel, "Previously on " + episode[0] + ": ")
