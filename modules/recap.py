@@ -50,7 +50,7 @@ class recap(BaseModule):
                     recap.append(self.scramble_nick(line))
             return recap
         except:
-            self.bot.debug_print("Error getting channel buffer in get_lines")
+            self.bot.debug_print("Error getting channel buffer in get_lines", error=True)
             return False
 
     def valid_line(self, line):
@@ -90,7 +90,7 @@ class recap(BaseModule):
             #take the old nick out of the submitted line and replace it with the new scramble one
             return ' '.join([nick, line.split(None,1)[1]])
         except IndexError:
-            self.bot.debug_print("Error scrambling nick. Just moving on")
+            self.bot.debug_print("Error scrambling nick. Just moving on", error=True)
             return line #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
 
     def contains_url(self, line):

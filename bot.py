@@ -504,15 +504,20 @@ class Bot(threading.Thread):
         raise
   # end worker
 
-  def debug_print(self, line):
+  def debug_print(self, line, error=False):
     """
     Prepends incoming lines with the current timestamp and the thread's name, then spits it to stdout.
     Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.
 
     Args:
     line: text.
+    error: boolean, defaults to False. if True, prints out with red >> in the debug line
     """
-    print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
+        #self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
+    if not error:
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
+    else:
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.RED + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
 
     
   def run(self):
