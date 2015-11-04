@@ -115,7 +115,7 @@ class recap(BaseModule):
     
     def reset_timer(self, channel):
         """If there's an error getting a recap, call this to reset lockdown timer"""
-            self.bot.mem_store['recap'][channel] = int(time.time())
+        self.bot.mem_store['recap'][channel] = int(time.time())
 
     def get_timediff(self, channel):
         """Return how much time remains in the function lockdown"""
