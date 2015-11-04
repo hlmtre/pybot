@@ -59,30 +59,26 @@ class recap(BaseModule):
     def scramble_nick(self, line):
         """Given a valid line, scramble a vowel in the nick to avoid beeping the user"""
         try:
+            vowels = 'aeiou'
+            nick_vowels = []
             nick = list(line.split()[0][1:-1]) #grab the nick from between <> and conver to a list to make changes
-            #index1 = random.randint(0,len(nick) - 1)
-            #if index1 in range(0, len(nick) - 1):
-                #index2 = index1 + 1
-            #else:
-                #index2 = index1 - 1
-            #nick[index1], nick[index2] = nick[index2], nick[index1]
-            repl =  ''
-            if nick[0].isupper():
-                repl = random.choice(string.ascii_uppercase)
-                while repl == nick[0]:
-                    repl = random.choice(string.ascii_uppercase)
+            for i,v in enumerate(nick):
+                if v in vowels:
+                    nick_vowels.append((i,v))
+            sel = random.choice(nick_vowels)
+            repl = random.choice(vowels)
+            while repl == sel[1].lower(): #make sure we're actually changing the vowel
+                repl = random.choice(vowels)
+            if nick[sel[0]].isupper():
+                nick[sel[0]] = repl.upper()
             else:
-                repl = random.choice(string.ascii_lowercase)
-                while repl == nick[0]:
-                    repl = random.choice(string.ascii_lowercase)
-            nick[0] = repl
+                nick[sel[0]] = repl
             nick = '<' + ''.join(nick) + '>'  #convert back from list to string and add <>
             return ' '.join([nick, line.split(None,1)[1]]) #replace the old nick with scrambled nick
         except:
             self.debug_print("Error scrambling nick. Just moving on")
             return line #if there's any problems, just don't scramble the nick
-            
-    
+
     def contains_url(self, line):
         """Given a string, returns True if there is a url present"""
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
