@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from event import Event
 import random
 import string
@@ -47,7 +49,8 @@ class recap(BaseModule):
                 line = lines.pop()
                 #test for validity and add to our array of valid lines
                 if self.valid_line(line):
-                    recap.append(self.scramble_nick(line))
+                    parts = line.split(None, 1)
+                    recap.append(self.scramble_nick(parts[0]) + " " + self.dramatize_line(parts[1]))
             return recap
         except:
             self.bot.debug_print("Error getting channel buffer in get_lines", error=True)
@@ -62,13 +65,45 @@ class recap(BaseModule):
                 return True
         return False
 
-    
-    def scramble_nick(self, line):
+    def dramatize_line(self, line):
+        """Pass a valid line in, return line with some random type of dramatic formatting"""
+        drama = random.randint(0,100) #choose a random number
+        line = line.strip()
+        try:
+            if drama in range(0,10):
+                return line + "??"
+            elif drama in range(10,20):
+                return line + "..."
+            elif drama in range(20,30):
+                return line.upper()
+            elif drama in range(30,40):
+                return line + "!!"
+            elif drama in range(40,50):
+                return line.upper() + "!!"
+            elif drama in range(50,60):
+                return line.upper() + "?!?"
+            elif drama in range(70,80):
+                return line + " ~"
+            elif drama in range(80,90):
+                listline = list(line)
+                for x in range(0, len(listline), 2):
+                    listline[x] = listline[x].upper()
+                return ''.join(listline)
+            elif drama == 69:
+                return u'( ͡° ͜ʖ ͡°) (ง ͠° ͟ل͜ ͡°)ง ᕦ( ͡° ͜ʖ ͡°)ᕤ ( ͡~ ͜ʖ ͡°)'
+            elif drama == 100:
+                return line[::-1] #reversed string
+            else:
+                return line
+        except:
+            return line
+
+    def scramble_nick(self, nick):
         """Given a valid line, scramble a vowel in the nick to avoid beeping the user"""
         try:
             vowels = 'aeiou'
             nick_vowels = []
-            nick = list(line.split()[0][1:-1]) #grab the nick from between <> and conver to a list to make changes
+            nick = list(nick[1:-1]) #grab the nick from between <> and conver to a list to make changes
             #create a list of tuples. each tuple is (index of a vowel in nick, the vowel at that index)
             for i,v in enumerate(nick):
                 if v in vowels:
@@ -88,10 +123,10 @@ class recap(BaseModule):
             #take that list of individual characters and slam it all back together into a string surrounded by <>
             nick = '<' + ''.join(nick) + '>'  
             #take the old nick out of the submitted line and replace it with the new scramble one
-            return ' '.join([nick, line.split(None,1)[1]])
+            return nick
         except IndexError:
             self.bot.debug_print("Error scrambling nick. Just moving on", error=True)
-            return line #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
+            return nick #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
 
     def contains_url(self, line):
         """Given a string, returns True if there is a url present"""
@@ -197,10 +232,10 @@ class recap(BaseModule):
                     self.reset_timer(event.channel)
                     self.say(event.channel, "Error processing recap request")
                     return
-                self.say(event.channel, "Previously on " + episode[0] + ": ")
+                self.say(event.channel, "Previously on \"" + episode[0] + "\": ")
                 for r in recap:
                     self.say(event.channel, r)
-                self.say(event.channel, "Tonight's episode: " + episode[1])
+                self.say(event.channel, "Tonight's episode: \"" + episode[1] + "\"")
             else:
                 timediff = str(self.get_timediff(event.channel))
                 self.say(event.user, "Recap is on lockdown for " + timediff + " more seconds.")
