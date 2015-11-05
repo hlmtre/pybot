@@ -581,9 +581,9 @@ if __name__ == "__main__":
       cm = confman.ConfManager(config)
       net_list = cm.getNetworks()
       q = Queue.Queue()
-      q.put(botslist)
       for c in cm.getNetworks():
-        b = bot.Bot(conf=cm, network=c, d=DEBUG)
+        b = bot.Bot(conf=cm, network=c, d=DEBUG, blist=q)
+        q.put(botslist)
         b.daemon =True
         b.start()
         botslist.append(b)
