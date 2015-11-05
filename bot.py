@@ -584,7 +584,6 @@ if __name__ == "__main__":
       for c in cm.getNetworks():
         b = bot.Bot(conf=cm, network=c, d=DEBUG, blist=q)
         q.put(botslist)
-        b.daemon =True
         b.start()
         botslist.append(b)
 
@@ -610,6 +609,7 @@ if __name__ == "__main__":
       b.daemon = True
       b.start()
       botslist.append(b)
+
     try:
       while True:
         time.sleep(5)
