@@ -43,15 +43,12 @@ class recap(BaseModule):
             random.shuffle(lines)
             recap = []
             while len(lines)>0 and len(recap) < self.RECAP_LENGTH:
-                print "checking for lines"
                 #as long as we have lines in the buffer and haven't chosen the desired number
                 #keep popping lines off the top of the scrambled buffer
                 #this ensures no duplicates ever are chosen
                 line = lines.pop()
-                print line
                 #test for validity and add to our array of valid lines
                 if self.valid_line(line):
-                    print line + ": valid"
                     parts = line.split(None, 1)
                     recap.append(self.scramble_nick(parts[0]) + " " + self.dramatize_line(parts[1]))
             return recap
@@ -112,7 +109,6 @@ class recap(BaseModule):
             for i,v in enumerate(nick_letters):
                 if v in vowels:
                     nick_vowels.append((i,v))
-            print str(nick_vowels)
             #randomly choose one of the vowels in the nick to replace
             sel = random.choice(nick_vowels)
             #randomly select any vowel
