@@ -64,7 +64,15 @@ class Connect(BaseModule):
     a = self.fill_conf(event)
     f = self.bot.blist.get() # get the botslist out
     q.put(f)
-    cm = ConfManager(a, string=True)
+    try:
+      cm = ConfManager(a, string=True)
+    except TypeError as e:
+      e.args += (a,)
+      self.bot.debug_print("error: ")
+      self.bot.debug_print(e)
+      self.bot.debug_print("a: ")
+      self.bot.debug_print(a)
+      return
     c = cm.getNetworks()
     b = Bot(conf=cm, network=c, d=self.bot.DEBUG, blist=q)
     b.start()
