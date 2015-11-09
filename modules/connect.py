@@ -19,6 +19,10 @@ class Connect(BaseModule):
 
     self.bot.register_event(connect, self)
 
+    self.CONF_STRING = '{ "__pybot_conf":{ "db_type": "%s" }, "%s": '
+    self.CONF_STRING += '{ "channels": [ "%s" ], "port":"%s", "nick": "%s","ircpass": "%s", "owner": "%s",'
+    self.CONF_STRING += '"dbusername": "%s","dbpass": "%s","dbname": "%s" } }'
+
   def fill_conf(self, event):
     linesplit = event.msg.split()
     try:
@@ -39,17 +43,13 @@ class Connect(BaseModule):
     except IndexError:
       password = ""
 
-    conf_string = '{ "__pybot_conf":{ "db_type": "%s" }, "%s": '
-    conf_string += '{ "channels": [ "%s" ], "port":"%s", "nick": "%s","ircpass": "%s", "owner": "%s",'
-    conf_string += '"dbusername": "%s","dbpass": "%s","dbname": "%s" } }'
-
     db_type = self.bot.conf.getDBType()
     db_name = self.bot.conf.getDBName(self.bot.network)
     db_username = self.bot.conf.getDBUsername(self.bot.network)
     db_pass = self.bot.conf.getDBPass(self.bot.network)
     owner = self.bot.conf.getOwner(self.bot.network)
     
-    output = conf_string % (db_type, server, channel, port, nick, password, 
+    output = self.CONF_STRING % (db_type, server, channel, port, nick, password, 
                                       owner, db_username, db_pass, db_name)
     return output
     
