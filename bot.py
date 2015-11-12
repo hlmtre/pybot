@@ -40,6 +40,7 @@ class Bot(threading.Thread):
 
     self.DEBUG = d
     self.brain = None
+# i have no idea why this is coming in as a list when the bot is instantiated by an existing thread. FIXME
     if type(network) is list and len(network):
       self.network = network[0]
     else:
