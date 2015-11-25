@@ -603,6 +603,7 @@ if __name__ == "__main__":
 
     cm = confman.ConfManager(config)
     net_list = cm.getNetworks()
+# the queue is used because it is a thread-safe way to pass some data into the thread after the thread has been instantiated.
     q = Queue.Queue()
     for c in cm.getNetworks():
       b = bot.Bot(conf=cm, network=c, d=DEBUG, blist=q)
