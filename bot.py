@@ -17,6 +17,8 @@ import threading
 import inspect
 import argparse
 import Queue
+import json
+import imp # for dynamic module loading
 
 import botbrain
 from logger import Logger
@@ -54,6 +56,14 @@ class Bot(threading.Thread):
     self.logger = Logger()
 #   to be a dict of dicts
     self.command_function_map = dict()
+
+    # we have to cast it to an int, otherwise the connection fails silently and the entire process dies
+    self.PORT = int(self.conf.getPort(self.network))
+    self.HOST = self.network
+    self.NICK = self.conf.getNick(self.network)
+    self.IDENT = 'mypy'
+    self.REALNAME = 's1ash'
+    self.OWNER = self.conf.getOwner(self.network) 
 
     """
       blist contains a queue, which is thread-safe. inside that queue should be a single list -- the list of bots the main function owns. so that we can later add another bot obj.
@@ -106,7 +116,7 @@ class Bot(threading.Thread):
     lastfm.define(".lastfm")
 
     dance = Event("__.dance__")
-    dance.define("\.dance")
+    dance.define(r"\.dance")
 
     #unloads = Event("__module__")
     #unloads.define("^\.module")
@@ -236,9 +246,6 @@ class Bot(threading.Thread):
 
     # this is magic.
 
-    import os, imp, json
-
-
     self.load_snippets()
     self.set_snippets()
 
@@ -254,7 +261,7 @@ class Bot(threading.Thread):
         for k in autoloads.keys():
           self.logger.write(Logger.INFO, "Autoloads found for network " + k, self.NICK)
       except IOError:
-        self.logger.write(Logger.ERROR, "Could not load autoloads file.",self.NICK)
+        self.logger.write(Logger.WARNING, "Could not load autoloads file.",self.NICK)
     # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
@@ -315,7 +322,7 @@ class Bot(threading.Thread):
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "DEBUGGING OUTPUT", self.NICK)
         self.logger.write(Logger.INFO, self.getName() + " " + message.encode('utf-8', 'ignore'), self.NICK)
-        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + " " + message.encode('utf-8', 'ignore'))
+        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ":" + message.encode('utf-8', 'ignore'))
 
       self.s.send(message.encode('utf-8', 'ignore'))
       target = message.split()[1]
@@ -402,18 +409,10 @@ class Bot(threading.Thread):
     Args:
     mock: boolean. If mock is true, don't loop forever -- mock is for testing.
     """
-    self.HOST = self.network
-    self.NICK = self.conf.getNick(self.network)
 
-    # we have to cast it to an int, otherwise the connection fails silently and the entire process dies
-    self.PORT = int(self.conf.getPort(self.network))
-    self.IDENT = 'mypy'
-    self.REALNAME = 's1ash'
-    self.OWNER = self.conf.getOwner(self.network) 
-    
     # connect to server
     self.s = socket.socket()
-    while self.CONNECTED == False:
+    while not self.CONNECTED:
       try:
 # low level socket TCP/IP connection
         self.s.connect((self.HOST, self.PORT)) # force them into one argument
@@ -448,6 +447,7 @@ class Bot(threading.Thread):
       if self.DEBUG:
         self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
 
+    # end while not self.CONNECTED
     self.s.setblocking(1)
     
     read = ""

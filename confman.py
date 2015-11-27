@@ -10,32 +10,32 @@ class ConfManager:
   def __init__(self,conf=None, string=False):
     if string:
       self.parsed = json.loads(conf)
+      return
 
-    else:
-      if conf is not None:
+    if conf is not None:
+      try:
+        self.conf_file = open(os.path.expanduser(conf))
+      except IOError:
+        raise ConfError("could not open conf file '"+os.path.expanduser(conf)+"'")
+    if conf is None:
+      if os.environ.has_key('HOME'):
         try:
-          self.conf_file = open(os.path.expanduser(conf))
+          self.conf_path = os.environ['HOME'] + '/.pybotrc'
+          self.conf_file = open(self.conf_path)
         except IOError:
-          raise ConfError("could not open conf file '"+os.path.expanduser(conf)+"'")
-      if conf is None:
-        if os.environ.has_key('HOME'):
+          raise ConfError("could not open conf file '"+self.conf_path+"'")
+      else: # lines of with os.environ.has_key
+        try:
+          self.conf_file = open('.pybotrc')
+        except IOError:
+          self.conf_path = os.environ['HOME'] + '/.pybotrc'
           try:
-            self.conf_path = os.environ['HOME'] + '/.pybotrc'
+            #self.conf_path = os.environ['HOME'] + conf
             self.conf_file = open(self.conf_path)
           except IOError:
             raise ConfError("could not open conf file '"+self.conf_path+"'")
-        else: # lines of with os.environ.has_key
-          try:
-            self.conf_file = open('.pybotrc')
-          except IOError:
-            self.conf_path = os.environ['HOME'] + '/.pybotrc'
-            try:
-              #self.conf_path = os.environ['HOME'] + conf
-              self.conf_file = open(self.conf_path)
-            except IOError:
-              raise ConfError("could not open conf file '"+self.conf_path+"'")
-      
-      self.parsed = json.load(self.conf_file)
+    
+    self.parsed = json.load(self.conf_file)
 
   def getDBType(self):
     try:
@@ -83,11 +83,10 @@ class ConfManager:
     return l
   
   def getNumNets(self):
-    i = 0
-    for n in self.parsed.iterkeys():
-      if n != "__pybot_conf":
-        i += 1
-    return i
+    if "__pybot_conf" not in self.parsed:
+      return len(self.parsed)
+    else:
+      return len(self.parsed) - 1 # our self-data network doesn't count
 
 # deprecated
   def getNetwork(self):
