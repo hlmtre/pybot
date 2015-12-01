@@ -52,8 +52,9 @@ class recap(BaseModule):
                     parts = line.split(None, 1)
                     recap.append(self.scramble_nick(parts[0]) + " " + self.dramatize_line(parts[1]))
             return recap
-        except:
-            self.bot.debug_print("Error getting channel buffer in get_lines", error=True)
+        except Exception as e:
+            self.bot.debug_print("Error getting channel buffer in get_lines")
+            self.bot.debug_print(str(e))
             return False
 
     def valid_line(self, line):
@@ -67,31 +68,31 @@ class recap(BaseModule):
 
     def dramatize_line(self, line):
         """Pass a valid line in, return line with some random type of dramatic formatting"""
-        drama = random.randint(0,100) #choose a random number
+        drama = random.randint(0,750) #choose a random number
         line = line.strip()
         try:
-            if drama in range(0,10):
+            if drama in range(100,200):
                 return line + "??"
-            elif drama in range(10,20):
+            elif drama in range(200,300):
                 return line + "..."
-            elif drama in range(20,30):
+            elif drama in range(300,400):
                 return line.upper()
-            elif drama in range(30,40):
+            elif drama in range(400,500):
                 return line + "!!"
-            elif drama in range(40,50):
+            elif drama in range(500,550):
                 return line.upper() + "!!"
-            elif drama in range(50,60):
+            elif drama in range(550,600):
                 return line.upper() + "?!?"
-            elif drama in range(70,80):
+            elif drama in range(600,700):
                 return line + " ~"
-            elif drama in range(80,90):
+            elif drama in range(700,750):
                 listline = list(line)
                 for x in range(0, len(listline), 2):
                     listline[x] = listline[x].upper()
                 return ''.join(listline)
             elif drama == 69:
                 return u'( ͡° ͜ʖ ͡°) (ง ͠° ͟ل͜ ͡°)ง ᕦ( ͡° ͜ʖ ͡°)ᕤ ( ͡~ ͜ʖ ͡°)'
-            elif drama == 100:
+            elif drama == 750:
                 return line[::-1] #reversed string
             else:
                 return line
@@ -100,12 +101,13 @@ class recap(BaseModule):
 
     def scramble_nick(self, nick):
         """Given a valid line, scramble a vowel in the nick to avoid beeping the user"""
+        original_nick = nick
         try:
             vowels = 'aeiou'
             nick_vowels = []
-            nick = list(nick[1:-1]) #grab the nick from between <> and conver to a list to make changes
+            nick_letters = list(nick[1:-1]) #grab the nick from between <> and conver to a list to make changes
             #create a list of tuples. each tuple is (index of a vowel in nick, the vowel at that index)
-            for i,v in enumerate(nick):
+            for i,v in enumerate(nick_letters):
                 if v in vowels:
                     nick_vowels.append((i,v))
             #randomly choose one of the vowels in the nick to replace
@@ -116,16 +118,16 @@ class recap(BaseModule):
             while repl == sel[1].lower():
                 repl = random.choice(vowels)
             #if the chosen letter to be replaced is upper case, make sure the replacement is too
-            if nick[sel[0]].isupper():
-                nick[sel[0]] = repl.upper()
+            if nick_letters[sel[0]].isupper():
+                nick_letters[sel[0]] = repl.upper()
             else:
-                nick[sel[0]] = repl
+                nick_letters[sel[0]] = repl
             #take that list of individual characters and slam it all back together into a string surrounded by <>
-            nick = '<' + ''.join(nick) + '>'  
+            nick = '<' + ''.join(nick_letters) + '>'  
             #take the old nick out of the submitted line and replace it with the new scramble one
             return nick
         except IndexError:
-            self.bot.debug_print("Error scrambling nick. Just moving on", error=True)
+            self.bot.debug_print("Error scrambling nick. Just moving on. Nick was: " + original_nick, error=True)
             return nick #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
 
     def contains_url(self, line):
