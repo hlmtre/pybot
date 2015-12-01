@@ -2,7 +2,7 @@ from event import Event
 class BaseModule(object):
   """
   A base module class for deriving modules (anything you fine folk write, probably) to inherit from.
-  The nice this is this allows you to define your own post_init and handle functions.
+  The nice thing is this allows you to define your own post_init and handle functions.
 
   In your module's post_init, define and register your own events, and pass your module in.
   

@@ -569,7 +569,7 @@ if __name__ == "__main__":
   else:
     config = "~/.pybotrc"
 
-  global botslist 
+  #global botslist 
   botslist = list()
   if not DEBUG and hasattr(os, 'fork'):
     pid = os.fork()
