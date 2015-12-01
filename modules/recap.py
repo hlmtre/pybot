@@ -217,6 +217,9 @@ class recap(BaseModule):
                     "Sunbreaker or Sunbroken?",
                     "Testing in Production",
                     "BoneKin Codes a New Module and Forgets How to Use Git",
+                    "The Curse of the Spiduh",
+                    "Snipe Quits Halo (Part 2)",
+                    "Monopoly Is A Fun Game",
                     "Dr. GV, PhD, although I guess if he was a medical doctor he wouldn't have a PhD? Or maybe they can, I don't know. I know he'd be called 'Dr.' though. I think they should make that clearer, like in the dictionary or wherever they spell things out like that. But I guess it wouldn't be an English thing it'd be a medical licensing and terminology thing? Uuuuuuugggggghhhh it's already so late and I was supposed to go to bed 23 minutes ago but then t"
                     ]
                     
