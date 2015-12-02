@@ -100,7 +100,8 @@ class recap(BaseModule):
             return line
 
     def scramble_nick(self, nick):
-        """Given a valid nick, scramble a vowel in the nick to avoid beeping the user"""
+        """Given a valid line, scramble a vowel in the nick to avoid beeping the user"""
+        original_nick = nick
         try:
             vowels = 'aeiou'
             nick_vowels = []
@@ -125,9 +126,8 @@ class recap(BaseModule):
             nick = '<' + ''.join(nick_letters) + '>'  
             #take the old nick out of the submitted line and replace it with the new scramble one
             return nick
-        except Exception as e:
-            self.bot.debug_print("Error scrambling nick " + nick + ". Just moving on")
-            self.bot.debug_print(str(e))
+        except IndexError:
+            self.bot.debug_print("Error scrambling nick. Just moving on. Nick was: " + original_nick, error=True)
             return nick #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
 
     def contains_url(self, line):
