@@ -19,7 +19,7 @@ class Replace(BaseModule):
 
     self.bot.register_event(replace, self)
 
-    self.help = ".r <search string> | <replacement text>"
+    self.help = ".r <search string> | <replacement text> OR s/<search string>/<replacement string>"
     self.MAX_BUFFER_SIZE = 300 
     self.MAX_HISTORY_SIZE = 10
 
@@ -140,6 +140,7 @@ class Replace(BaseModule):
       user = newString[1:msg_index]
       #pybot sends the new replacement message to the chat
       self.say(event.channel, user + " MEANT to say: " + message)
+    # because both .r and s// are valid formats now
     if event.msg.startswith("s/"):
       #alternative notation: s/<substring to replace>/<substring to replace with>
       string_token = event.msg[2:].split('/', 1)
