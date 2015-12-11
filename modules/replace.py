@@ -140,5 +140,24 @@ class Replace(BaseModule):
       user = newString[1:msg_index]
       #pybot sends the new replacement message to the chat
       self.say(event.channel, user + " MEANT to say: " + message)
+    if event.msg.startswith("s/"):
+      #alternative notation: s/<substring to replace>/<substring to replace with>
+      string_token = event.msg[2:].split('/', 1)
+      find_msg = string_token[0]
+      try:
+        replace_msg = string_token[1]
+      except IndexError:
+        return
+      #looking for a message containing our search string
+      newString = self.get_replacement_message(event.channel, find_msg)
+      
+      #because the mem_store line shows "<user> message", we have to split up the username and their message
+      #this actually works to our advantage so we dont have to do additional calls to find out who sent what
+      msg_index = newString.find(">")
+      message = newString[msg_index + 2:]
+      message = message.replace(find_msg, replace_msg)
+      user = newString[1:msg_index]
+      #pybot sends the new replacement message to the chat
+      self.say(event.channel, user + " MEANT to say: " + message)
     if event.user != self.bot.NICK :
       self.add_buffer(event)
