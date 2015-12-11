@@ -19,7 +19,7 @@ class Replace(BaseModule):
 
     self.bot.register_event(replace, self)
 
-    self.help = ".r <search string> | <replacement text>"
+    self.help = ".r <search string> | <replacement text> OR s/<search string>/<replacement string>"
     self.MAX_BUFFER_SIZE = 300 
     self.MAX_HISTORY_SIZE = 10
 
@@ -127,6 +127,26 @@ class Replace(BaseModule):
       find_msg = string_token[0].rstrip()
       try:
         replace_msg = string_token[1].lstrip() #if there's nothing after the pipe, then this resolves to '' which is fine
+      except IndexError:
+        return
+      #looking for a message containing our search string
+      newString = self.get_replacement_message(event.channel, find_msg)
+      
+      #because the mem_store line shows "<user> message", we have to split up the username and their message
+      #this actually works to our advantage so we dont have to do additional calls to find out who sent what
+      msg_index = newString.find(">")
+      message = newString[msg_index + 2:]
+      message = message.replace(find_msg, replace_msg)
+      user = newString[1:msg_index]
+      #pybot sends the new replacement message to the chat
+      self.say(event.channel, user + " MEANT to say: " + message)
+    # because both .r and s// are valid formats now
+    if event.msg.startswith("s/"):
+      #alternative notation: s/<substring to replace>/<substring to replace with>
+      string_token = event.msg[2:].split('/', 1)
+      find_msg = string_token[0]
+      try:
+        replace_msg = string_token[1]
       except IndexError:
         return
       #looking for a message containing our search string
