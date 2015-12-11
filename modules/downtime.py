@@ -24,5 +24,8 @@ class Downtime(BaseModule):
     self._downtime(event)
 
   def _downtime(self, event):
-    self.say(event.channel, self.action_string + ' gets ' + event.user + ' ' + random.choice(self.drinks)+ "\001\n")
+    if event.user.lower() == "george" or "thorogood" in event.user.lower():
+      self.say(event.channel, self.action_string + ' gets ' + event.user + ' one bourbon, one scotch, one beer'+ "\001\n")
+    else:
+      self.say(event.channel, self.action_string + ' gets ' + event.user + ' ' + random.choice(self.drinks)+ "\001\n")
 
