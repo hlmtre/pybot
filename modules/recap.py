@@ -19,7 +19,7 @@ class recap(BaseModule):
         self.ignore_list = [self.bot.NICK, 'TSDBot', 'Bonk-Bot']
         self.ignore_nicks = self.create_ignore_nicks_tuple()
         self.RATE_LIMIT = 600 #rate limit in seconds
-        self.MIN_WORDS = 3 #we want at least this many words for a valid line
+        self.MIN_WORDS = 4 #we want at least this many words for a valid line
         self.RECAP_LENGTH = 4 #number of lines to include in recap
         self.bot.mem_store['recap'] = {}
 
