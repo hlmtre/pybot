@@ -532,10 +532,12 @@ class Bot(threading.Thread):
     error: boolean, defaults to False. if True, prints out with red >> in the debug line
     """
         #self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
+    if not hasattr(self, 'network'):
+      self.network = ""
     if not error:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
+      print str(datetime.datetime.now()) + ": " + self.getName() + "(" + util.bcolors.WARNING + self.network + util.bcolors.ENDC + "): " + line.strip('\n').rstrip().lstrip()
     else:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.FAIL + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
+      print str(datetime.datetime.now()) + ": " + self.getName() + "(" + util.bcolors.WARNING + self.network + util.bcolors.ENDC + "):" + util.bcolors.FAIL + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
 
     
   def run(self):

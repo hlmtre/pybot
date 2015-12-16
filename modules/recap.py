@@ -126,7 +126,7 @@ class recap(BaseModule):
             nick = '<' + ''.join(nick_letters) + '>'  
             #take the old nick out of the submitted line and replace it with the new scramble one
             return nick
-        except IndexError:
+        except IndexError: # no vowels, probably
             self.bot.debug_print("Error scrambling nick. Just moving on. Nick was: " + original_nick, error=True)
             return nick #if there's any problems at all, just don't scramble the nick. odd cases like no vowels
 
