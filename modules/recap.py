@@ -62,7 +62,10 @@ class recap(BaseModule):
            Not an action line, longer than minimum length, not spoken by ignored nicks, no URLs"""
         #easy check to see if it's a line of someone speaking
         if line.startswith("<"):
-            if not (line.startswith(self.ignore_nicks) or self.contains_url(line) or len(line.split()) < self.MIN_WORDS):
+            if not (line.startswith(self.ignore_nicks) or 
+                    self.contains_url(line) or 
+                    len(line.split()) < self.MIN_WORDS or
+                    line.split(None,1)[1].startswith((".","#")): #check for the line after the <nick> starting with . or #
                 return True
         return False
 
