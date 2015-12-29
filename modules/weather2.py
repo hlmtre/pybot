@@ -11,11 +11,11 @@ class Weather2(BaseModule):
 
     def post_init(self):
         weather2 = Event('__.weather2__')
-        weather2.define(msg_definition='^\.weather')
+        weather2.define(msg_definition='^\.[Ww]eather')
         weather2.subscribe(self)
 
         forecast = Event('__.forecast__')
-        forecast.define(msg_definition='^\.forecast')
+        forecast.define(msg_definition='^\.[Ff]orecast')
         forecast.subscribe(self)
 
         self.bot.register_event(forecast, self)
@@ -39,6 +39,7 @@ class Weather2(BaseModule):
         phrase = phrase + item['title'] + ": " + item['fcttext'] + " "
         counter += 1
 
+      print phrase
       return phrase[:-1] # super hackish way to remove the trailing comma
 
 
