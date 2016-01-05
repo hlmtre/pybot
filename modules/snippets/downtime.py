@@ -8,7 +8,6 @@ from util import commands, parse_line
 def _downtime(bot, message, channel):
   drinks = ['a beer', 'a scotch', 'a bloody mary', 'a nice glass of wine', 'FUCKIN FOUR LOKO', 'a crisp cider']
   action_string = "\001ACTION "
-  print message
   user = parse_line(message).user
   if user.lower() == "george" or "thorogood" in user.lower():
     bot.say(channel, action_string + ' gets ' + user + ' one bourbon, one scotch, one beer'+ "\001\n")
