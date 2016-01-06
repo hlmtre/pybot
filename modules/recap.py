@@ -19,7 +19,7 @@ class recap(BaseModule):
         self.ignore_list = [self.bot.NICK, 'TSDBot', 'Bonk-Bot']
         self.ignore_nicks = self.create_ignore_nicks_tuple()
         self.RATE_LIMIT = 600 #rate limit in seconds
-        self.MIN_WORDS = 3 #we want at least this many words for a valid line
+        self.MIN_WORDS = 4 #we want at least this many words for a valid line
         self.RECAP_LENGTH = 4 #number of lines to include in recap
         self.bot.mem_store['recap'] = {}
 
@@ -62,7 +62,10 @@ class recap(BaseModule):
            Not an action line, longer than minimum length, not spoken by ignored nicks, no URLs"""
         #easy check to see if it's a line of someone speaking
         if line.startswith("<"):
-            if not (line.startswith(self.ignore_nicks) or self.contains_url(line) or len(line.split()) < self.MIN_WORDS):
+            if not (line.startswith(self.ignore_nicks) or 
+                    self.contains_url(line) or 
+                    len(line.split()) < self.MIN_WORDS or
+                    line.split(None,1)[1].startswith((".","#"))): #check for the line after the <nick> starting with . or #
                 return True
         return False
 
@@ -100,15 +103,14 @@ class recap(BaseModule):
             return line
 
     def scramble_nick(self, nick):
-        """Given a valid line, scramble a vowel in the nick to avoid beeping the user"""
-        original_nick = nick
+        """Given a valid nick in the format <nickname>, scramble a vowel in the nick to avoid beeping the user"""
         try:
             vowels = 'aeiou'
             nick_vowels = []
             nick_letters = list(nick[1:-1]) #grab the nick from between <> and conver to a list to make changes
             #create a list of tuples. each tuple is (index of a vowel in nick, the vowel at that index)
             for i,v in enumerate(nick_letters):
-                if v in vowels:
+                if v.lower() in vowels:
                     nick_vowels.append((i,v))
             #randomly choose one of the vowels in the nick to replace
             sel = random.choice(nick_vowels)
@@ -216,6 +218,9 @@ class recap(BaseModule):
                     "Sunbreaker or Sunbroken?",
                     "Testing in Production",
                     "BoneKin Codes a New Module and Forgets How to Use Git",
+                    "The Curse of the Spiduh",
+                    "Snipe Quits Halo (Part 2)",
+                    "Monopoly Is A Fun Game",
                     "Dr. GV, PhD, although I guess if he was a medical doctor he wouldn't have a PhD? Or maybe they can, I don't know. I know he'd be called 'Dr.' though. I think they should make that clearer, like in the dictionary or wherever they spell things out like that. But I guess it wouldn't be an English thing it'd be a medical licensing and terminology thing? Uuuuuuugggggghhhh it's already so late and I was supposed to go to bed 23 minutes ago but then t"
                     ]
                     
