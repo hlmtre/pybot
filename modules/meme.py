@@ -113,7 +113,7 @@ class meme:
         return None
 
     def get_line(self, array_of_lines):
-        """Given an array of lines from which to pick,  randomly
+        """Given an array of lines from which to pick, randomly
         select an appropriate line, clean it up, and return the string."""
         line = ""
         #our counter so we don't get caught in an infinite loop when too few good lines exist
@@ -123,17 +123,26 @@ class meme:
             while not line.startswith("<") and counter < 20:
                 counter += 1
                 line = random.choice(array_of_lines)
-                formatted_line = self.format_string(line)
-                #discard any lines with .commands or said by ignored nicks. those aren't any fun
-                #also discard lines that contain a URL
-                if formatted_line.startswith(".") or line.startswith(self.ignore_nicks) or self.contains_url(line):
+                if not self.is_valid_line(line): 
                     line = ""
-        except KeyError, e:
-            self.bot.debug_print("KeyError in get_random_line(): ")
+        except Exception as e:
+            self.bot.debug_print("Error in get_random_line(): ")
             self.bot.debug_print(str(e))
             return
         #format the string for use in the meme and return it
-        return formatted_line
+        return self.format_string(line)
+
+    def is_valid_line(self, line):
+        """Given a line from the qdb buffer, return True if certain conditions are met
+        that make it good for meme selection. Return False if not"""
+        formatted_line = self.format_string(line) #strips the nick off the beginning
+        if (formatted_line.startswith(".") or       #reject .commands
+            formatted_line.startswith("#") or       #reject #commands meant for BonkBot
+            formatted_line.startswith("s/") or       #reject s// substitution lines
+            self.contains_url(line) or              #reject lines with URLs
+            line.startswith(self.ignore_nicks)):    #reject lines spoken by bots
+            return False
+        return True
 
     def get_user_lines(self, channel, nick):
         """Given a specific nick and channel, create a list of all their lines in the buffer"""
@@ -145,7 +154,7 @@ class meme:
 
 
     def format_string(self, line):
-        """Given an appropriate line, strip out <nick>"""
+        """Given an appropriate line, strip out <nick>. Otherwise return unmodified line"""
         if line.startswith("<"):
             return line.split("> ", 1)[1]
         else:
@@ -175,6 +184,7 @@ class meme:
         except KeyError, e:
             self.bot.debug_print("KeyError in create_meme(): ")
             self.bot.debug_print(str(e))
+            self.bot.debug_print(str(meme.json()))
             return
 
     def get_last_meme_time(self, nick):
