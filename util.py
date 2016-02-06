@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 class bcolors:
   """
   Allows for prettyprinting to the console for debugging.
@@ -74,13 +75,8 @@ def __prettyDate(time):
     diff = now - datetime.fromtimestamp(time)
   elif isinstance(time,datetime):
     diff = now - time 
-  elif not time:
-    diff = now - now
   second_diff = diff.seconds
   day_diff = diff.days
-
-  if day_diff < 0:
-    return ''
 
   if day_diff == 0:
     if second_diff < 10:
