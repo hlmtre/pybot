@@ -10,8 +10,10 @@ class SqliteDB:
     self.con.close()
 
 
-  def _prepare_database(self):
+  def _prepare_database(self, create_string=None):
     self._open()
+    if create_string:
+      self.cur.execute(create_string)
     self.cur.execute('CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username CHAR(32) DEFAULT NULL UNIQUE)') 
     self.cur.execute('CREATE TABLE IF NOT EXISTS img (id INTEGER PRIMARY KEY, url CHAR(128) DEFAULT NULL, user CHAR(32) DEFAULT NULL, time DATETIME DEFAULT CURRENT_TIMESTAMP, channel CHAR(32) DEFAULT NULL)')
     self.cur.execute('CREATE TABLE IF NOT EXISTS lastfm (lastfm_username CHAR(64) NOT NULL, nick CHAR(32) NOT NULL)')
