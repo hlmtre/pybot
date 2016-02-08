@@ -39,7 +39,7 @@ class Weather2(BaseModule):
         phrase = phrase + item['title'] + ": " + item['fcttext'] + " "
         counter += 1
 
-      print phrase
+      #print phrase
       return phrase[:-1] # super hackish way to remove the trailing comma
 
 

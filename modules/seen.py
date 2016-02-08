@@ -14,8 +14,8 @@ except ImportError:
 
 class Seen(BaseModule):
   def mem_store_init(self):
-    if not "tell" in self.bot.mem_store:
-      self.bot.mem_store['tell'] = dict()
+    if not "seen" in self.bot.mem_store:
+      self.bot.mem_store['seen'] = dict()
 
   def post_init(self):
     self.interests = ['__privmsg__']  # should be first event in the listing.. so lines being added is a priority
@@ -32,13 +32,13 @@ class Seen(BaseModule):
 
     if event.msg.startswith(".seen"):
       try:
-        nick = event.msg.split()[1]
+        nick = event.msg.split()[1].lower() # store all nicks in lowercase
       except IndexError:
         return
-      if nick in self.bot.mem_store['tell']:
-        self.say(event.channel, "Last saw " + nick + " " + prettydate(self.bot.mem_store['tell'][nick]))
+      if nick in self.bot.mem_store['seen']:
+        self.say(event.channel, "Last saw " + nick + " " + prettydate(self.bot.mem_store['seen'][nick]))
       else:
         self.say(event.channel, "haven't seen " + nick)
 
-    self.bot.mem_store['tell'][event.user] = datetime.now()
+    self.bot.mem_store['seen'][event.user] = datetime.now()
 
