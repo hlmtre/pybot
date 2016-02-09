@@ -62,7 +62,7 @@ If you have Vagrant locally installed and configured, you can set up pybot by in
 Images & Explanation
 ====================
 
-![debug mode](http://i.imgur.com/k5T7SKq.png "debug mode")
+![debug mode](http://i.imgur.com/x99zXOJ.png "debug mode")
 
 Here pybot is connected to two networks at once. They are held entirely separately. Modules loaded on one are independent of modules loaded on another.
 If one server goes down, the other connections to other networks are unaffected.
