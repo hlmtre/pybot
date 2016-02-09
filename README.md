@@ -16,7 +16,7 @@ python versions > 3 are in the works.
 
 Take care of dependencies. If you don't use MySQL and don't care about twitter posting or reddit info, you don't need anything but python 2.7 and standard libs.
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-sudo pip install -r requirements.txt
+`sudo pip install -r requirements.txt`
 
 * python-dev
 * libmysqlclient-dev (aka mysql-python in pip)
