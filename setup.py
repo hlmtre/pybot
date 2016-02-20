@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
   name = 'yapybot',
   packages = ['yapybot'],
-  version = '0.8.5',
+  version = '0.8.6',
   description = 'yet another python irc bot',
   author = 'Matt Weller',
   author_email = 'hellmitre@gmail.com',

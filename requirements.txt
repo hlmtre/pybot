@@ -1,5 +1,0 @@
-praw
-MySQL-python
-python-twitter
-imgurpython
-isodate
