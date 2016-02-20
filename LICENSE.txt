@@ -1,0 +1,1 @@
+This project (pybot) is released by Matt Weller under the MIT License.
