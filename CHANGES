@@ -96,3 +96,7 @@ v0.8.0
     
   Bugfixes:
     * Fixes a few bugs in modules now that the bot is all unicode internally.
+
+v0.8.5
+======
+  Add 'seen' module, which does not as yet write out to the DB. Allows for .seen <nick> commands, to tell the user when the specified nick was last seen active in chat.
