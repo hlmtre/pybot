@@ -3,11 +3,6 @@ from util import __prettyDate as prettydate
 from util import strip_nick
 from datetime import datetime
 
-class UserHistory():
-  def __init__(self, user=None, timestamp=None):
-    self.user = user
-    self.timestamp = timestamp
-
 try:
   from basemodule import BaseModule
 except ImportError:
