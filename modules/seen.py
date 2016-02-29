@@ -1,5 +1,6 @@
 from event import Event
 from util import __prettyDate as prettydate
+from util import strip_nick
 from datetime import datetime
 
 class UserHistory():
@@ -32,13 +33,13 @@ class Seen(BaseModule):
 
     if event.msg.startswith(".seen"):
       try:
-        nick = event.msg.split()[1].lower() # store all nicks in lowercase
+        nick = strip_nick(event.msg.split()[1].lower()) # store all nicks in lowercase
       except IndexError:
         return
-      if nick in self.bot.mem_store['seen']:
+      if nick in (n.lower() for n in self.bot.mem_store['seen']):
         self.say(event.channel, "Last saw " + nick + " " + prettydate(self.bot.mem_store['seen'][nick]))
       else:
         self.say(event.channel, "haven't seen " + nick)
 
-    self.bot.mem_store['seen'][event.user] = datetime.now()
+    self.bot.mem_store['seen'][strip_nick(event.user).lower()] = datetime.now()
 

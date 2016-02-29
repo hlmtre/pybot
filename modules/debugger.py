@@ -10,8 +10,13 @@ class Debugger(BaseModule):
     debug_event.define(msg_definition="^\.debug")
     debug_event.subscribe(self)
 
+    delete_event = Event("__.delete__")
+    delete_event.define(msg_definition="^\.delete")
+    delete_event.subscribe(self)
+
     # register ourself to our new debug_event event
     self.bot.register_event(debug_event, self)
+    self.bot.register_event(delete_event, self)
 
   def recurse(self, obj):
     if type(obj) is not dict:
@@ -19,6 +24,13 @@ class Debugger(BaseModule):
     else:
       for k in obj:
         self.recurse(k)
+
+  def mem_store_delete(self, mem_store_key):
+    if not mem_store_key:
+      return False
+    if mem_store_key in self.bot.mem_store:
+      del(self.bot.mem_store[mem_store_key])
+      return True
 
   def pretty(self, d, event, indent=0):
     for key, value in d.iteritems():
@@ -33,6 +45,11 @@ class Debugger(BaseModule):
     
   def handle(self, event):
     if not self.bot.brain._isAdmin(event.user):
+      return
+    if event.msg.startswith(".delete"):
+      target = event.msg.split()[-1]
+      if self.mem_store_delete(target):
+        self.say(event.user, "deleted " + target + " from mem_store")
       return
     try:
       key = event.msg.split()[1]
