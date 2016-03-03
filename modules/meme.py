@@ -44,7 +44,7 @@ class meme:
         self.help = ".meme [[meme name] [| nick to use for history]]"
         self.ignore_list = [self.bot.NICK, 'TSDBot', 'Bonk-Bot']
         self.ignore_nicks = self.create_ignore_nicks_tuple()
-        self.RATE_LIMIT = 300 #rate limit in seconds
+        self.RATE_LIMIT = 30 #rate limit in seconds
         self.bot.mem_store['meme'] = {}
 
         for event in events:
