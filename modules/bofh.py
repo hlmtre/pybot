@@ -1,16 +1,17 @@
 import urllib2
-class Bofh:
-  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
-    self.events = events
-    self.printer = printer_handle
-    self.interests = ['__.bofh__']
-    self.bot = bot
+from event import Event
+try:
+  from basemodule import BaseModule
+except ImportError:
+  from modules.basemodule import BaseModule
+class Bofh(BaseModule):
+  def post_init(self):
+    b_event = Event("__.bofh__")
 
-    self.help = ".bofh"
+    b_event.define(msg_definition="^\.bofh")
+    b_event.subscribe(self)
 
-    for event in events:
-      if event._type in self.interests:
-        event.subscribe(self)
+    self.bot.register_event(b_event, self)
 
   def handle(self, event):
     try:
@@ -18,6 +19,6 @@ class Bofh:
       response = urllib2.urlopen(url)
       text = response.read()
       bofhquote = text.splitlines()[2]
-      self.printer("PRIVMSG " + event.channel + " :BOFH: " + bofhquote + '\n')
+      self.say(event.channel, "BOFH: " + bofhquote)
     except:
       pass

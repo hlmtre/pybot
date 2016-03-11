@@ -25,7 +25,8 @@ class QDB:
         self.imgur_client_id = "6f4e468a474bb6e"
         self.imgur_client_secret = "22f791df5569e7964a1ca78637125c94cba6f312"
 
-        self.bot.mem_store['qdb'] = {}
+        if not "qdb" in self.bot.mem_store:
+          self.bot.mem_store['qdb'] = {}
         #define a key for _recent since that will not be a potential channel name
         self.bot.mem_store['qdb']['_recent'] = []
 
@@ -236,7 +237,7 @@ class QDB:
             print ""
             return ''
         #accessing hlmtre's qdb api
-        url = 'http://qdb.zero9f9.com/api.php'
+        url = 'https://qdb.zero9f9.com/api.php'
         payload = {'q':'new', 'quote': qdb_submission.rstrip('\n')}
         try:
           qdb = requests.post(url, payload)
@@ -249,11 +250,14 @@ class QDB:
         except requests.exceptions.HTTPError, e:
             self.bot.debug_print('HTTPError: ')
             self.bot.debug_print(str(e))
+            self.bot.debug_print("Perhaps informative:")
+            self.bot.debug_print(url)
+            self.bot.debug_print(str(payload))
             return "HTTPError encountered when submitting to QDB"
         try:
             q_url = qdb.json()
             self.add_recently_submitted(q_url['id'], qdb_submission)
-            return "QDB submission successful! http://qdb.zero9f9.com/quote.php?id=" + str(q_url['id'])
+            return "QDB submission successful! https://qdb.zero9f9.com/quote.php?id=" + str(q_url['id'])
         except (KeyError, UnicodeDecodeError):
             return "Error getting status of quote submission." 
         return "That was probably successful since no errors came up, but no status available."
