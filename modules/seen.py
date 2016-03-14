@@ -19,7 +19,7 @@ class Seen(BaseModule):
       if event._type in self.interests:
         event.subscribe(self)
 
-    self.help = ".seen <nickname>. describes when the bot last saw <nickname> active in channel"  
+    self.help = ".seen <nickname>. describes when the bot last saw <nickname> active on server"  
 
     self.mem_store_init()
     
