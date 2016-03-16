@@ -5,20 +5,19 @@ import time
 import re
 
 try:
-  import requests
+    import requests
 except ImportError:
-  print "Warning: meme module requires requests."
-  requests = object
+    print "Warning: meme module requires requests."
+    requests = object
 
 try: 
-  from meme_credentials import MemeCredentials as mc
+    from meme_credentials import MemeCredentials as mc
 except ImportError:
-  print "Warning: meme module requires ceredentials in modules/meme_credentials.py"
-  class PhonyMc:
-    imgflip_userid = "None"
-    imgflip_password = "None"
-
-  mc = PhonyMc()
+    print "Warning: meme module requires credentials in modules/meme_credentials.py"
+    class PhonyMc:
+        imgflip_userid = "None"
+        imgflip_password = "None"
+    mc = PhonyMc()
 
 """
 the imgflip api requires credentials, which are bad to put directly into source code. in order to use this module, you will need a file in modules/ called meme_credentials, whose content follows this pattern:
@@ -41,7 +40,7 @@ class meme:
         self.imgflip_password = mc.imgflip_password
         self.top_memes_list = self.get_top_memes()
         self.cmd = ".meme"
-        self.help = ".meme [[meme name] [| nick to use for history]]"
+        self.help = ".meme [nickname]"
         self.ignore_list = [self.bot.NICK, 'TSDBot', 'Bonk-Bot']
         self.ignore_nicks = self.create_ignore_nicks_tuple()
         self.RATE_LIMIT = 30 #rate limit in seconds
@@ -100,17 +99,6 @@ class meme:
         if comparison.ratio() >= 0.67:
             return True
         return False
-
-    def get_specific_meme_id(self, user_description):
-        """finds a meme_id based on user's description. if not found, selects randomly"""
-        try:
-            for meme in self.top_memes_list:
-                if self.compare_description(meme['name'], user_description):
-                    return meme['id']
-        except (IndexError, KeyError), e:
-            self.bot.debug_print("KeyError in get_specific_meme_id(): ")
-            self.bot.debug_print(str(e))
-        return None
 
     def get_line(self, array_of_lines):
         """Given an array of lines from which to pick, randomly
@@ -183,6 +171,7 @@ class meme:
             return meme.json()['data']['url']
         except KeyError, e:
             self.bot.debug_print("KeyError in create_meme(): ")
+            self.bot.debug_print("User: " + self.imgflip_userid + " Password: " + self.imgflip_password)
             self.bot.debug_print(str(e))
             self.bot.debug_print(str(meme.json()))
             return
@@ -248,35 +237,20 @@ class meme:
                     line_array = self.bot.mem_store['qdb'][event.channel]
                     top_line = self.get_line(line_array)
                     bottom_line = self.get_line(line_array)
-                    meme_id = self.get_random_meme_id()
-                    meme_url = self.create_meme(meme_id, top_line, bottom_line)
-                    if(meme_url):
-                        self.say(event.channel, self.get_random_flavor() + meme_url)
-                    else:
-                        self.say(event.channel, "Error making memes. What a bummer.")
-                    return
                 #more detail requested
                 else:
-                    args = event.msg[5:].split("|",1)
-                    if args[0].strip():
-                        meme_id = self.get_specific_meme_id(args[0])
-                        if not meme_id:
-                            self.say(event.channel, "Bruh, I couldn't find that meme. We'll do a rando.")
-                            meme_id = self.get_random_meme_id()
-                    else:
-                        meme_id = self.get_random_meme_id()
-                    if len(args) > 1:
-                        line_array = self.get_user_lines(event.channel, args[1].strip())
-                        if not line_array:
-                            self.say(event.channel, "That memer hasn't spoken or doesn't exist. Using randoms.")
-                            line_array = self.bot.mem_store['qdb'][event.channel]
-                    else:
+                    nick = event.msg[5:].strip().split(None)[0]
+                    line_array = self.get_user_lines(event.channel, nick)
+                    if not line_array:
+                        self.say(event.channel, "That memer hasn't spoken or doesn't exist. Using randoms.")
                         line_array = self.bot.mem_store['qdb'][event.channel]
                     top_line = self.get_line(line_array)
                     bottom_line = self.get_line(line_array)
-                    meme_url = self.create_meme(meme_id, top_line, bottom_line)
-                    if meme_url:
-                        self.say(event.channel, self.get_random_flavor() + meme_url)
-                    else:
-                        self.say(event.channel, "It's all ogre. Memery broken.")
-                    return
+
+                meme_id = self.get_random_meme_id()
+                meme_url = self.create_meme(meme_id, top_line, bottom_line)
+                if meme_url:
+                    self.say(event.channel, self.get_random_flavor() + meme_url)
+                else:
+                    self.say(event.channel, "It's all ogre. Memery broken.")
+                return
