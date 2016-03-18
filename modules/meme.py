@@ -231,26 +231,27 @@ class meme:
                 return
             
             #check the rate first, then continue with processing
-            if self.check_rate(event.user):
-                #just a random meme please
-                if event.msg == ".meme":
+            if not self.check_rate(event.user):
+              return
+            #just a random meme please
+            if event.msg == ".meme":
+                line_array = self.bot.mem_store['qdb'][event.channel]
+                top_line = self.get_line(line_array)
+                bottom_line = self.get_line(line_array)
+            #more detail requested
+            else:
+                nick = event.msg[5:].strip().split(None)[0]
+                line_array = self.get_user_lines(event.channel, nick)
+                if not line_array:
+                    self.say(event.channel, "That memer hasn't spoken or doesn't exist. Using randoms.")
                     line_array = self.bot.mem_store['qdb'][event.channel]
-                    top_line = self.get_line(line_array)
-                    bottom_line = self.get_line(line_array)
-                #more detail requested
-                else:
-                    nick = event.msg[5:].strip().split(None)[0]
-                    line_array = self.get_user_lines(event.channel, nick)
-                    if not line_array:
-                        self.say(event.channel, "That memer hasn't spoken or doesn't exist. Using randoms.")
-                        line_array = self.bot.mem_store['qdb'][event.channel]
-                    top_line = self.get_line(line_array)
-                    bottom_line = self.get_line(line_array)
+                top_line = self.get_line(line_array)
+                bottom_line = self.get_line(line_array)
 
-                meme_id = self.get_random_meme_id()
-                meme_url = self.create_meme(meme_id, top_line, bottom_line)
-                if meme_url:
-                    self.say(event.channel, self.get_random_flavor() + meme_url)
-                else:
-                    self.say(event.channel, "It's all ogre. Memery broken.")
+            meme_id = self.get_random_meme_id()
+            meme_url = self.create_meme(meme_id, top_line, bottom_line)
+            if meme_url:
+                self.say(event.channel, self.get_random_flavor() + meme_url)
+            else:
+                self.say(event.channel, "It's all ogre. Memery broken.")
                 return
