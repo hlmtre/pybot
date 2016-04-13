@@ -65,7 +65,7 @@ class recap(BaseModule):
             if not (line.startswith(self.ignore_nicks) or 
                     self.contains_url(line) or 
                     len(line.split()) < self.MIN_WORDS or
-                    line.split(None,1)[1].startswith((".","#"))): #check for the line after the <nick> starting with . or #
+                    line.split(None,1)[1].startswith((".","#","s/"))): 
                 return True
         return False
 
