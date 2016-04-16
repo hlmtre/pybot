@@ -28,4 +28,3 @@ class Uptime(BaseModule):
   def _uptime(self, channel):
     #print timedelta(seconds=time.time() - self.starttime)
     self.say(channel,"I've been up " +str(timedelta(seconds=time.time() - self.bot.mem_store['uptime']['starttime'])).split(".")[0] + ", since "+time.strftime("%a, %d %b %Y %H:%M:%S -0800", self.bot.mem_store['uptime']['localtime']))
-
