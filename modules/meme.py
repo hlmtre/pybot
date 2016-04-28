@@ -128,7 +128,8 @@ class meme:
             formatted_line.startswith("#") or       #reject #commands meant for BonkBot
             formatted_line.startswith("s/") or       #reject s// substitution lines
             self.contains_url(line) or              #reject lines with URLs
-            line.startswith(self.ignore_nicks)):    #reject lines spoken by bots
+            line.startswith(self.ignore_nicks) or   #reject lines spoken by bots
+            "TSDBot" in line):    #reject any line with "TSDBot" due to mass printout summoning
             return False
         return True
 
