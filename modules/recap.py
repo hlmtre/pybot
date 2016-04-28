@@ -63,6 +63,7 @@ class recap(BaseModule):
         #easy check to see if it's a line of someone speaking
         if line.startswith("<"):
             if not (line.startswith(self.ignore_nicks) or 
+                    "TSDBot" in line or #rejects all printout requests, because that's a lotta noise
                     self.contains_url(line) or 
                     len(line.split()) < self.MIN_WORDS or
                     line.split(None,1)[1].startswith((".","#","s/"))): 
