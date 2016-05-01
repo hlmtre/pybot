@@ -405,8 +405,8 @@ class Bot(threading.Thread):
           self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + "connected to " + self.network)
       except:
         if self.DEBUG:
-          self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect to " + self.HOST + " at " + self.PORT + "! Retrying... ")
-        self.logger.write(Logger.CRITICAL, "Could not connect to " + self.HOST + " at " + self.PORT + "! Retrying...")
+          self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect to " + self.HOST + " at " + str(self.PORT) + "! Retrying... ")
+        self.logger.write(Logger.CRITICAL, "Could not connect to " + self.HOST + " at " + str(self.PORT) + "! Retrying...")
         time.sleep(1)
 
         self.worker()
