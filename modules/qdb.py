@@ -25,6 +25,7 @@ class QDB:
         self.imgur_client_id = "6f4e468a474bb6e"
         self.imgur_client_secret = "22f791df5569e7964a1ca78637125c94cba6f312"
 
+        # prevent unecessarily clearing our mem_store['qdb'] dict
         if not "qdb" in self.bot.mem_store:
           self.bot.mem_store['qdb'] = {}
         #define a key for _recent since that will not be a potential channel name
@@ -64,17 +65,40 @@ class QDB:
       
     def _detect_url(self, quote):
         """
-        right now this is strictly for tsdbot's printout functionality
+        for tsd printouts and imgflip (.meme)
         follows this format:
         http://irc.teamschoolyd.org/printouts/8xnK5DmfMz
+        http://i.imgflip.com/zs1e6.jpg
         """
+        tsd_regex = "(?P<url>http://irc\.teamschoolyd\.org/printouts/\w+)"
+        if_regex = "(?P<url>http://i\.imgflip\.com/\w+.jpg)"
+
+        # to allow us to check both variables at the end
+        tsd_url, if_url = None, None
+
         try:
-            url = re.search("(?P<url>http://irc\.teamschoolyd\.org/printouts/\w+)", quote).group("url")
-        except AttributeError: # we didn't find anything
+            tsd_url = re.search(tsd_regex, quote).group("url")
+        except AttributeError:
+            pass
+        try:
+            if_url = re.search(if_regex, quote).group("url")
+        except AttributeError:
+            pass
+
+        if not tsd_url and not if_url:
             return quote
 
+        if tsd_url:
+          url = tsd_url
+        if if_url:
+          url = if_url
+
         repl = self._imgurify(url)
-        new_quote = re.sub('(?P<url>http://irc\.teamschoolyd\.org/printouts/\w+)',repl[0]['link'], quote)
+
+        if tsd_url:
+          new_quote = re.sub(tsd_regex, repl[0]['link'], quote)
+        if if_url:
+          new_quote = re.sub(if_regex, repl[0]['link'], quote)
         return new_quote
     
     def strip_formatting(self, msg):
