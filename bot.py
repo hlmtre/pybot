@@ -34,6 +34,10 @@ class Bot(threading.Thread):
   def __init__(self, conf=None, network=None, d=None):
     threading.Thread.__init__(self)
 
+    self.HOST = None
+    self.PORT = None
+    self.REALNAME = None
+    self.IDENT = None
     self.DEBUG = d
     self.brain = None
     self.network = network
@@ -227,12 +231,12 @@ class Bot(threading.Thread):
     dir_list = os.listdir(modules_path)
     mods = {}
     autoloads = {}
-    #load autoloads if it exists
+    # load autoloads if it exists
     if os.path.isfile(autoload_path): 
       self.logger.write(Logger.INFO, "Found autoloads file", self.NICK)
       try:
         autoloads = json.load(open(autoload_path))
-        #logging
+        # logging
         for k in autoloads.keys():
           self.logger.write(Logger.INFO, "Autoloads found for network " + k, self.NICK)
       except IOError:
@@ -243,7 +247,7 @@ class Bot(threading.Thread):
       if specific is None:
         nonspecific = True
         # ignore compiled python and __init__ files. 
-        #choose to either load all .py files or, available, just ones specified in autoloads
+        # choose to either load all .py files or, available, just ones specified in autoloads
         if self.network not in autoloads.keys(): # if autoload does not specify for this network
           if ext == '.py' and not name == '__init__': 
             f, filename, descr = imp.find_module(name, [modules_path])
@@ -279,7 +283,8 @@ class Bot(threading.Thread):
 
     if nonspecific is True or found is True:
       return 0
-    else: return 1
+    else:
+      return 1
     # end magic.
     
   def send(self, message):
@@ -351,7 +356,7 @@ class Bot(threading.Thread):
       else:
 # patch contributed by github.com/thekanbo
         if self.JOINED is False and (message_number == "376" or message_number == "422"): 
-          # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exis
+          # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exist
           self.chan_list = self.conf.getChannels(self.network) 
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
@@ -395,7 +400,7 @@ class Bot(threading.Thread):
     
     # connect to server
     self.s = socket.socket()
-    while self.CONNECTED == False:
+    while not self.CONNECTED:
       try:
 # low level socket TCP/IP connection
         self.s.connect((self.HOST, self.PORT)) # force them into one argument
@@ -465,9 +470,7 @@ class Bot(threading.Thread):
           self.worker()
 
         time.sleep(1)
-       # if self.CONNECTED == False:
-       #   self.connect()
-        ready = select.select([self.s],[],[], 1)
+        ready = select.select([self.s], [], [], 1)
         if ready[0]:
           try:
             read = read + self.s.recv(1024).decode('utf8', 'ignore')
@@ -513,7 +516,7 @@ class Bot(threading.Thread):
     line: text.
     error: boolean, defaults to False. if True, prints out with red >> in the debug line
     """
-        #self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
+
     if not error:
       print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
     else:
