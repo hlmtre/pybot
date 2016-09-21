@@ -10,6 +10,8 @@ he is modular, extensible, multi-threaded (for network independence!), and confi
 pybot runs on python ~~2.6~~ and 2.7, on both windows and linux.
 python versions > 3 are in the works.
 
+**master branch should be stable. feature branches can be broken at any time.**
+
 
 (Now probably more than) 10-second TL;DR:
 =========================================
