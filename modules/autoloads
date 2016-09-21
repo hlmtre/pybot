@@ -8,7 +8,9 @@
   "grizzly.bearcopter.com": { 
     "exclude": [
       "shortener",
-      "redditinfo"
+      "redditinfo",
+      "replace",
+      "recap"
       ]
   },
   "prod-srv": {
