@@ -34,7 +34,15 @@ class Youtube(BaseModule):
 
 
     # for the new v3 google api >:(
-    self.api_key = "AIzaSyDwzB3Sf_E-7VyKZYWXP9DjjlnPBs5kSfc"
+    try: 
+        from youtube_credentials import YoutubeCredentials as yc
+    except ImportError:
+        print "Warning: youtube module requires credentials in modules/youtube_credentials.py"
+        class PhonyYc:
+            api_key = "None"
+        yc = PhonyYc()
+
+    self.api_key = yc.api_key    
     self.api_url = "https://www.googleapis.com/youtube/v3/videos?id="
     #self.api_url = "https://www.googleapis.com/youtube/v3/videos?id=2k_9mXpNdgU&key=&part=snippet"
 

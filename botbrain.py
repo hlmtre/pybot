@@ -116,7 +116,8 @@ class BotBrain:
   def respond(self, usr, channel, message):
 # this bit is not a command
 # TODO (pull this out into a module)
-    if any(k in message for k in (".png",".gif",".jpg",".jpeg", ".gifv")) and ("http:" in message or "https:" in message) or ("imgur.com" in message and "gallery" in message):
+    if any(k in message for k in (".png",".gif",".jpg",".jpeg", ".gifv")) and ("http:" in message or "https:" in message) \
+      or ("imgur.com" in message and "gallery" in message) or ("https" in message and "gfycat.com" in message):
      url = re.search("(?P<url>https?://[^\s]+)", message).group("url")
      if url:
        self._insertImg(usr, url, channel)

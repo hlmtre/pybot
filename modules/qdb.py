@@ -22,8 +22,16 @@ class QDB:
         self.interests = ['__.qdb__', '1__all_lines__']  # should be first event in the listing.. so lines being added is a priority
         self.bot = bot
         self.say = say
-        self.imgur_client_id = "6f4e468a474bb6e"
-        self.imgur_client_secret = "22f791df5569e7964a1ca78637125c94cba6f312"
+        try:
+          from imgur_credentials import ImgurCredentials as ic
+        except ImportError:
+            print "Warning: imgur module requires credentials in modules/imgur_credentials.py"
+            class PhonyIc:
+                imgur_client_id = "None"
+                imgur_client_secret = "None"
+            ic = PhonyIc()
+        self.imgur_client_id = ic.imgur_client_id
+        self.imgur_client_secret = ic.imgur_client_secret
 
         # prevent unecessarily clearing our mem_store['qdb'] dict
         if not "qdb" in self.bot.mem_store:
