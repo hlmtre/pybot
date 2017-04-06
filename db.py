@@ -1,4 +1,4 @@
-import logger
+from logger import Logger
 try:
   import MySQLdb as mdb
 except ImportError:
@@ -35,7 +35,8 @@ class DB:
       self.con = mdb.connect("localhost",dbusername,password,dbname)
     except mdb.OperationalError as e:
       self.dry_run = True
-      self.bot.logger(logger.Logger.WARNING, e)
+      self.bot.logger(Logger.WARNING, e)
+      print e
       return
 
     self.cur = self.con.cursor()
@@ -128,7 +129,7 @@ class DB:
       if not self.dry_run:
         self.con.commit()
     except:
-      self.bot.logger(logger.Logger.WARNING, 'failed to insert ' + url)
+      self.bot.logger(Logger.WARNING, 'failed to insert ' + url)
       print "failure"
       print "Unexpected error:", sys.exc_info()[0]
       if not self.dry_run:
