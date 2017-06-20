@@ -15,9 +15,9 @@ class Welcome:
     thankyou = Event("__thankyou__")
     ty = Event("__ty__")
 
-    thanks.define(msg_definition="^([T|t]hanks) " + nick)
-    thankyou.define(msg_definition="^([T|t]hank you) " + nick)
-    ty.define(msg_definition="^ty " + nick)
+    thanks.define(msg_definition="([T|t]hanks) " + nick)
+    thankyou.define(msg_definition="([T|t]hank you) " + nick)
+    ty.define(msg_definition="ty " + nick)
 
     thanks.subscribe(self)
     thankyou.subscribe(self)
