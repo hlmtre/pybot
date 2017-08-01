@@ -1,4 +1,4 @@
-import urllib2
+import requests
 import re
 class Shortener:
   def __init__(self, events=None, printer_handle=None, bot=None, say=None):
@@ -21,9 +21,12 @@ class Shortener:
     try:
       target = re.search("https?://[\S]+", event.line).group(0)
       if len(target) > 60:
-        url = "http://is.gd/create.php?format=simple&url=" + target 
-        response = urllib2.urlopen(url)
-        self.printer("PRIVMSG " + event.channel + " :" + response.read() + '\n')
+        url = 'https://is.gd/create.php'
+        payload = {'format':'simple', 'url':target}
+        r = requests.get(url, params=payload)
+        self.say(event.channel, r.text)
 
-    except:
-      pass
+    except requests.exceptions.HTTPError as e:
+      self.bot.debug_print("HTTPError")
+      self.bot.debug_print(str(e))
+
