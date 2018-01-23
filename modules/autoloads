@@ -15,8 +15,7 @@
   },
   "prod-srv": {
     "exclude": [
-      "redditinfo",
-      "shortener"
+      "redditinfo"
       ]
     }
 }
