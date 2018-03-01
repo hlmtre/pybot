@@ -29,6 +29,9 @@ class Weather2(BaseModule):
       except requests.exceptions.HTTPError:
         self.say(channel, "Encountered an error with the WUnderground API")
         return None
+      except requests.exceptions.MissingSchema:
+        self.say(channel, "Badly formatted location?")
+        return None
       results = q.json()
       # we're only doing two days for now
       counter = 0
