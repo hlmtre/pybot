@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 #
 # see version.py for version
 # works with python 2.6.x and 2.7.x
