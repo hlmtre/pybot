@@ -61,6 +61,8 @@ class Weather2(BaseModule):
           zipcode = re.match('[0-9]{5}', location)
           query = '/q/'+zipcode.string
         except ValueError: # it's a city name (or broken encoding on numbers or something)
+          if location == "stl": # little shortcut to prevent it thinking St Louis should be the one in Ontario
+            location = "Saint Louis"
           #create autocomplete search
           q = requests.get('http://autocomplete.wunderground.com/aq', params={'query':location})
           try:
