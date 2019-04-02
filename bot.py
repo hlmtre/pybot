@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 #
 # see version.py for version
-# works with python 2.6.x and 2.7.x
+# works with python 2.7.x
 #
 
 
@@ -240,7 +240,7 @@ class Bot(threading.Thread):
         for k in autoloads.keys():
           self.logger.write(Logger.INFO, "Autoloads found for network " + k, self.NICK)
       except IOError:
-        self.logger.write(Logger.ERROR, "Could not load autoloads file.",self.NICK)
+        self.logger.write(Logger.WARNING, "Could not load autoloads file.",self.NICK)
     # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
