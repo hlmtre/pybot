@@ -35,6 +35,9 @@ class Choose(BaseModule):
                 self.say(event.channel, "If you only have one option, the choice is easy. Go with " + choices[0].strip())
                 return
             self.say(event.channel, random.choice(flavortext) + random.choice(choices).strip())
+        except IndexError:
+            self.say(event.channel, "gib choices")
+            return
         except Exception as e:
             self.say(event.channel, "I couldn't decide")
             self.bot.debug_print("Error making decision in choice module")
