@@ -1,2 +1,4 @@
+indent-string='  '
+
 [MESSAGES CONTROL]
 disable=print-statement
