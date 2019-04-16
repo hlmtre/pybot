@@ -22,7 +22,6 @@ class Help:
   def handle(self, event):
     try:
       my_modules = list()
-      self.printer("PRIVMSG " + event.user + " :Help: \n")
       for m in self.bot.events_list:
         for s in m.subscribers:
           my_modules.append(s)
@@ -33,6 +32,7 @@ class Help:
         if hasattr(sm, "help") and sm.help is not None:
           line_list.append(sm.help)
 
+      self.printer("PRIVMSG " + event.user + " :Help: \n")
       self.say(event.user, ", ".join(line_list))
       #self.printer("PRIVMSG " + event.user + " :" + ", ".join(line_list) + "\n")
     except:

@@ -5,7 +5,7 @@ except ImportError:
   from modules.basemodule import BaseModule
 class Disconnect_Yeller(BaseModule):
   def post_init(self):
-    self.interests = ['__.help__']
+    self.interests = ['__.disconnection__']
 
     for event in self.events:
       if event._type in self.interests:
