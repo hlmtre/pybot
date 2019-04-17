@@ -28,7 +28,7 @@ class Ctof(BaseModule):
         c_temp = split_msg[1]
         c = float(c_temp)
         f = (c * 1.8)+32 #Does the math from celcius to freedom units
-        self.say(event.channel, str(f) + u"° F") #Spits the conversion into the proper channel
+        self.say(event.channel, str(round(f,1)) + u"° F") #Spits the conversion into the proper channel
         
     except ValueError:
       self.say(event.channel, "Enter a number you rube!")
