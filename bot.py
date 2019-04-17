@@ -91,14 +91,8 @@ class Bot(threading.Thread):
     lastfm = Event("__.lastfm__")
     lastfm.define(".lastfm")
 
-    dance = Event("__.dance__")
-    dance.define("\.dance")
-
     #unloads = Event("__module__")
     #unloads.define("^\.module")
-
-    pimp = Event("__pimp__")
-    pimp.define("\.pimp")
 
     bofh = Event("__.bofh__")
     bofh.define("\.bofh")
@@ -128,8 +122,6 @@ class Bot(threading.Thread):
     # add your defined events here
     # tell your friends
     self.events_list.append(lastfm)
-    self.events_list.append(dance)
-    self.events_list.append(pimp)
     #self.events_list.append(youtube)
     self.events_list.append(bofh)
     self.events_list.append(weather)

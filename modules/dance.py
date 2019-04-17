@@ -1,19 +1,27 @@
-class Dance:
-  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
-    self.events = events
-    self.printer = printer_handle
-    self.interests = ['__.dance__']
-    self.bot = bot 
+##Tiny dancing man##
 
-    self.help = ".dance"
+from event import Event
+import re
 
-    for event in events:
-      if event._type in self.interests:
-        event.subscribe(self)
+try:
+  from basemodule import BaseModule
+except ImportError:
+  from modules.basemodule import BaseModule
 
+class Dance(BaseModule):
+
+  def post_init(self):
+    dance = Event("__.dance__")
+    dance.define(msg_definition="^.dance$")
+    dance.subscribe(self)
+    self.cmd = ".dance"
+    self.help = None
+    
+    self.bot.register_event(dance, self)
+  
   def handle(self, event):
     try:
-      self.printer("PRIVMSG " + event.channel + " : :D-\-< " + '\n')
+      self.printer("PRIVMSG " + event.channel + " : :D-\-< " + '\n') #Prints this dancing guy out to proper channel
       self.printer("PRIVMSG " + event.channel + " : :D-|-< " + '\n')
       self.printer("PRIVMSG " + event.channel + " : :D-/-< " + '\n')
     except TypeError:
