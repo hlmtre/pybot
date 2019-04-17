@@ -63,22 +63,6 @@ class BotBrain:
   def notice(self, channel, thing):
     self.microphone('NOTICE ' + channel + ' :' + str(thing) + '\n')
 
-  # now implemented as a module
-  #def _weather(self, channel, zipcode):
-
-  # now implemented as a module
- # def _getyoutubetitle(self, line, channel):
-
-  def _ctof(self, channel, c_temp):
-    c = float(c_temp)
-    f = (c * 1.8)+32
-    self.say(channel, str(f) + u"° F")
-
-  def _ftoc(self, channel, f_temp):
-    f = float(f_temp)
-    c = (f - 32)*(.5555)
-    self.say(channel, str(c) + u"° C")
-
   def _speak(self, user, target, message):
     if target.startswith("#"):
       self.say(target, message) 
@@ -132,17 +116,7 @@ class BotBrain:
       if os.getenv('USER') == 'pybot':
         self.say(channel, "http://pybot.zero9f9.com/img/")
       else:
-        self.say(channel, "http://zero9f9.com/~"+os.getenv('USER')+"/img/")
-    #if message.startswith(".seen"):
-    #  self._seen(message.split()[-1], channel)
-    if message.startswith(".ctof"):
-      last = message.split()
-      if last[-1] != "":
-        self._ctof(channel, last[-1])
-    if message.startswith(".ftoc"):
-      last = message.split()
-      if last[-1] != "":
-        self._ftoc(channel, last[-1]) 
+        self.say(channel, "http://zero9f9.com/~"+os.getenv('USER')+"/img/") 
     if message.startswith(".help"):
       self._help(usr)     
     if message.startswith(".onstat"):
