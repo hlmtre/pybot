@@ -1,5 +1,7 @@
 class TestBase():
   conf = 'tests/test_pybotrc'
+  irc_server = 'irc.zero9f9.com'
+
   def testConfExistence(self):
     f = open (TestBase.conf)
     assert f is not None
@@ -11,13 +13,13 @@ class TestBase():
   def testBase(self):
     import bot
     import confman
-    assert bot.Bot(confman.ConfManager(TestBase.conf), "zero9f9.com") is not None, "bot is None!"
+    assert bot.Bot(conf=confman.ConfManager(TestBase.conf), network=TestBase.irc_server) is not None, "bot is None! Check tests/test_pybotrc for reachable IRC server."
 
   # this one you might want to remove, since it connects to a hardcoded ircd
   def testBotSocket(self):
     import bot
     import confman
-    b = bot.Bot(confman.ConfManager(TestBase.conf), "zero9f9.com", True)
+    b = bot.Bot(confman.ConfManager(TestBase.conf), TestBase.irc_server, True)
     b.worker(mock=True)
     assert b.s is not None
 
@@ -34,6 +36,6 @@ class TestBase():
   def testLoad(self):
     import bot
     import confman
-    b = bot.Bot(confman.ConfManager(TestBase.conf), "zero9f9.com", True)
+    b = bot.Bot(confman.ConfManager(TestBase.conf), TestBase.irc_server, True)
     b.load_modules()
     assert len(b.loaded_modules) > 0
