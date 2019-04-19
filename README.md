@@ -1,4 +1,4 @@
-[![Build Status](https://ci.zero9f9.com/job/pybot/badge/icon)](https://ci.zero9f9.com/job/pybot/)
+[![Build Status](https://travis-ci.org/hlmtre/pybot.svg?branch=master)]
 
 [ReadTheDocs documentation](http://pybot.readthedocs.org/en/master/ "ReadTheDocs pybot documentation")
 
