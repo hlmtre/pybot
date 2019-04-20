@@ -20,14 +20,16 @@ class Weather2(BaseModule):
 
         self.bot.register_event(forecast, self)
         self.bot.register_event(weather2, self)
-        self.api_key = "1fe31b3b4cfdab66"
+        # now using openweathermap as wunderground ended theirs :(
+        self.api_key = "6dc001f4e77cc0985c5013283368be51"
+        self.api_url = "https://api.openweathermap.org/data/2.5/weather"
     
     def forecast(self, url, channel):
       q = requests.get(url)
       try:
         q.raise_for_status()
       except requests.exceptions.HTTPError:
-        self.say(channel, "Encountered an error with the WUnderground API")
+        self.say(channel, "Encountered an error with the OpenWeatherMap API")
         return None
       except requests.exceptions.MissingSchema:
         self.say(channel, "Badly formatted location?")
@@ -59,7 +61,7 @@ class Weather2(BaseModule):
             self.say(channel,"valid zipcode required, numbnuts")
             return None
           zipcode = re.match('[0-9]{5}', location)
-          query = '/q/'+zipcode.string
+          query = '?zip='+zipcode.string
         except ValueError: # it's a city name (or broken encoding on numbers or something)
           if location == "stl": # little shortcut to prevent it thinking St Louis should be the one in Ontario
             location = "Saint Louis"
@@ -68,7 +70,7 @@ class Weather2(BaseModule):
           try:
               q.raise_for_status()
           except requests.exceptions.HTTPError:
-              self.say(channel, "Encountered an error contacting the WUnderground API")
+              self.say(channel, "Encountered an error contacting the OpenWeatherMap API")
               return None
           results = q.json()
           try:
@@ -82,7 +84,7 @@ class Weather2(BaseModule):
 
         if query:
             #return the full URL of the query we want to make
-            return 'http://api.wunderground.com/api/'+self.api_key+'/' + command + query+'.json'
+            return self.api_url+query+"&appid="+self.api_key+"&units=imperial"
         return None
 
     def get_conditions(self, query, channel):
@@ -91,21 +93,24 @@ class Weather2(BaseModule):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            self.say(channel, "Encountered an error contacting the WUnderground API")
+            self.say(channel, "Encountered an error contacting the OpenWeatherMap API")
             return
         weather = r.json()
         try:
             #grab the relevant data we want for formatting
-            location = weather['current_observation']['display_location']['full']
-            conditions = weather['current_observation']['weather']
-            temp_f = str(weather['current_observation']['temp_f'])
-            temp_c = str(weather['current_observation']['temp_c'])
-            humidity = weather['current_observation']['relative_humidity']
+            location = weather['name']
+            conditions = weather['weather'][0]['main']
+            temp_f = str(weather['main']['temp'])
+            #location = weather['current_observation']['display_location']['full']
+            #conditions = weather['current_observation']['weather']
+            #temp_f = str(weather['current_observation']['temp_f'])
+            #temp_c = str(weather['current_observation']['temp_c'])
+            #humidity = weather['current_observation']['relative_humidity']
         except KeyError:
             self.say(channel, "Unable to get weather data from results. Sorry.")
             return
         #return the formatted string of weather data
-        return location + ': ' + conditions + ', ' + temp_f + 'F (' + temp_c + 'C). Humidity: ' + humidity
+        return location + ': ' + conditions + ', ' + temp_f + 'F' 
 
   
     def handle(self, event):
