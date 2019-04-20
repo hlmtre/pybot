@@ -16,6 +16,7 @@ import traceback
 import threading
 import inspect
 import argparse
+import pickle
 
 import botbrain
 from logger import Logger
@@ -66,6 +67,14 @@ class Bot(threading.Thread):
     # arbitrary key/value store for modules
     # they should be 'namespaced' like bot.mem_store.module_name
     self.mem_store = dict()
+    self.persistence = list()
+
+    #demo = {"lion": "yellow", "kitty": "red"}
+    #demo2 = {"tiger": "purple", "cougar": "pink"}
+    #pickle.dump(demo, open('pickle/'+'demo', 'wb'))
+    #pickle.dump(demo2, open('pickle/'+'demo2', 'wb'))
+    # after the mem_store is instantiated, reload pickled objects
+    self.load_persistence()
 
     self.CHANNELINIT = conf.getChannels(self.network)
 # this will be the socket
@@ -181,6 +190,19 @@ class Bot(threading.Thread):
       except Exception, e:
         print e
         print name, filename
+
+  def persist(self, namespace):
+    self.persistence.append(namespace)
+
+  def save_persistence(self):
+    for n in self.persistence:
+      pickle.dump(self.mem_store[n], 'pickle/'+n, 'wb')
+   
+  def load_persistence(self):
+    for f in os.listdir('pickle'):
+      if f == "." or f == "..": # don't unpickle current directory (.) or up one (..) because those aren't pickled objects
+        continue
+      self.mem_store[f] = pickle.load(open('pickle/'+f, 'rb'))
 
   def set_snippets(self):
     """ 
@@ -596,6 +618,7 @@ if __name__ == "__main__":
       l = Logger()
       l.write(Logger.INFO, "killed by ctrl+c or term signal")
       for b in botslist:
+        b.save_persistence()
         b.s.send("QUIT :because I got killed\n")
       print
       print "keyboard interrupt caught; exiting"
