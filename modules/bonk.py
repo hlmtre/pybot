@@ -61,7 +61,7 @@ class Bonk(BaseModule):
     'wub-wubs %s'
     ]
     bonk_action = random.choice(bonk_actions) % bonkee
-    return bonk_action
+    return "\001ACTION " + bonk_action
 
 
   def handle(self, event):

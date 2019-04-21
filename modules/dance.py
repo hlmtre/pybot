@@ -1,7 +1,6 @@
 ##Hold me closer tiny dancer##
 
 from event import Event
-import re
 
 try:
   from basemodule import BaseModule
