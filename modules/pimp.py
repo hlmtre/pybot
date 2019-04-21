@@ -17,7 +17,7 @@ class Pimp(BaseModule):
     self.cmd = ".pimp"
     self.help = None
     
-    self.bot.register_event(pimp, self)
+    self.bot.register_event(pimp, self) #Register your event
 
   def handle(self, event):
     self.say(event.channel, "http://bitbucket.org/hlmtre/pybot") #Just prints that to the intended channel

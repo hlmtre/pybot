@@ -1,4 +1,4 @@
-##Tiny dancing man##
+##Hold me closer tiny dancer##
 
 from event import Event
 import re
