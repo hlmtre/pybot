@@ -1,32 +1,27 @@
+##Created by hlmtre, just pybot giving a friendly hello##
+
 from event import Event
 from random import choice
-class Hello:
-  def __init__(self, events=None, printer_handle=None, bot=None, say=None):
-    self.events = events
-    self.printer = printer_handle
-    self.interests = []
-    self.bot = bot
 
-    self.retorts = ['hello', 'sup', 'hi', 'good to see you', 'loldicks']
+try:
+  from basemodule import BaseModule
+except ImportError:
+  from modules.basemodule import BaseModule
 
+class Hello(BaseModule):
+  
+  def post_init(self):
     hello = Event("__hello__")
-    nick = self.bot.conf.getNick(self.bot.network)
-    hello.define(msg_definition="^([H|h]ello|[H|h]i|[H|h]owdy) " + nick)
     hello.subscribe(self)
-
-    # register ourself to our new hello event
-    self.bot.register_event(hello, self)
-
     self.help = None
-
-    # register ourself for any events that we're interested in that exist already
-    for event in events:
-      if event._type in self.interests:
-        event.subscribe(self)
+    self.bot.register_event(hello, self) #Register to your event
+    
+    nick = self.bot.conf.getNick(self.bot.network) #Grabs the nick of the person greeting pybot
+    hello.define(msg_definition="^([H|h]ello|[H|h]i|[H|h]owdy|[H|h]ey) " + nick) #How pybot determines whether he is being greeted
+    self.retorts = ['hello', 'sup', 'hi', 'good to see you', 'loldicks'] #List of different ways he will be able to respond
 
   def handle(self, event):
-    try:
-      self.bot.brain.say(event.channel, choice(self.retorts) + " " + event.user + '\n')
-    except Exception,e:
-      print e
-
+      try:
+        self.say(event.channel, choice(self.retorts) + " " + event.user) #If the parameters above in "hello.define" are met he will spit out the greeting in the channel
+      except Exception,e:
+        print e
