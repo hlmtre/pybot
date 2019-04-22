@@ -73,12 +73,6 @@ class BotBrain:
   def _onstat(self, channel):
     self.say(channel, "Yep, I'm on. Idiot.")
 
-  def _help(self, user):
-    self.microphone('PRIVMSG ' + user + ' :' + ".uptime,\n")
-    self.microphone('PRIVMSG ' + user + ' :' + ".imgs,\n")
-    self.microphone('PRIVMSG ' + user + ' :' + ".ctof [celsius],\n")
-    self.microphone('PRIVMSG ' + user + ' :' + ".ftoc [fahrenheit],\n")
-
   def _join(self, usr, message):
     if self._isAdmin(usr):
       if len(message.split()) is 3:
@@ -117,8 +111,6 @@ class BotBrain:
         self.say(channel, "http://pybot.zero9f9.com/img/")
       else:
         self.say(channel, "http://zero9f9.com/~"+os.getenv('USER')+"/img/") 
-    if message.startswith(".help"):
-      self._help(usr)     
     if message.startswith(".onstat"):
       self._onstat(channel)
     if message.startswith(".speak"):
