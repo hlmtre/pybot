@@ -106,15 +106,6 @@ class Bot(threading.Thread):
     steam = Event("__.steam__")
     steam.define("\.steam")
 
-    part = Event("__.part__")
-    part.define("part")
-
-    tell = Event("__privmsg__")
-    tell.define("PRIVMSG")
-
-    links = Event("__urls__")
-    links.define("https?://*")
-
   # example
   #  test = Event("__test__")
   #  test.define(msg_definition="^\.test")
@@ -126,9 +117,6 @@ class Bot(threading.Thread):
     self.events_list.append(bofh)
     self.events_list.append(weather)
     self.events_list.append(steam)
-    self.events_list.append(part)
-    self.events_list.append(tell)
-    self.events_list.append(links)
     #self.events_list.append(unloads)
   # example
   #  self.events_list.append(test)
