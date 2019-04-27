@@ -106,9 +106,6 @@ class Bot(threading.Thread):
     steam = Event("__.steam__")
     steam.define("\.steam")
 
-    part = Event("__.part__")
-    part.define("part")
-
   # example
   #  test = Event("__test__")
   #  test.define(msg_definition="^\.test")
@@ -120,7 +117,6 @@ class Bot(threading.Thread):
     self.events_list.append(bofh)
     self.events_list.append(weather)
     self.events_list.append(steam)
-    self.events_list.append(part)
     #self.events_list.append(unloads)
   # example
   #  self.events_list.append(test)
