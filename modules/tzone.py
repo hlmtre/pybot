@@ -5,7 +5,11 @@
 
 from event import Event
 import os, time
-import pytz
+try:
+  import pytz
+except ImportError:
+  print "tzone requires pytz pip module"
+  pytz = None
 
 
 try:
@@ -14,7 +18,6 @@ except ImportError:
   from modules.basemodule import BaseModule
 
 class Tzone(BaseModule):
-  
   def post_init(self):
     tzone = Event("__.tzone__")
     tzone.define(msg_definition="^\.tzone")
@@ -25,6 +28,10 @@ class Tzone(BaseModule):
     self.bot.register_event(tzone, self)
 
   def handle(self, event):
+    if pytz == None:
+      print "tzone requires pytz pip module"
+      return
+
     lower_list = []  #Empty list for TZ list with no capitalization
     tz_list = pytz.all_timezones #List of all available timezones
     try:
@@ -34,7 +41,7 @@ class Tzone(BaseModule):
 
         for x in pytz.all_timezones: #Adds all timezones with no capitalization so the user will not have to worry about that
           lower_list.append(x.lower())
-          
+
         ll_index = lower_list.index(tz) #Grabs the index number of the timezone requested to be applied to the main timezone list
 
         if tz not in lower_list: #If the timezone requested is not in the lower list it will spit this out
