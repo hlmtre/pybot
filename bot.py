@@ -7,7 +7,6 @@
 
 import sys
 import socket
-import string
 import os
 import datetime
 import time
@@ -50,11 +49,11 @@ class Bot(threading.Thread):
     self.logger = Logger()
 #   to be a dict of dicts
     self.command_function_map = dict()
-    
+
     if self.conf.getDBType() == "sqlite":
       import lite
       self.db = lite.SqliteDB(self)
-    else: 
+    else:
       import db
       self.db = db.DB(self)
 
@@ -177,7 +176,7 @@ class Bot(threading.Thread):
   def save_persistence(self):
     for n in self.persistence:
       pickle.dump(self.mem_store[n], 'pickle/'+n, 'wb')
-   
+
   def load_persistence(self):
     for f in os.listdir('pickle'):
       if f == "." or f == "..": # don't unpickle current directory (.) or up one (..) because those aren't pickled objects
@@ -214,9 +213,6 @@ class Bot(threading.Thread):
 
     self.loaded_modules = list()
 
-    modules_dir_list = list()
-    tmp_list = list()
-    
     self.modules_path = 'modules'
     modules_path = 'modules'
     self.autoload_path = 'modules/autoloads'
@@ -224,7 +220,7 @@ class Bot(threading.Thread):
 
     # this is magic.
 
-    import os, imp, json
+    import imp, json
 
 
     self.load_snippets()
@@ -234,7 +230,7 @@ class Bot(threading.Thread):
     mods = {}
     autoloads = {}
     # load autoloads if it exists
-    if os.path.isfile(autoload_path): 
+    if os.path.isfile(autoload_path):
       self.logger.write(Logger.INFO, "Found autoloads file", self.NICK)
       try:
         autoloads = json.load(open(autoload_path))
@@ -248,10 +244,10 @@ class Bot(threading.Thread):
       name, ext = os.path.splitext(fname)
       if specific is None:
         nonspecific = True
-        # ignore compiled python and __init__ files. 
+        # ignore compiled python and __init__ files.
         # choose to either load all .py files or, available, just ones specified in autoloads
         if self.network not in autoloads.keys(): # if autoload does not specify for this network
-          if ext == '.py' and not name == '__init__': 
+          if ext == '.py' and not name == '__init__':
             f, filename, descr = imp.find_module(name, [modules_path])
             mods[name] = imp.load_module(name, f, filename, descr)
             self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
@@ -267,7 +263,7 @@ class Bot(threading.Thread):
               self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
       else:
         if name == specific: # we're reloading only one module
-          if ext != '.pyc': # ignore compiled 
+          if ext != '.pyc': # ignore compiled
             f, filename, descr = imp.find_module(name, [modules_path])
             mods[name] = imp.load_module(name, f, filename, descr)
             found = True
@@ -285,10 +281,9 @@ class Bot(threading.Thread):
 
     if nonspecific is True or found is True:
       return 0
-    else:
-      return 1
+    return 1
     # end magic.
-    
+
   def send(self, message):
     """
     Simply sends the specified message to the socket. Which should be our connected server.
@@ -329,7 +324,6 @@ class Bot(threading.Thread):
 
     """
     if self.DEBUG:
-      import datetime
       if os.name == "posix": # because windows doesn't like the color codes.
         self.debug_print(util.bcolors.OKBLUE + "<< " + util.bcolors.ENDC + line)
       else:
@@ -363,12 +357,12 @@ class Bot(threading.Thread):
           for c in self.chan_list:
             self.send('JOIN '+c+' \n')
           self.JOINED = True
-        
+
         line_array = line.split()
         user_and_mask = line_array[0][1:]
         usr = user_and_mask.split("!")[0]
         channel = line_array[2]
-        try: 
+        try:
           message = line.split(":",2)[2]
           self.brain.respond(usr, channel, message)
         except IndexError:
@@ -377,7 +371,7 @@ class Bot(threading.Thread):
             self.brain.respond(usr, channel, message)
           except IndexError:
             print "index out of range.", line
-        
+
     except Exception:
       print "Unexpected error:", sys.exc_info()[0]
       traceback.print_exc(file=sys.stdout)
