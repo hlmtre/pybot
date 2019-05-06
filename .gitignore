@@ -12,3 +12,5 @@ modules/imgur_credentials.py
 docs/_build
 _build
 *.db
+pickle/*
+venv/*
