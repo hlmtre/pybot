@@ -15,7 +15,7 @@ class Pimp(BaseModule):
     pimp.define(msg_definition="^\.pimp$")
     pimp.subscribe(self)
     self.cmd = ".pimp"
-    self.help = None
+    self.help = ".pimp (bot repo URL)"
     
     self.bot.register_event(pimp, self) #Register your event
 

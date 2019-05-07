@@ -9,7 +9,8 @@ class D20(BaseModule):
     d20event = Event("__.d20event__")
     d20event.define(msg_definition="^\.d20")
     d20event.subscribe(self)
-
+    
+    self.help = ".d20 (random number 1-20)"
     # register ourself to our new d20event event
     self.bot.register_event(d20event, self)
     

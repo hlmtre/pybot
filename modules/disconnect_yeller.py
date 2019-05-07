@@ -1,3 +1,5 @@
+#Prints to your Console when disconnected#
+
 from event import Event
 try:
   from basemodule import BaseModule

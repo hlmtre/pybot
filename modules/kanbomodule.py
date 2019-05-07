@@ -12,7 +12,7 @@ class KanboModule(BaseModule):
     kanbo = Event("__.custom__")
     kanbo.define(msg_definition="^\.kanbo")
     kanbo.subscribe(self)
-
+    self.help = ".kanbo (kanbo face)"
     self.bot.register_event(kanbo, self)
     self.messages = [u'( ͡° ͜ʖ ͡°)', u'( ͡0 ͜ʖ ͡0)', u'|╲/( ͡° ͡° ͜ʖ ͡° ͡°)/\╱\\', u'┬┴┬┴┤( ͡° ͜ʖ├┬┴┬┴']
     
