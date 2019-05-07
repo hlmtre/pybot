@@ -14,7 +14,7 @@ class Dance(BaseModule):
     dance.define(msg_definition="^.dance$")
     dance.subscribe(self)
     self.cmd = ".dance"
-    self.help = ".dance 'bot dances'"
+    self.help = ".dance (bot dances)"
     
     self.bot.register_event(dance, self)
   

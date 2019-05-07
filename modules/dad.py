@@ -13,7 +13,7 @@ class Dad(BaseModule):
     d_event.subscribe(self)
 
     self.bot.register_event(d_event, self)
-    self.help = ".dad 'prints dad joke'"
+    self.help = ".dad (prints dad joke)"
   def handle(self, event):
     try:
       url = "https://icanhazdadjoke.com/"

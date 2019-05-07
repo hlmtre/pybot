@@ -12,7 +12,7 @@ class Bofh(BaseModule):
     b_event.subscribe(self)
 
     self.bot.register_event(b_event, self)
-    self.help = ".bofh 'random quote'"
+    self.help = ".bofh (prints random quote)"
   def handle(self, event):
     try:
       url = "http://zero9f9.com/api/bofh"

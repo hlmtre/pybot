@@ -14,7 +14,6 @@ class Isup(BaseModule):
     isup = Event("__.isup__")
     isup.define(msg_definition="^\.isup")
     isup.subscribe(self)
-    self.help = ".isup <website of interest>"
 
     # register ourself to our new isup event
     self.bot.register_event(isup, self)
@@ -22,16 +21,12 @@ class Isup(BaseModule):
     self.url = "http://isup.me/"
     
   def handle(self, event):
-    print("MADE IT HERE") 
     if len(event.msg.split()) == 2:
       try:
         r = requests.get(self.url + event.msg.split()[1])
-        print(r)
       except requests.ConnectionError:
-        #self.say(event.channel, "Connection error.")
-        print("NO CONNECTION")
+        self.say("Connection error.")
       # we get back plain HTML. hopefully the phrases don't change.
-      print(r)
       up = "It's just you."
       down = "looks down from here"
       not_a_site = "doesn't look like a site"
