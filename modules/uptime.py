@@ -10,7 +10,7 @@ class Uptime(BaseModule):
     uptime_event = Event("__.uptime__")
     uptime_event.define(msg_definition="^\.uptime")
     uptime_event.subscribe(self)
-
+    self.help = ".uptime 'spits out uptime'"
     # register ourself to our new custom event
     self.bot.register_event(uptime_event, self)
 

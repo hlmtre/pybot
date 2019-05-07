@@ -1,3 +1,5 @@
+#Jury module created by Bonekin#
+
 from event import Event
 import random
 try:
@@ -9,6 +11,7 @@ class Jury(BaseModule):
     jury = Event("__.jury__")
     jury.define(msg_definition="^\.jury")
     jury.subscribe(self)
+    self.help = ".jury 'prints yeas and nays'"
 
     # register ourself to our new jury event
     self.bot.register_event(jury, self)

@@ -9,6 +9,7 @@ class Howdy(BaseModule):
     howdy = Event("__.howdy__")
     howdy.define(msg_definition="^\.howdy")
     howdy.subscribe(self)
+    self.help = ".howdy 'spits out cowboy stuff'"
 
     # register ourself to our new howdy event
     self.bot.register_event(howdy, self)
