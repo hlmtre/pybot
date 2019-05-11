@@ -1,3 +1,10 @@
+#Created by hlmtre#
+
+"""
+Works only in hlmtre's specifically  configured environment
+and when his house has not burned down
+"""
+
 from event import Event
 try:
   from basemodule import BaseModule
@@ -8,7 +15,7 @@ class Vyos(BaseModule):
     vevent = Event("__.vyos__")
     vevent.define(msg_definition="^\.vyos")
     vevent.subscribe(self)
-
+    self.help = ".vyos <name of box>"
     self.box_to_ip = dict([('mech', '10.0.0.76'), ('bonekin', '192.168.17.40'), ('thraust', '192.168.0.126')])
 
     self.bot.register_event(vevent, self)
