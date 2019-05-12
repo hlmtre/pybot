@@ -2,4 +2,4 @@
 indent-string='  '
 
 [MESSAGES CONTROL]
-disable=print-statement
+disable=print-statement, line-too-long

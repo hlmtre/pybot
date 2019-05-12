@@ -40,7 +40,7 @@ def parse_line(line):
   returns an object with a nice set of line-pulled-apart members
   """
   class Parsed():
-    def __init(self):
+    def __init__(self):
       self.first_word = None
       self.message = None
       self.channel = None

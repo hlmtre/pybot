@@ -460,7 +460,6 @@ class Bot(threading.Thread):
           except UnicodeDecodeError, e:
             self.debug_print("Unicode decode error; " + e.__str__())
             self.debug_print("Offending recv: " + self.s.recv)
-            pass
           except Exception, e:
             print e
             if self.DEBUG:
@@ -474,12 +473,13 @@ class Bot(threading.Thread):
 
           lines = read.split('\n')
 
-          
+
           # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
           # line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
-          read = lines.pop() 
+          read = lines.pop()
 
-          if len(lines) > 0:
+          # an empty array evaluates to False
+          if lines:
             timeout = 0
 
           for line in lines:
@@ -493,7 +493,7 @@ class Bot(threading.Thread):
   def debug_print(self, line, error=False):
     """
     Prepends incoming lines with the current timestamp and the thread's name, then spits it to stdout.
-    Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.
+    Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.  # 
 
     Args:
     line: text.
@@ -503,9 +503,9 @@ class Bot(threading.Thread):
     if not error:
       print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
     else:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.RED + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.FAIL + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
 
-    
+
   def run(self):
     """
     For implementing the parent threading.Thread class. Allows the thread the be initialized with our code.
@@ -518,7 +518,7 @@ class Bot(threading.Thread):
     """
     self.brain.say(channel, thing)
 # end class Bot
-              
+
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
@@ -584,5 +584,3 @@ if __name__ == "__main__":
       print
       print "keyboard interrupt caught; exiting"
       sys.exit(1)
-      
-
