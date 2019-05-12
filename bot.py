@@ -26,6 +26,7 @@ import util
 DEBUG = False
 RETRY_COUNTER = 0
 
+
 class Bot(threading.Thread):
   """
     bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
@@ -57,7 +58,6 @@ class Bot(threading.Thread):
       import db
       self.db = db.DB(self)
 
-
     self.NICK = self.conf.getNick(self.network)
 
     self.logger.write(Logger.INFO, "\n", self.NICK)
@@ -67,11 +67,6 @@ class Bot(threading.Thread):
     # they should be 'namespaced' like bot.mem_store.module_name
     self.mem_store = dict()
     self.persistence = list()
-
-    #demo = {"lion": "yellow", "kitty": "red"}
-    #demo2 = {"tiger": "purple", "cougar": "pink"}
-    #pickle.dump(demo, open('pickle/'+'demo', 'wb'))
-    #pickle.dump(demo2, open('pickle/'+'demo2', 'wb'))
     # after the mem_store is instantiated, reload pickled objects
     self.load_persistence()
 
@@ -79,7 +74,7 @@ class Bot(threading.Thread):
 # this will be the socket
     self.s = None # each bot thread holds its own socket open to the network
 
-    self.brain = botbrain.BotBrain(self.send, self) 
+    self.brain = botbrain.BotBrain(self.send, self)
 
     self.events_list = list()
 
@@ -134,11 +129,11 @@ class Bot(threading.Thread):
       Allows for dynamic, asynchronous event creation. To be used by modules, mostly, to define their own events in their initialization.
       Prevents multiple of the same _type of event being registered.
 
-      Args: 
-      event: an event object to be registered with the bot 
+      Args:
+      event: an event object to be registered with the bot
       module: calling module; ensures the calling module can be subscribed to the event if it is not already.
 
-      Returns: 
+      Returns:
       nothing.
     """
     for e in self.events_list:
@@ -192,8 +187,6 @@ class Bot(threading.Thread):
               self.command_function_map[c] = dict()
             self.command_function_map[c] = v
 
-
-  # utility function for loading modules; can be called by modules themselves
   def load_modules(self, specific=None):
     """
       Run through the ${bot_dir}/modules directory, dynamically instantiating each module as it goes.
@@ -217,7 +210,6 @@ class Bot(threading.Thread):
     # this is magic.
 
     import imp, json
-
 
     self.load_snippets()
     self.set_snippets()
@@ -346,7 +338,7 @@ class Bot(threading.Thread):
         self.pong(ping_response_line[1])
       # pings we respond to directly. everything else...
       else:
-# patch contributed by github.com/thekanbo
+        # patch contributed by github.com/thekanbo
         if self.JOINED is False and (message_number == "376" or message_number == "422"): 
           # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exist
           self.chan_list = self.conf.getChannels(self.network) 
@@ -372,7 +364,6 @@ class Bot(threading.Thread):
       print "Unexpected error:", sys.exc_info()[0]
       traceback.print_exc(file=sys.stdout)
 
-      
   def worker(self, mock=False):
     """
     Open the socket, make the first incision^H^H connection and get us on the server. 

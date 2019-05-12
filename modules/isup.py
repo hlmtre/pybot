@@ -1,22 +1,23 @@
 ## version 0.1 created by hlmtre ##
 ## version 0.2 updated by mech ##
 
+import json
 from event import Event
 try:
   import requests
 except ImportError:
   print "Warning: isup module requires requests"
   requests = object
-import json
 try:
-  from basemodule import BaseModule
+  from modules.basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
 class Isup(BaseModule):
+  """ takes a url and determines if the site hosted there is up """
   def post_init(self):
     isup = Event("__.isup__")
-    isup.define(msg_definition="^\.isup")
+    isup.define(msg_definition=r"^\.isup")
     isup.subscribe(self)
     self.help = ".isup <Valid website using *.com, *.net, etc.>"
 
