@@ -26,6 +26,7 @@ import util
 DEBUG = False
 RETRY_COUNTER = 0
 
+
 class Bot(threading.Thread):
   """
     bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
@@ -44,11 +45,13 @@ class Bot(threading.Thread):
     self.OFFLINE = False
     self.CONNECTED = False
     self.JOINED = False
+    self.OWNER = None
     self.conf = conf
     self.pid = os.getpid()
     self.logger = Logger()
 #   to be a dict of dicts
     self.command_function_map = dict()
+    self.snippets_list = set()
 
     if self.conf.getDBType() == "sqlite":
       import lite
@@ -56,7 +59,6 @@ class Bot(threading.Thread):
     else:
       import db
       self.db = db.DB(self)
-
 
     self.NICK = self.conf.getNick(self.network)
 
@@ -67,11 +69,6 @@ class Bot(threading.Thread):
     # they should be 'namespaced' like bot.mem_store.module_name
     self.mem_store = dict()
     self.persistence = list()
-
-    #demo = {"lion": "yellow", "kitty": "red"}
-    #demo2 = {"tiger": "purple", "cougar": "pink"}
-    #pickle.dump(demo, open('pickle/'+'demo', 'wb'))
-    #pickle.dump(demo2, open('pickle/'+'demo2', 'wb'))
     # after the mem_store is instantiated, reload pickled objects
     self.load_persistence()
 
@@ -79,7 +76,7 @@ class Bot(threading.Thread):
 # this will be the socket
     self.s = None # each bot thread holds its own socket open to the network
 
-    self.brain = botbrain.BotBrain(self.send, self) 
+    self.brain = botbrain.BotBrain(self.send, self)
 
     self.events_list = list()
 
@@ -134,11 +131,11 @@ class Bot(threading.Thread):
       Allows for dynamic, asynchronous event creation. To be used by modules, mostly, to define their own events in their initialization.
       Prevents multiple of the same _type of event being registered.
 
-      Args: 
-      event: an event object to be registered with the bot 
+      Args:
+      event: an event object to be registered with the bot
       module: calling module; ensures the calling module can be subscribed to the event if it is not already.
 
-      Returns: 
+      Returns:
       nothing.
     """
     for e in self.events_list:
@@ -153,7 +150,6 @@ class Bot(threading.Thread):
   def load_snippets(self):
     import imp
     snippets_path = self.modules_path + '/snippets'
-    self.snippets_list = set()
 # load up snippets first
     for filename in os.listdir(snippets_path):
       name, ext = os.path.splitext(filename)
@@ -180,20 +176,18 @@ class Bot(threading.Thread):
       self.mem_store[f] = pickle.load(open('pickle/'+f, 'rb'))
 
   def set_snippets(self):
-    """ 
+    """
     check each snippet for a function with a list of commands in it
     create a big ol list of dictionaries, commands mapping to the functions to call if the command is encountered
     """
     for obj in self.snippets_list:
-      for k,v in inspect.getmembers(obj, inspect.isfunction):
+      for k, v in inspect.getmembers(obj, inspect.isfunction):
         if inspect.isfunction(v) and hasattr(v, 'commands'):
           for c in v.commands:
             if not c in self.command_function_map:
               self.command_function_map[c] = dict()
             self.command_function_map[c] = v
 
-
-  # utility function for loading modules; can be called by modules themselves
   def load_modules(self, specific=None):
     """
       Run through the ${bot_dir}/modules directory, dynamically instantiating each module as it goes.
@@ -217,7 +211,6 @@ class Bot(threading.Thread):
     # this is magic.
 
     import imp, json
-
 
     self.load_snippets()
     self.set_snippets()
@@ -264,7 +257,7 @@ class Bot(threading.Thread):
             mods[name] = imp.load_module(name, f, filename, descr)
             found = True
 
-    for k,v in mods.iteritems(): 
+    for k,v in mods.iteritems():
       for name in dir(v):
         obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
@@ -346,7 +339,7 @@ class Bot(threading.Thread):
         self.pong(ping_response_line[1])
       # pings we respond to directly. everything else...
       else:
-# patch contributed by github.com/thekanbo
+        # patch contributed by github.com/thekanbo
         if self.JOINED is False and (message_number == "376" or message_number == "422"): 
           # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exist
           self.chan_list = self.conf.getChannels(self.network) 
@@ -372,10 +365,9 @@ class Bot(threading.Thread):
       print "Unexpected error:", sys.exc_info()[0]
       traceback.print_exc(file=sys.stdout)
 
-      
   def worker(self, mock=False):
     """
-    Open the socket, make the first incision^H^H connection and get us on the server. 
+    Open the socket, make the first incision^H^H connection and get us on the server.
     Handles keeping the connection alive; if we disconnect from the server, attempts to reconnect.
 
     Args:
@@ -388,8 +380,8 @@ class Bot(threading.Thread):
     self.PORT = int(self.conf.getPort(self.network))
     self.IDENT = 'mypy'
     self.REALNAME = 's1ash'
-    self.OWNER = self.conf.getOwner(self.network) 
-    
+    self.OWNER = self.conf.getOwner(self.network)
+
     # connect to server
     self.s = socket.socket()
     while not self.CONNECTED:
@@ -428,9 +420,9 @@ class Bot(threading.Thread):
         self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
 
     self.s.setblocking(1)
-    
+
     read = ""
-    
+
     timeout = 0
 
 #   does not require a definition -- it will be invoked specifically when the bot notices it has been disconnected
@@ -469,7 +461,6 @@ class Bot(threading.Thread):
           except UnicodeDecodeError, e:
             self.debug_print("Unicode decode error; " + e.__str__())
             self.debug_print("Offending recv: " + self.s.recv)
-            pass
           except Exception, e:
             print e
             if self.DEBUG:
@@ -483,12 +474,13 @@ class Bot(threading.Thread):
 
           lines = read.split('\n')
 
-          
+
           # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
           # line that couldn't fit in the socket buffer. It is stored and tacked on to the start of the next recv.
-          read = lines.pop() 
+          read = lines.pop()
 
-          if len(lines) > 0:
+          # an empty array evaluates to False
+          if lines:
             timeout = 0
 
           for line in lines:
@@ -502,7 +494,7 @@ class Bot(threading.Thread):
   def debug_print(self, line, error=False):
     """
     Prepends incoming lines with the current timestamp and the thread's name, then spits it to stdout.
-    Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.
+    Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.  #
 
     Args:
     line: text.
@@ -512,9 +504,9 @@ class Bot(threading.Thread):
     if not error:
       print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
     else:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.RED + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
+      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.FAIL + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
 
-    
+
   def run(self):
     """
     For implementing the parent threading.Thread class. Allows the thread the be initialized with our code.
@@ -527,7 +519,7 @@ class Bot(threading.Thread):
     """
     self.brain.say(channel, thing)
 # end class Bot
-              
+
 ## MAIN ## ACTUAL EXECUTION STARTS HERE
 
 if __name__ == "__main__":
@@ -593,5 +585,3 @@ if __name__ == "__main__":
       print
       print "keyboard interrupt caught; exiting"
       sys.exit(1)
-      
-
