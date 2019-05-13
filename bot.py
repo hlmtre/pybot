@@ -45,11 +45,13 @@ class Bot(threading.Thread):
     self.OFFLINE = False
     self.CONNECTED = False
     self.JOINED = False
+    self.OWNER = None
     self.conf = conf
     self.pid = os.getpid()
     self.logger = Logger()
 #   to be a dict of dicts
     self.command_function_map = dict()
+    self.snippets_list = set()
 
     if self.conf.getDBType() == "sqlite":
       import lite
@@ -148,7 +150,6 @@ class Bot(threading.Thread):
   def load_snippets(self):
     import imp
     snippets_path = self.modules_path + '/snippets'
-    self.snippets_list = set()
 # load up snippets first
     for filename in os.listdir(snippets_path):
       name, ext = os.path.splitext(filename)
@@ -175,12 +176,12 @@ class Bot(threading.Thread):
       self.mem_store[f] = pickle.load(open('pickle/'+f, 'rb'))
 
   def set_snippets(self):
-    """ 
+    """
     check each snippet for a function with a list of commands in it
     create a big ol list of dictionaries, commands mapping to the functions to call if the command is encountered
     """
     for obj in self.snippets_list:
-      for k,v in inspect.getmembers(obj, inspect.isfunction):
+      for k, v in inspect.getmembers(obj, inspect.isfunction):
         if inspect.isfunction(v) and hasattr(v, 'commands'):
           for c in v.commands:
             if not c in self.command_function_map:
@@ -256,7 +257,7 @@ class Bot(threading.Thread):
             mods[name] = imp.load_module(name, f, filename, descr)
             found = True
 
-    for k,v in mods.iteritems(): 
+    for k,v in mods.iteritems():
       for name in dir(v):
         obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
@@ -366,7 +367,7 @@ class Bot(threading.Thread):
 
   def worker(self, mock=False):
     """
-    Open the socket, make the first incision^H^H connection and get us on the server. 
+    Open the socket, make the first incision^H^H connection and get us on the server.
     Handles keeping the connection alive; if we disconnect from the server, attempts to reconnect.
 
     Args:
@@ -379,8 +380,8 @@ class Bot(threading.Thread):
     self.PORT = int(self.conf.getPort(self.network))
     self.IDENT = 'mypy'
     self.REALNAME = 's1ash'
-    self.OWNER = self.conf.getOwner(self.network) 
-    
+    self.OWNER = self.conf.getOwner(self.network)
+
     # connect to server
     self.s = socket.socket()
     while not self.CONNECTED:
@@ -419,9 +420,9 @@ class Bot(threading.Thread):
         self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
 
     self.s.setblocking(1)
-    
+
     read = ""
-    
+
     timeout = 0
 
 #   does not require a definition -- it will be invoked specifically when the bot notices it has been disconnected
@@ -493,7 +494,7 @@ class Bot(threading.Thread):
   def debug_print(self, line, error=False):
     """
     Prepends incoming lines with the current timestamp and the thread's name, then spits it to stdout.
-    Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.  # 
+    Warning: this is entirely asynchronous between threads. If you connect to multiple networks, they will interrupt each other between lines.  #
 
     Args:
     line: text.
