@@ -100,3 +100,10 @@ v0.8.0
 v0.8.5
 ======
   Add 'seen' module, which does not as yet write out to the DB. Allows for .seen <nick> commands, to tell the user when the specified nick was last seen active in chat.
+
+v1.0.1
+======
+  Just a big-boy version upgrade.
+  * Lots of cleanup from contributors of old modules to inheriting from BaseModule.
+  * Further pep8 conformity cleanup, stuff like whitespace. Some suggestions have been ignored for reasons.
+  * Split the bot into its own class file `bot.py` and change running him to `./pybot.py`.

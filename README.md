@@ -28,24 +28,25 @@ Take care of dependencies. If you don't use MySQL and don't care about certain m
 * mysql-python (if you do use mysql)
 * sphinx (for docs)
 * python-twitter (twitterposter)
+* pytz (tzone)
 
 Local Development (with sqlite3)
 --------------------------------
 1. Copy pybotrc to the user who will run the bot (you can probably do `cp pybotrc ~/.pybotrc`)
 2. Modify ~/.pybotrc with your network, owner, and nickname.
-3. `./bot.py`
+3. `./pybot.py`
 4. laugh at mysql guys.
 5. continue laughing.
-6. for debugging purposes, `./bot.py -d.`
+6. for debugging purposes, `./pybot.py -d.`
 
 Local Development (with MySQL)
 ------------------------------
 1. modify pybotrc with your channels and passwords.
 2. run `sudo ./bootstrap.sh` to install pybot dependencies such as mysql.
 3. run `./setup.sh`. It will check for module dependencies and create a mysql_init file. `mysql -p < mysql_init`
-4. `./bot.py pybotrc`
+4. `./pybot.py pybotrc`
 5. rejoice.
-6. for debugging purposes, `./bot.py -d.`
+6. for debugging purposes, `./pybot.py -d.`
 
 Manual
 ------
@@ -56,7 +57,7 @@ ___
 Run the included mysql_dump file (as root, `mysql -p <pybot's database name> < mysql_dump`).
 Set his dbpass in the config file (pybotrc) to the password you've given him.
 Copy that config file to the home folder of whatever user will be running the bot. (~user/.pybotrc)
-As that user, `./bot.py.`
+As that user, `./pybot.py.`
 
 Vagrant Development
 -------------------
