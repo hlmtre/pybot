@@ -28,6 +28,7 @@ Take care of dependencies. If you don't use MySQL and don't care about certain m
 * mysql-python (if you do use mysql)
 * sphinx (for docs)
 * python-twitter (twitterposter)
+* pytz (tzone)
 
 Local Development (with sqlite3)
 --------------------------------

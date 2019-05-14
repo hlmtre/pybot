@@ -163,10 +163,14 @@ class Bot(threading.Thread):
     self.persistence.append(namespace)
 
   def save_persistence(self):
+    if not os.path.exists('pickle/'):
+      os.makedirs('pickle')
     for n in self.persistence:
       pickle.dump(self.mem_store[n], 'pickle/'+n, 'wb')
 
   def load_persistence(self):
+    if not os.path.exists('pickle/'):
+      os.makedirs('pickle')
     for f in os.listdir('pickle'):
       if f == "." or f == "..": # don't unpickle current directory (.) or up one (..) because those aren't pickled objects
         continue
