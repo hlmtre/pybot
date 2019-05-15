@@ -1,10 +1,15 @@
 ##Lists modules and usage##
 
 from event import Event
+import sys
 try:
-  from .basemodule import BaseModule
+  if sys.version_info > (3,0,0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
+
 class Help(BaseModule):
   def post_init(self):
     help = Event("__.help__")

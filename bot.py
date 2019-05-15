@@ -1,6 +1,6 @@
 #
 # see version.py for version
-# works with python 2.7.x
+# works with python 2.7.x and 3 (!!)
 #
 
 
@@ -303,7 +303,9 @@ class Bot(threading.Thread):
       else:
         self.s.send(message)
       target = message.split()[1]
-      if target.startswith(("#").encode()):
+      if type(target) is bytes:
+        target = target.decode()
+      if target.startswith('#'):
         if type(message) is bytes:
           self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.decode().rstrip())
         elif type(message) is str:

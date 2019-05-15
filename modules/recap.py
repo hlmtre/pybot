@@ -5,11 +5,19 @@ import random
 import string
 import time
 import re
+import sys
 
-try:
-  from .basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+if sys.version > (3,0,0):
+  try:
+    from .basemodule import BaseModule
+  except ImportError:
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except ImportError:
+    from modules.basemodule import BaseModule
+
 
 class recap(BaseModule):
     def post_init(self):
