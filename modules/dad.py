@@ -1,10 +1,20 @@
-import urllib.request, urllib.error, urllib.parse
 import json
+import sys
+if sys.version_info > (3, 0, 0):
+  import urllib.request, urllib.error, urllib.parse
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  import urllib2 as urllib
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 from event import Event
-try:
-  from .basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+
 class Dad(BaseModule):
   def post_init(self):
     d_event = Event("__.dad__")

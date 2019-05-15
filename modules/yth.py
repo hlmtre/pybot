@@ -1,6 +1,6 @@
 try:
   from modules.basemodule import BaseModule
-except ImportError:
+except (ImportError, SystemError):
   from .basemodule import BaseModule
 
 from event import Event

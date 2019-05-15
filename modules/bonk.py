@@ -3,10 +3,14 @@
 
 from event import Event
 import random
+import sys
 
 try:
-  from .basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Bonk(BaseModule):
@@ -19,7 +23,7 @@ class Bonk(BaseModule):
     self.help = ".bonk <bonkee>"
 
     self.bot.register_event(bonk, self) #Subscribe to your event
-  
+
   def get_bonked(self, bonkee=''): #Randomly selects and returns a string with a bonk action directed toward a given bonkee."
 
     bonk_actions = [

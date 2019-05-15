@@ -7,15 +7,15 @@ import time
 import re
 import sys
 
-if sys.version > (3,0,0):
+if sys.version_info > (3,0,0):
   try:
     from .basemodule import BaseModule
-  except ImportError:
+  except (ImportError, SystemError):
     from modules.basemodule import BaseModule
 else:
   try:
     from basemodule import BaseModule
-  except ImportError:
+  except (ImportError, SystemError):
     from modules.basemodule import BaseModule
 
 

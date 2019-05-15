@@ -1,11 +1,15 @@
+import sys
 from event import Event
 from util import __prettyDate as prettydate
 from util import strip_nick
 from datetime import datetime
 
 try:
-  from .basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Seen(BaseModule):
@@ -19,10 +23,10 @@ class Seen(BaseModule):
       if event._type in self.interests:
         event.subscribe(self)
 
-    self.help = ".seen <nickname>. describes when the bot last saw <nickname> active on server"  
+    self.help = ".seen <nickname>. describes when the bot last saw <nickname> active on server"
 
     self.mem_store_init()
-    
+
   def handle(self, event):
     self.mem_store_init()
 

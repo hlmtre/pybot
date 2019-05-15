@@ -1,10 +1,18 @@
 #Part module, removes bot from specified channel#
 
+import sys
 from event import Event
-try:
-  from .basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+if sys.version_info > (3, 0, 0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 class Part(BaseModule):
   """This command should be used as a private message to the bot or else it will not work"""
   def post_init(self):

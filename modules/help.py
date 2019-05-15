@@ -7,7 +7,7 @@ try:
     from .basemodule import BaseModule
   else:
     from basemodule import BaseModule
-except ImportError:
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Help(BaseModule):

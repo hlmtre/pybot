@@ -3,18 +3,21 @@
 """More to come, add some regex in and make it easier to find the timezone without being super specific"""
 
 
+import os, time, sys
 from event import Event
-import os, time
 try:
   import pytz
-except ImportError:
+except (ImportError, SystemError):
   print("tzone requires pytz pip module")
   pytz = None
 
 
 try:
-  from .basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Tzone(BaseModule):

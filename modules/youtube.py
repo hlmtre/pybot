@@ -1,7 +1,19 @@
-import re
-import urllib.request, urllib.error, urllib.parse
-import json
-from urllib.parse import urlparse, parse_qsl
+import re, sys, json
+if sys.version_info > (3, 0, 0):
+  from urllib.parse import urlparse, parse_qsl
+  import urllib.request, urllib.error, urllib.parse
+  try:
+    from modules.basemodule import BaseModule
+  except (ImportError, SystemError):
+    from .basemodule import BaseModule
+else:
+  from urlparse import urlparse, parse_qsl
+  import urllib2 as urllib
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
 from collections import OrderedDict
@@ -11,13 +23,9 @@ from event import Event
 
 try:
   import isodate
-except ImportError:
+except (ImportError, SystemError):
   print("WARNING: youtube module now requires isodate (thanks, ISO8601)")
 
-try:
-  from modules.basemodule import BaseModule
-except ImportError:
-  from .basemodule import BaseModule
 class Youtube(BaseModule):
   def post_init(self):
     youtube = Event("__.youtubes__")
@@ -36,7 +44,7 @@ class Youtube(BaseModule):
     # for the new v3 google api >:(
     try: 
         from youtube_credentials import YoutubeCredentials as yc
-    except ImportError:
+    except (ImportError, SystemError):
         print("Warning: youtube module requires credentials in modules/youtube_credentials.py")
         class PhonyYc:
             api_key = "None"

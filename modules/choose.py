@@ -1,11 +1,17 @@
+import random, sys
 from event import Event
-import random
-import string
 
-try:
-  from .basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+if sys.version_info > (3, 0, 0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 
 class Choose(BaseModule):
     def post_init(self):

@@ -1,13 +1,19 @@
 ##NEEDS
 #adding a bold character for '<user> MEANT so say'
 
+import requests, sys
 from event import Event
-import requests
 
-try:
-  from .basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+if sys.version_info > (3, 0, 0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
 
 class Replace(BaseModule):
   def post_init(self):

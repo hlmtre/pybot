@@ -1,17 +1,24 @@
 ##Lastfm module created by hlmtre##
 
-import sys
-import urllib.request, urllib.error, urllib.parse
 import json
+import sys
+if sys.version_info > (3, 0, 0):
+  import urllib.request, urllib.error, urllib.parse
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  import urllib2 as urllib
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
 
 from event import Event
-try:
-  from .basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
 
 class LastFM(BaseModule):
-  
+
   def post_init(self):
     lastfm = Event("__.lastfm__")
     lastfm.define(msg_definition="^\.lastfm")
@@ -20,7 +27,7 @@ class LastFM(BaseModule):
 
     # register ourself to our new custom event
     self.bot.register_event(lastfm, self)
-    
+
   def handle(self, event):
     msg = event.line.rsplit(":")[-1]
     # replace username in db if their nick already exists; otherwise insert new row

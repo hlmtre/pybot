@@ -3,7 +3,7 @@ from . import version
 try:
   import praw
   successful_import = True
-except ImportError:
+except (ImportError, SystemError):
   print("WARNING: redditinfo requires praw (https://github.com/praw-dev/praw/, or pip install praw).")
   successful_import = False
 

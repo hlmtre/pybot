@@ -1,15 +1,20 @@
 #Shortener module created by hlmtre#
 
+import sys
 import requests
 import re
 
 from event import Event
 try:
-  from .basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
+
 class Shortener(BaseModule):
-  
+
   def post_init(self):
     shortener = Event("__urls__")
     shortener.define(msg_definition = "https?://[\S]+") # What to look for to trigger event
@@ -17,7 +22,7 @@ class Shortener(BaseModule):
 
     # register ourself to our new custom event
     self.bot.register_event(shortener, self)
-    
+
   def handle(self, event):
     try:
       target = re.search("https?://[\S]+", event.line).group(0)

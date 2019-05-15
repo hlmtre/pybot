@@ -1,11 +1,16 @@
 #Jimmies module created by Bonekin#
+from __future__ import print_function
 
 from event import Event
 import random
+import sys
 
 try:
-  from .basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Jimmies(BaseModule):
@@ -60,4 +65,3 @@ class Jimmies(BaseModule):
       print("DEBUG: TypeError: ", end=' ')
       print(event.channel, end=' ')
       print(event.user)
-

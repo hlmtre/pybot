@@ -4,13 +4,13 @@ import difflib
 
 try:
   import imgurpython
-except ImportError:
+except (ImportError, SystemError):
   print("Warning: QDB module requires imgurpython.")
   imgurpython = object
 
 try:
   import requests
-except ImportError:
+except (ImportError, SystemError):
   print("Warning: QDB module requires requests.")
   requests = object
 
@@ -24,7 +24,7 @@ class QDB:
         self.say = say
         try:
           from imgur_credentials import ImgurCredentials as ic
-        except ImportError:
+        except (ImportError, SystemError):
             print("Warning: imgur module requires credentials in modules/imgur_credentials.py")
             class PhonyIc:
                 imgur_client_id = "None"

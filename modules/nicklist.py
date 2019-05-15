@@ -1,9 +1,14 @@
+import sys
 from util import strip_nick
 from event import Event
 try:
-  from .basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
+
 class Nicklist(BaseModule):
   def post_init(self):
     nicklisting_self_join = Event("__.nicklisting_self_join__")

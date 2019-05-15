@@ -1,13 +1,13 @@
 from event import Event
 import sys
 try:
-  if sys.version_info > (3,0,0):
+  if sys.version_info > (3, 0, 0):
     from .basemodule import BaseModule
     import urllib.request, urllib.error, urllib.parse
   else:
     import urlllib2 as urllib
     from basemodule import BaseModule
-except ImportError:
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Bofh(BaseModule):

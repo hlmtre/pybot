@@ -1,9 +1,17 @@
+import ast, sys
 from event import Event
-import ast
-try:
-  from .basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+
+if sys.version_info > (3, 0, 0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 class Debugger(BaseModule):
   def post_init(self):
     debug_event = Event("__.debug__")
@@ -36,7 +44,7 @@ class Debugger(BaseModule):
     for key, value in d.items():
       self.say(event.user, '\t' * indent + key.encode('utf-8','ignore'))
       if isinstance(value, dict):
-        pretty(value, event, indent+1)
+        self.pretty(value, event, indent+1)
       else:
         try:
           self.say(event.user, '\t' * (indent+1) + str(value))

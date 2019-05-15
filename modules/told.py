@@ -1,22 +1,26 @@
 #Told Module created by Bonekin#
 
-from event import Event
 import random
+import sys
+from event import Event
 
 try:
-  from .basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Told(BaseModule):
-  
+
   def post_init(self):
     told = Event("__.told__")
-    told.define(msg_definition="^\.told")
+    told.define(msg_definition=r"^\.told")
     told.subscribe(self)
     self.cmd = ".told"
     self.help = ".told <nick>"
-    
+
     # register ourself to our new custom event
     self.bot.register_event(told, self)
 

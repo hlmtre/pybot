@@ -6,13 +6,13 @@ import re
 
 try:
     import requests
-except ImportError:
+except (ImportError, SystemError):
     print("Warning: meme module requires requests.")
     requests = object
 
 try: 
     from meme_credentials import MemeCredentials as mc
-except ImportError:
+except (ImportError, SystemError):
     print("Warning: meme module requires credentials in modules/meme_credentials.py")
     class PhonyMc:
         imgflip_userid = "None"
