@@ -1,7 +1,7 @@
 from util import strip_nick
 from event import Event
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Nicklist(BaseModule):
@@ -39,7 +39,7 @@ class Nicklist(BaseModule):
       self.bot.mem_store['nicklist'][event.channel] = event.line.split(":")[2].split()
     
     if event.msg.startswith(".nicklist"):
-      print self.bot.mem_store['nicklist'][event.channel]
+      print(self.bot.mem_store['nicklist'][event.channel])
 
     if event._type == "__.nicklisting_other_join__":
       try:
@@ -55,7 +55,7 @@ class Nicklist(BaseModule):
 
     if event._type == "__.nicklisting_quit__":
       try:
-        for name, chan in self.bot.mem_store['nicklist'].iteritems():
+        for name, chan in self.bot.mem_store['nicklist'].items():
           chan.remove(strip_nick(event.user))
       except ValueError:
         pass

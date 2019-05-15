@@ -1,8 +1,8 @@
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 from event import Event
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Dad(BaseModule):
@@ -17,8 +17,8 @@ class Dad(BaseModule):
   def handle(self, event):
     try:
       url = "https://icanhazdadjoke.com/"
-      req = urllib2.Request(url, headers={'Accept' : "application/json", 'User-Agent' : "Magic Browser"})
-      resp = urllib2.urlopen(req)
+      req = urllib.request.Request(url, headers={'Accept' : "application/json", 'User-Agent' : "Magic Browser"})
+      resp = urllib.request.urlopen(req)
       j = json.loads(resp.read())
       self.say(event.channel, j['joke'])
     except:

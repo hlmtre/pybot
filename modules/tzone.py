@@ -8,12 +8,12 @@ import os, time
 try:
   import pytz
 except ImportError:
-  print "tzone requires pytz pip module"
+  print("tzone requires pytz pip module")
   pytz = None
 
 
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
@@ -29,7 +29,7 @@ class Tzone(BaseModule):
 
   def handle(self, event):
     if pytz == None:
-      print "tzone requires pytz pip module"
+      print("tzone requires pytz pip module")
       return
 
     lower_list = []  #Empty list for TZ list with no capitalization

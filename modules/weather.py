@@ -5,7 +5,7 @@ import re
 import json
 from event import Event
 try:
-    from basemodule import BaseModule
+    from .basemodule import BaseModule
 except ImportError:
     from modules.basemodule import BaseModule
 
@@ -60,7 +60,7 @@ class Weather2(BaseModule):
             self.say(channel, "Unable to get weather data from results. Sorry.")
             return
         #return the formatted string of weather data
-        return location + ': ' + conditions + ', ' + temp_f + u'° F' 
+        return location + ': ' + conditions + ', ' + temp_f + '° F' 
 
   
     def handle(self, event):

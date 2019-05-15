@@ -2,7 +2,7 @@
 
 from event import Event
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
@@ -71,7 +71,7 @@ class Tell(BaseModule):
         if "tell" in self.bot.mem_store:
           for n in self.bot.mem_store["tell"]:
             if event.user.lower() == n.obj.lower():
-              self.say(event.channel, "Hey " + n.obj + ", " + n.subject + " says \""+ u" ".join(n.message)+"\"")
+              self.say(event.channel, "Hey " + n.obj + ", " + n.subject + " says \""+ " ".join(n.message)+"\"")
               # we've said it, now delete it.
               self.bot.mem_store["tell"].remove(n)
     except IndexError:

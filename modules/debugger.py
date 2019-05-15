@@ -1,7 +1,7 @@
 from event import Event
 import ast
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Debugger(BaseModule):
@@ -20,7 +20,7 @@ class Debugger(BaseModule):
 
   def recurse(self, obj):
     if type(obj) is not dict:
-      print obj
+      print(obj)
     else:
       for k in obj:
         self.recurse(k)
@@ -33,7 +33,7 @@ class Debugger(BaseModule):
       return True
 
   def pretty(self, d, event, indent=0):
-    for key, value in d.iteritems():
+    for key, value in d.items():
       self.say(event.user, '\t' * indent + key.encode('utf-8','ignore'))
       if isinstance(value, dict):
         pretty(value, event, indent+1)
@@ -75,5 +75,5 @@ class Debugger(BaseModule):
 #      outstr = ", ".join(self.bot.mem_store[key])
 #      self.say(event.user, outstr)
     except IndexError:
-      print "ERROR: "
-      print event.msg
+      print("ERROR: ")
+      print(event.msg)

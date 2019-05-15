@@ -2,7 +2,7 @@
 
 from event import Event
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Disconnect_Yeller(BaseModule):
@@ -14,5 +14,5 @@ class Disconnect_Yeller(BaseModule):
         event.subscribe(self)
 
   def handle(self, event):
-    print "I'VE BEEN DISCONNECTED"
-    print "OH COCK"
+    print("I'VE BEEN DISCONNECTED")
+    print("OH COCK")

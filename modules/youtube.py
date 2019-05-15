@@ -1,7 +1,7 @@
 import re
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
-from urlparse import urlparse, parse_qsl
+from urllib.parse import urlparse, parse_qsl
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
 from collections import OrderedDict
@@ -12,12 +12,12 @@ from event import Event
 try:
   import isodate
 except ImportError:
-  print "WARNING: youtube module now requires isodate (thanks, ISO8601)"
+  print("WARNING: youtube module now requires isodate (thanks, ISO8601)")
 
 try:
   from modules.basemodule import BaseModule
 except ImportError:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 class Youtube(BaseModule):
   def post_init(self):
     youtube = Event("__.youtubes__")
@@ -37,7 +37,7 @@ class Youtube(BaseModule):
     try: 
         from youtube_credentials import YoutubeCredentials as yc
     except ImportError:
-        print "Warning: youtube module requires credentials in modules/youtube_credentials.py"
+        print("Warning: youtube module requires credentials in modules/youtube_credentials.py")
         class PhonyYc:
             api_key = "None"
         yc = PhonyYc()
@@ -52,13 +52,13 @@ class Youtube(BaseModule):
     if event.msg.startswith("YouTube:"):
       return
     try:
-      response = urllib2.urlopen(self.api_url+video_tag+"&key="+self.api_key+"&part=contentDetails,snippet").read()
-    except urllib2.HTTPError:
+      response = urllib.request.urlopen(self.api_url+video_tag+"&key="+self.api_key+"&part=contentDetails,snippet").read()
+    except urllib.error.HTTPError:
       return
 
     try:
       jsonified = json.loads(response)["items"][0]
-    except IndexError, e:
+    except IndexError as e:
       self.bot.logger.write(logger.Logger.WARNING, "IndexError pulling youtube videos. Zero results for: ")
       self.bot.logger.write(logger.Logger.WARNING, url)
       return

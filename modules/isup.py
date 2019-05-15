@@ -6,7 +6,7 @@ from event import Event
 try:
   import requests
 except ImportError:
-  print "Warning: isup module requires requests"
+  print("Warning: isup module requires requests")
   requests = object
 try:
   from modules.basemodule import BaseModule

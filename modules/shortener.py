@@ -5,7 +5,7 @@ import re
 
 from event import Event
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Shortener(BaseModule):

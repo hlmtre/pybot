@@ -5,7 +5,7 @@ from event import Event
 import requests
 
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
@@ -31,10 +31,10 @@ class Replace(BaseModule):
     is maxed out, the oldest line is removed and newest one inserted at the beginning.
     """
     if debug:
-      print "Line: " + event.line
-      print "Verb: " + event.verb
-      print "Channel: " + event.channel
-      print ""
+      print("Line: " + event.line)
+      print("Verb: " + event.verb)
+      print("Channel: " + event.channel)
+      print("")
     if not event:
       return
     #there are certain things we want to record in history, like nick changes and quits
@@ -48,14 +48,14 @@ class Replace(BaseModule):
       if event.verb not in ["QUIT", "NICK"]:
         return
       try:
-        for chan in self.bot.mem_store['replace'].keys():
+        for chan in list(self.bot.mem_store['replace'].keys()):
           if len(self.bot.mem_store['replace'][chan]) >= self.MAX_BUFFER_SIZE:
             self.bot.mem_store['replace'][chan].pop()
           line = self.format_line(event)
           if line:
             self.bot.mem_store['replace'][chan].insert(0, line)
-      except KeyError, IndexError:
-        print "Replace add_buffer() error when no event channel"
+      except KeyError as IndexError:
+        print("Replace add_buffer() error when no event channel")
     #now we continue with normal, per channel line addition
     #create a dictionary associating the channel with an empty list if it doesn't exist yet
     # END if not event.channel:
@@ -72,7 +72,7 @@ class Replace(BaseModule):
         if line:
           self.bot.mem_store['replace'][event.channel].insert(0, line)
       except IndexError:
-        print "Replace add_buffer() error. Couldn't access the list index."
+        print("Replace add_buffer() error. Couldn't access the list index.")
 
   def format_line(self, event):
     """Takes an event and formats a string appropriate for quotation from it"""

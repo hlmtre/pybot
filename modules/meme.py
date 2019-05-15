@@ -7,13 +7,13 @@ import re
 try:
     import requests
 except ImportError:
-    print "Warning: meme module requires requests."
+    print("Warning: meme module requires requests.")
     requests = object
 
 try: 
     from meme_credentials import MemeCredentials as mc
 except ImportError:
-    print "Warning: meme module requires credentials in modules/meme_credentials.py"
+    print("Warning: meme module requires credentials in modules/meme_credentials.py")
     class PhonyMc:
         imgflip_userid = "None"
         imgflip_password = "None"
@@ -56,13 +56,13 @@ class meme:
         url = "https://api.imgflip.com/get_memes"
         try:
             top_memes = requests.get(url)
-        except ConnectionError, e:
+        except ConnectionError as e:
             self.bot.debug_print("ConnectionError in get_top_memes(): ")
             self.bot.debug_print(str(e))
         #check for HTTP errors
         try:
             top_memes.raise_for_status()
-        except requests.exceptions.HTTPError, e:
+        except requests.exceptions.HTTPError as e:
             self.bot.debug_print("HTTPError in get_top_memes(): ")
             self.bot.debug_print(str(e))
             return
@@ -70,7 +70,7 @@ class meme:
         try:
             top_memes_list = top_memes.json()['data']['memes']
             return top_memes_list
-        except KeyError, e:
+        except KeyError as e:
             self.bot.debug_print("KeyError in get_top_memes(): ")
             self.bot.debug_print(str(e))
             return
@@ -86,7 +86,7 @@ class meme:
         """Selects a random id from the top_memes_list"""
         try:
             return random.choice(self.top_memes_list)['id']
-        except KeyError, e:
+        except KeyError as e:
             self.bot.debug_print("KeyError in get_random_meme_id(): ")
             self.bot.debug_print(str(e))
             return
@@ -157,20 +157,20 @@ class meme:
                    'password':self.imgflip_password, 'text0':top_line, 'text1':bottom_line}
         try:
             meme = requests.post(url, payload)
-        except ConnectionError, e:
+        except ConnectionError as e:
             self.bot.debug_print("ConnectionError in create_meme(): ")
             self.bot.debug_print(str(e))
             return
         #check for HTTP errors
         try:
             meme.raise_for_status()
-        except request.exceptions.HTTPError, e:
+        except request.exceptions.HTTPError as e:
             self.bot.debug_print("HTTPError in create_meme(): ")
             self.bot.debug_print(str(e))
             return
         try:
             return meme.json()['data']['url']
-        except KeyError, e:
+        except KeyError as e:
             self.bot.debug_print("KeyError in create_meme(): ")
             self.bot.debug_print("User: " + self.imgflip_userid + " Password: " + self.imgflip_password)
             self.bot.debug_print(str(e))

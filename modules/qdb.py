@@ -5,13 +5,13 @@ import difflib
 try:
   import imgurpython
 except ImportError:
-  print "Warning: QDB module requires imgurpython."
+  print("Warning: QDB module requires imgurpython.")
   imgurpython = object
 
 try:
   import requests
 except ImportError:
-  print "Warning: QDB module requires requests."
+  print("Warning: QDB module requires requests.")
   requests = object
 
 
@@ -25,7 +25,7 @@ class QDB:
         try:
           from imgur_credentials import ImgurCredentials as ic
         except ImportError:
-            print "Warning: imgur module requires credentials in modules/imgur_credentials.py"
+            print("Warning: imgur module requires credentials in modules/imgur_credentials.py")
             class PhonyIc:
                 imgur_client_id = "None"
                 imgur_client_secret = "None"
@@ -60,13 +60,13 @@ class QDB:
             try:
                 resp = client.upload_from_url(url)
                 replacement_values.append(resp)
-            except imgurpython.helpers.error.ImgurClientError, e:
+            except imgurpython.helpers.error.ImgurClientError as e:
                 self.bot.debug_print("ImgurClientError: ") 
                 self.bot.debug_print(str(e))
-            except UnboundLocalError, e:
+            except UnboundLocalError as e:
                 self.bot.debug_print("UnboundLocalError: ")
                 self.bot.debug_print(str(e))
-            except requests.ConnectionError, e:
+            except requests.ConnectionError as e:
                 self.bot.debug_print("ConnectionError: ")
                 self.bot.debug_print(str(e))
         return replacement_values
@@ -121,10 +121,10 @@ class QDB:
         is maxed out, the oldest line is removed and newest one inserted at the beginning.
         """
         if debug:
-            print "Line: " + event.line
-            print "Verb: " + event.verb
-            print "Channel: " + event.channel
-            print ""
+            print("Line: " + event.line)
+            print("Verb: " + event.verb)
+            print("Channel: " + event.channel)
+            print("")
         if not event:
             return
         #there are certain things we want to record in history, like nick changes and quits
@@ -138,7 +138,7 @@ class QDB:
             if event.verb not in ["QUIT", "NICK"]:
                 return
             try:
-                for chan in self.bot.mem_store['qdb'].keys():
+                for chan in list(self.bot.mem_store['qdb'].keys()):
                     if chan != '_recent':
                         if len(self.bot.mem_store['qdb'][chan]) >= self.MAX_BUFFER_SIZE:
                             self.bot.mem_store['qdb'][chan].pop()
@@ -146,7 +146,7 @@ class QDB:
                         if line:
                             self.bot.mem_store['qdb'][chan].insert(0, line)
             except (KeyError, IndexError):
-                print "QDB add_buffer() error when no event channel"
+                print("QDB add_buffer() error when no event channel")
         #now we continue with normal, per channel line addition
         #create a dictionary associating the channel with an empty list if it doesn't exist yet
         else:
@@ -162,7 +162,7 @@ class QDB:
                 if line:
                     self.bot.mem_store['qdb'][event.channel].insert(0, line)
             except IndexError:
-                print "QDB add_buffer() error. Couldn't access the list index."
+                print("QDB add_buffer() error. Couldn't access the list index.")
 
     def format_line(self, event):
         """Takes an event and formats a string appropriate for quotation from it"""
@@ -248,11 +248,11 @@ class QDB:
         #now we generate the string to be returned for submission
         submission = ''
         try:
-            for i in reversed(range(end_index, start_index + 1)):
+            for i in reversed(list(range(end_index, start_index + 1))):
                 #print 'Index number is ' + str(i) + ' and current submission is ' + submission
                 submission += self._detect_url(self.bot.mem_store['qdb'][channel][i]) #detect temporary printout urls and replace with imgur
         except IndexError:
-            print "QDB get_qdb_submission() error when accessing list index"
+            print("QDB get_qdb_submission() error when accessing list index")
 
 
         return submission
@@ -262,24 +262,24 @@ class QDB:
         server. Returns a string with status of submission. If it worked, includes a link to new quote. 
         """ 
         if debug:
-            print "Submission is:"
-            print qdb_submission
-            print "Current buffer is:"
-            print self.bot.mem_store['qdb']
-            print ""
+            print("Submission is:")
+            print(qdb_submission)
+            print("Current buffer is:")
+            print(self.bot.mem_store['qdb'])
+            print("")
             return ''
         #accessing hlmtre's qdb api
         url = 'https://qdb.zero9f9.com/api.php'
         payload = {'q':'new', 'quote': qdb_submission.rstrip('\n')}
         try:
           qdb = requests.post(url, payload)
-        except ConnectionError, e:
+        except ConnectionError as e:
           self.bot.debug_print("ConnectionError: ")
           self.bot.debug_print(str(e))
         #check for any HTTP errors and return False if there were any
         try:
             qdb.raise_for_status()
-        except requests.exceptions.HTTPError, e:
+        except requests.exceptions.HTTPError as e:
             self.bot.debug_print('HTTPError: ')
             self.bot.debug_print(str(e))
             self.bot.debug_print("Perhaps informative:")
@@ -303,7 +303,7 @@ class QDB:
         #check for any HTTP errors and return False if there were any
         try:
             deletion.raise_for_status()
-        except requests.exceptions.HTTPError, e:
+        except requests.exceptions.HTTPError as e:
             self.bot.debug_print('HTTPError: ')
             self.bot.debug_print(str(e))
             return "HTTPError encountered when accessing QDB"
@@ -329,9 +329,9 @@ class QDB:
         #if we find that it has 75% similarity or greater to a recent submission, return True
         try:
             for recent_quote in self.bot.mem_store['qdb']['_recent']:
-                comparer.set_seq2(recent_quote.values()[0])
+                comparer.set_seq2(list(recent_quote.values())[0])
                 if comparer.ratio() >= .75:
-                    return recent_quote.keys()[0]
+                    return list(recent_quote.keys())[0]
         except TypeError:
             return -1
         except KeyError:

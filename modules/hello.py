@@ -4,7 +4,7 @@ from event import Event
 from random import choice
 
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
@@ -23,5 +23,5 @@ class Hello(BaseModule):
   def handle(self, event):
       try:
         self.say(event.channel, choice(self.retorts) + " " + event.user) #If the parameters above in "hello.define" are met he will spit out the greeting in the channel
-      except Exception,e:
-        print e
+      except Exception as e:
+        print(e)

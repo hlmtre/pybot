@@ -4,7 +4,7 @@ try:
 except ImportError:
   twitter = object
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
@@ -54,7 +54,7 @@ class TwitterPoster(BaseModule):
       try:
         status = api.PostUpdate(event.user + ": " + event.msg[:(140 - (len(event.user) + 2))]) # "username: <message>" all must be <= 140 char
       except Exception as e:
-        print e
-        print len(event.msg[:(140 - len(event.user) + 2)])
+        print(e)
+        print(len(event.msg[:(140 - len(event.user) + 2)]))
     elif event._type == "__.twitter_command__":
       self.say(event.channel, "https://twitter.com/pybot_posts_irc")

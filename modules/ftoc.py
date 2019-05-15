@@ -5,7 +5,7 @@
 from event import Event
 
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
@@ -28,7 +28,7 @@ class Ftoc(BaseModule):
         f_temp = split_msg[1] 
         f = float(f_temp)
         c = (f - 32)*(.5555) #Does math to convert from freedom units to celcius
-        self.say(event.channel, str(round(c, 1)) + u"° C") #Spits it out in the proper channel
+        self.say(event.channel, str(round(c, 1)) + "° C") #Spits it out in the proper channel
         
     except ValueError:
       self.say(event.channel, "Enter a number you rube!")

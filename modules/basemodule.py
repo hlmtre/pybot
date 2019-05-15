@@ -5,7 +5,7 @@ class BaseModule(object):
   The nice this is this allows you to define your own post_init and handle functions.
 
   In your module's post_init, define and register your own events, and pass your module in.
-  
+
   .. code-block:: python
 
     def MyModule(BaseModule):
@@ -15,7 +15,7 @@ class BaseModule(object):
         self.bot.register_event(e,self)
 
 
-  Bam, you've got the things you need (a bot handle, mostly) and by extending BaseModuleyou implement the right things to be called without error.
+  Bam, you've got the things you need (a bot handle, mostly) and by extending BaseModule you implement the right things to be called without error.
   Elzar.
   """
   def __init__(self, events=None, printer_handle=None, bot=None, say=None):
@@ -31,9 +31,9 @@ class BaseModule(object):
 
     # IMPORTANT: you must subscribe to events before you add your own below, or you'll subscribe twice.
     # register ourself for any events that we're interested in that exist already
-    for event in events:
-      if event._type in self.interests:
-        event.subscribe(self)
+    for e in events:
+      if e._type in self.interests:
+        e.subscribe(self)
 
     self.help = None
 

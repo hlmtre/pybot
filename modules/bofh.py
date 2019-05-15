@@ -1,7 +1,7 @@
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from event import Event
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Bofh(BaseModule):
@@ -16,7 +16,7 @@ class Bofh(BaseModule):
   def handle(self, event):
     try:
       url = "http://zero9f9.com/api/bofh"
-      response = urllib2.urlopen(url)
+      response = urllib.request.urlopen(url)
       text = response.read()
       bofhquote = text.splitlines()[2]
       self.say(event.channel, "BOFH: " + bofhquote)

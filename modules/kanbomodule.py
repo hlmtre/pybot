@@ -4,7 +4,7 @@ from event import Event
 import random
 
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class KanboModule(BaseModule):
@@ -14,7 +14,7 @@ class KanboModule(BaseModule):
     kanbo.subscribe(self)
     self.help = ".kanbo (kanbo face)"
     self.bot.register_event(kanbo, self)
-    self.messages = [u'( ͡° ͜ʖ ͡°)', u'( ͡0 ͜ʖ ͡0)', u'|╲/( ͡° ͡° ͜ʖ ͡° ͡°)/\╱\\', u'┬┴┬┴┤( ͡° ͜ʖ├┬┴┬┴']
+    self.messages = ['( ͡° ͜ʖ ͡°)', '( ͡0 ͜ʖ ͡0)', '|╲/( ͡° ͡° ͜ʖ ͡° ͡°)/\╱\\', '┬┴┬┴┤( ͡° ͜ʖ├┬┴┬┴']
     
   def handle(self, event):
     self.say(event.channel, random.choice(self.messages))

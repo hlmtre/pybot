@@ -7,7 +7,7 @@ and when his house has not burned down
 
 from event import Event
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Vyos(BaseModule):

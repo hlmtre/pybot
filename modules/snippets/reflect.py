@@ -2,6 +2,7 @@ import sys
 from util import commands
 from util import parse_line
 from logger import Logger
+import imp
 
 @commands(".reflect")
 def reflect_reload(bot, message, channel):
@@ -15,7 +16,7 @@ def reflect_reload(bot, message, channel):
     for m in recomposed.split()[2:]:
       if m in sys.modules:
         try:
-          reload(sys.modules[m])
+          imp.reload(sys.modules[m])
           bot.brain.notice(channel, 'reloaded ' + m)
           logger.write(Logger.INFO, bot.getName() + ": reloaded " + m, bot.NICK)
         except ImportError as e:

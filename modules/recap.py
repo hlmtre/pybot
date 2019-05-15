@@ -7,7 +7,7 @@ import time
 import re
 
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 
@@ -95,7 +95,7 @@ class recap(BaseModule):
                     listline[x] = listline[x].upper()
                 return ''.join(listline)
             elif drama == 69:
-                return u'( ͡° ͜ʖ ͡°) (ง ͠° ͟ل͜ ͡°)ง ᕦ( ͡° ͜ʖ ͡°)ᕤ ( ͡~ ͜ʖ ͡°)'
+                return '( ͡° ͜ʖ ͡°) (ง ͠° ͟ل͜ ͡°)ง ᕦ( ͡° ͜ʖ ͡°)ᕤ ( ͡~ ͜ʖ ͡°)'
             elif drama == 750:
                 return line[::-1] #reversed string
             else:

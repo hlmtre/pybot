@@ -1,7 +1,7 @@
 from event import Event
 import random
 try:
-  from basemodule import BaseModule
+  from .basemodule import BaseModule
 except ImportError:
   from modules.basemodule import BaseModule
 class Howdy(BaseModule):

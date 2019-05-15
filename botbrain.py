@@ -4,9 +4,9 @@ import webwriter
 import time
 import logger 
 import datetime
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
-from urlparse import urlparse, parse_qsl
+from urllib.parse import urlparse, parse_qsl
 import re
 from xml.dom.minidom import parseString
 #import db
@@ -49,12 +49,12 @@ class BotBrain:
     try:
       s = thing.encode('utf-8', 'ignore')
     except UnicodeEncodeError as e:
-      print e
-      print thing
+      print(e)
+      print(thing)
       return None
     except UnicodeDecodeError as d:
-      print d
-      print thing
+      print(d)
+      print(thing)
       return None
 
     outstring = 'PRIVMSG ' + channel + ' :' + s.decode('utf-8','ignore') + '\n'
@@ -87,7 +87,7 @@ class BotBrain:
   def __quit(self, usr):
     if self._isAdmin(usr):
       self.__bareSay("QUIT :quitting")
-      print "quitting as per " + usr
+      print(("quitting as per " + usr))
       sys.exit()
 
   
