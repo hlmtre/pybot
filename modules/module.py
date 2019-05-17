@@ -40,7 +40,7 @@ class Module:
 
     if event.msg == ".module eventslist":
       for m in self.bot.events_list:
-        print m._type
+        print(m._type)
 
     if event.msg.startswith(".module list"):
       # the set prevents a module with multiple events being printed more than once
@@ -49,7 +49,7 @@ class Module:
         for s in m.subscribers:
           modules_set.add(s.__class__.__name__)
 
-      print modules_set
+      print(modules_set)
       return
 
     if event.msg.startswith(".module unload"):

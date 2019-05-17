@@ -1,9 +1,14 @@
+import sys
 from util import strip_nick
 from event import Event
 try:
-  from basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
+
 class Nicklist(BaseModule):
   def post_init(self):
     nicklisting_self_join = Event("__.nicklisting_self_join__")
@@ -39,7 +44,7 @@ class Nicklist(BaseModule):
       self.bot.mem_store['nicklist'][event.channel] = event.line.split(":")[2].split()
     
     if event.msg.startswith(".nicklist"):
-      print self.bot.mem_store['nicklist'][event.channel]
+      print(self.bot.mem_store['nicklist'][event.channel])
 
     if event._type == "__.nicklisting_other_join__":
       try:
@@ -55,7 +60,7 @@ class Nicklist(BaseModule):
 
     if event._type == "__.nicklisting_quit__":
       try:
-        for name, chan in self.bot.mem_store['nicklist'].iteritems():
+        for name, chan in self.bot.mem_store['nicklist'].items():
           chan.remove(strip_nick(event.user))
       except ValueError:
         pass

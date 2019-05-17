@@ -1,6 +1,6 @@
 #
 # see version.py for version
-# works with python 2.7.x
+# works with python 2.7.x and 3 (!!)
 #
 
 
@@ -43,6 +43,7 @@ class Bot(threading.Thread):
     self.CONNECTED = False
     self.JOINED = False
     self.OWNER = None
+    self.chan_list = None
     self.conf = conf
     self.pid = os.getpid()
     self.logger = Logger()
@@ -155,9 +156,9 @@ class Bot(threading.Thread):
 # snippet is a module
           snippet = imp.load_source(name, snippets_path + '/' + filename)
           self.snippets_list.add(snippet)
-      except Exception, e:
-        print e
-        print name, filename
+      except Exception as e:
+        print(e)
+        print((name, filename))
 
   def persist(self, namespace):
     self.persistence.append(namespace)
@@ -225,7 +226,7 @@ class Bot(threading.Thread):
       try:
         autoloads = json.load(open(autoload_path))
         # logging
-        for k in autoloads.keys():
+        for k in list(autoloads.keys()):
           self.logger.write(Logger.INFO, "Autoloads found for network " + k, self.NICK)
       except IOError:
         self.logger.write(Logger.WARNING, "Could not load autoloads file.",self.NICK)
@@ -236,7 +237,7 @@ class Bot(threading.Thread):
         nonspecific = True
         # ignore compiled python and __init__ files.
         # choose to either load all .py files or, available, just ones specified in autoloads
-        if self.network not in autoloads.keys(): # if autoload does not specify for this network
+        if self.network not in list(autoloads.keys()): # if autoload does not specify for this network
           if ext == '.py' and not name == '__init__':
             f, filename, descr = imp.find_module(name, [modules_path])
             mods[name] = imp.load_module(name, f, filename, descr)
@@ -258,7 +259,7 @@ class Bot(threading.Thread):
             mods[name] = imp.load_module(name, f, filename, descr)
             found = True
 
-    for k,v in mods.iteritems():
+    for k,v in list(mods.items()):
       for name in dir(v):
         obj = getattr(mods[k], name) # get the object from the namespace of 'mods'
         try:
@@ -288,29 +289,43 @@ class Bot(threading.Thread):
     else:
       if self.DEBUG is True:
         self.logger.write(Logger.INFO, "DEBUGGING OUTPUT", self.NICK)
-        self.logger.write(Logger.INFO, self.getName() + " " + message.encode('utf-8', 'ignore'), self.NICK)
-        self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + " " + message.encode('utf-8', 'ignore'))
+        if type(message) is bytes:
+          self.logger.write(Logger.INFO, self.getName() + " " + message.decode('utf-8', 'ignore'), self.NICK)
+        else:
+          self.logger.write(Logger.INFO, self.getName() + " " + message, self.NICK)
+        if type(message) is bytes:
+          self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + " " + message.decode('utf-8', 'ignore'))
+        else:
+          self.debug_print(util.bcolors.OKGREEN + ">> " + util.bcolors.ENDC + ": " + " " + message)
 
-      self.s.send(message.encode('utf-8', 'ignore'))
+      if type(message) is not bytes:
+        self.s.send(message.encode('utf-8', 'ignore'))
+      else:
+        self.s.send(message)
       target = message.split()[1]
-      if target.startswith("#"):
-        self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip()) 
+      if type(target) is bytes:
+        target = target.decode()
+      if target.startswith('#'):
+        if type(message) is bytes:
+          self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.decode().rstrip())
+        elif type(message) is str:
+          self.processline(':' + self.conf.getNick(self.network) + '!~' + self.conf.getNick(self.network) + '@fakehost.here ' + message.rstrip())
 
   def pong(self, response):
     """
     Keepalive heartbeat for IRC protocol. Until someone changes the IRC spec, don't modify this.
     """
-    self.send('PONG ' + response + '\n')
+    self.send(('PONG ' + response + '\n').encode())
 
   def processline(self, line):
     """
-    Grab newline-delineated lines sent to us, and determine what to do with them. 
+    Grab newline-delineated lines sent to us, and determine what to do with them.
     This function handles our initial low-level IRC stuff, as well; if we haven't joined, it waits for the MOTD message (or message indicating there isn't one) and then issues our own JOIN calls.
 
     Also immediately passes off PING messages to PONG.
 
     Args:
-    line: string. 
+    line: string.
 
     """
     if self.DEBUG:
@@ -341,11 +356,11 @@ class Bot(threading.Thread):
       # pings we respond to directly. everything else...
       else:
         # patch contributed by github.com/thekanbo
-        if self.JOINED is False and (message_number == "376" or message_number == "422"): 
+        if self.JOINED is False and (message_number == "376" or message_number == "422"):
           # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exist
-          self.chan_list = self.conf.getChannels(self.network) 
+          self.chan_list = self.conf.getChannels(self.network)
           for c in self.chan_list:
-            self.send('JOIN '+c+' \n')
+            self.send(('JOIN '+c+' \n').encode())
           self.JOINED = True
 
         line_array = line.split()
@@ -360,10 +375,10 @@ class Bot(threading.Thread):
             message = line.split(":",2)[1]
             self.brain.respond(usr, channel, message)
           except IndexError:
-            print "index out of range.", line
+            print(("index out of range.", line))
 
     except Exception:
-      print "Unexpected error:", sys.exc_info()[0]
+      print(("Unexpected error:", sys.exc_info()[0]))
       traceback.print_exc(file=sys.stdout)
 
   def worker(self, mock=False):
@@ -403,19 +418,19 @@ class Bot(threading.Thread):
 
       time.sleep(1)
     # core IRC protocol stuff
-      self.s.send('NICK '+self.NICK+'\n')
+      self.s.send(('NICK '+self.NICK+'\n').encode())
 
       if self.DEBUG:
         self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': NICK ' + self.NICK + '\\n')
 
-      self.s.send('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n') # yeah, don't delete this line
+      self.s.send(('USER '+self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\n').encode()) # yeah, don't delete this line
 
       if self.DEBUG:
         self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ": USER " +self.IDENT+ ' 8 ' + ' bla : '+self.REALNAME+'\\n')
 
       time.sleep(3) # allow services to catch up
 
-      self.s.send('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n')  # we're registered!
+      self.s.send(('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n').encode())  # we're registered!
 
       if self.DEBUG:
         self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
@@ -459,11 +474,11 @@ class Bot(threading.Thread):
         if ready[0]:
           try:
             read = read + self.s.recv(1024).decode('utf8', 'ignore')
-          except UnicodeDecodeError, e:
+          except UnicodeDecodeError as e:
             self.debug_print("Unicode decode error; " + e.__str__())
             self.debug_print("Offending recv: " + self.s.recv)
-          except Exception, e:
-            print e
+          except Exception as e:
+            print(e)
             if self.DEBUG:
               self.debug_print("Disconnected! Retrying... ")
             disconnect_event.notifySubscribers("null")
@@ -488,7 +503,7 @@ class Bot(threading.Thread):
             line = line.rstrip()
             self.processline(line)
       except KeyboardInterrupt:
-        print "keyboard interrupt caught; exiting ..."
+        print("keyboard interrupt caught; exiting ...")
         raise
   # end worker
 
@@ -503,9 +518,9 @@ class Bot(threading.Thread):
     """
 
     if not error:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()
+      print((str(datetime.datetime.now()) + ": " + self.getName() + ": " + line.strip('\n').rstrip().lstrip()))
     else:
-      print str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.FAIL + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()
+      print((str(datetime.datetime.now()) + ": " + self.getName() + ": " + util.bcolors.FAIL + ">> " + util.bcolors.ENDC + line.strip('\n').rstrip().lstrip()))
 
 
   def run(self):

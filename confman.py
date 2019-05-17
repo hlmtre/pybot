@@ -14,7 +14,7 @@ class ConfManager:
       except IOError:
         raise ConfError("could not open conf file '"+os.path.expanduser(conf)+"'")
     if conf is None:
-      if os.environ.has_key('HOME'):
+      if 'HOME' in os.environ:
         try:
           self.conf_path = os.environ['HOME'] + '/.pybotrc'
           self.conf_file = open(self.conf_path)
@@ -73,14 +73,14 @@ class ConfManager:
 
   def getNetworks(self):
     l = list()
-    for n in self.parsed.iterkeys():
+    for n in list(self.parsed.keys()):
       if n != "__pybot_conf":
         l.append(n)
     return l
   
   def getNumNets(self):
     i = 0
-    for n in self.parsed.iterkeys():
+    for n in list(self.parsed.keys()):
       if n != "__pybot_conf":
         i += 1
     return i

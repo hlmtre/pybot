@@ -38,6 +38,6 @@ class Welcome:
   def handle(self, event):
     try:
       self.bot.brain.say(event.channel, choice(self.response) + " " + event.user + '\n')
-    except Exception,e:
-      print e
+    except Exception as e:
+      print(e)
 

@@ -1,20 +1,24 @@
 #Tell module created by hlmtre#
 
+import sys
 from event import Event
 try:
-  from basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 # Utility class for tell module
 class Notice:
   def __init__(self, subj, obj, message):
     self.subject = subj
-    self.obj = obj 
+    self.obj = obj
     self.message = message
 
 class Tell(BaseModule):
-  
+
   def post_init(self):
     """
     Because of the way this module works we have to make sure to set our
@@ -26,11 +30,11 @@ class Tell(BaseModule):
     We will set the .tell trigger in our handle function "if event.msg.startswith(".tell"):"
     and set define to PRIVMSG so it searches all lines from users. While simultaneously looking
     for the .tell trigger from the user.
-    
-    This is because we actually need 2 things for this module to work. 
 
-    1.) The user needs to be able to leave a message for someone else using ".tell someuser <Insert message here>" 
-    
+    This is because we actually need 2 things for this module to work.
+
+    1.) The user needs to be able to leave a message for someone else using ".tell someuser <Insert message here>"
+
     2.) The user who the .tell message is directed towards will be determined by the PRIVMSG definition.
         This is determined in the "else" block that searches every line not starting with .tell.
         If the user matches the stored user from the previous tell trigger, the event will be triggered and pybot will spit out text into
@@ -71,7 +75,7 @@ class Tell(BaseModule):
         if "tell" in self.bot.mem_store:
           for n in self.bot.mem_store["tell"]:
             if event.user.lower() == n.obj.lower():
-              self.say(event.channel, "Hey " + n.obj + ", " + n.subject + " says \""+ u" ".join(n.message)+"\"")
+              self.say(event.channel, "Hey " + n.obj + ", " + n.subject + " says \""+ " ".join(n.message)+"\"")
               # we've said it, now delete it.
               self.bot.mem_store["tell"].remove(n)
     except IndexError:

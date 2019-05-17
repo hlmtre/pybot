@@ -1,16 +1,20 @@
+import sys
 from event import Event
 try:
   import twitter
-except ImportError:
+except (ImportError, SystemError):
   twitter = object
 try:
-  from basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 """
   to use this, you'll need to create a file in the modules directory called 'twitter_credentials.py', and it should look like this:
-    
+
     class PybotTwitter:
       api_key = "<your api key (sometimes called consumer key)>"
       api_secret = "<api/consumer secret>"
@@ -22,7 +26,7 @@ except ImportError:
 class TwitterPoster(BaseModule):
   try:
     from modules.twitter_credentials import PybotTwitter as pt
-  except ImportError:
+  except (ImportError, SystemError):
     class PhonyPt:
       api_key = ""
       api_secret = ""
@@ -54,7 +58,7 @@ class TwitterPoster(BaseModule):
       try:
         status = api.PostUpdate(event.user + ": " + event.msg[:(140 - (len(event.user) + 2))]) # "username: <message>" all must be <= 140 char
       except Exception as e:
-        print e
-        print len(event.msg[:(140 - len(event.user) + 2)])
+        print(e)
+        print(len(event.msg[:(140 - len(event.user) + 2)]))
     elif event._type == "__.twitter_command__":
       self.say(event.channel, "https://twitter.com/pybot_posts_irc")

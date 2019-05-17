@@ -1,10 +1,20 @@
-import urllib2
 import json
+import sys
+if sys.version_info > (3, 0, 0):
+  import urllib.request, urllib.error, urllib.parse
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  import urllib2 as urllib
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 from event import Event
-try:
-  from basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+
 class Dad(BaseModule):
   def post_init(self):
     d_event = Event("__.dad__")
@@ -17,8 +27,8 @@ class Dad(BaseModule):
   def handle(self, event):
     try:
       url = "https://icanhazdadjoke.com/"
-      req = urllib2.Request(url, headers={'Accept' : "application/json", 'User-Agent' : "Magic Browser"})
-      resp = urllib2.urlopen(req)
+      req = urllib.request.Request(url, headers={'Accept' : "application/json", 'User-Agent' : "Magic Browser"})
+      resp = urllib.request.urlopen(req)
       j = json.loads(resp.read())
       self.say(event.channel, j['joke'])
     except:

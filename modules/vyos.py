@@ -5,11 +5,20 @@ Works only in hlmtre's specifically  configured environment
 and when his house has not burned down
 """
 
+import sys
+if sys.version_info > (3, 0, 0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 from event import Event
-try:
-  from basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+
 class Vyos(BaseModule):
   def post_init(self):
     vevent = Event("__.vyos__")

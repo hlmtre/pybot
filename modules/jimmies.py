@@ -1,11 +1,16 @@
 #Jimmies module created by Bonekin#
+from __future__ import print_function
 
 from event import Event
 import random
+import sys
 
 try:
-  from basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Jimmies(BaseModule):
@@ -57,7 +62,6 @@ class Jimmies(BaseModule):
     except IndexError:
       self.say(event.channel, "You didn\'t specify whose jimmies you wanted to check. " + event.user + "\'s jimmies status: " + jimmies_status) # Spits into channel if user not specified correctly
     except TypeError:
-      print "DEBUG: TypeError: ",
-      print event.channel,
-      print event.user
-
+      print("DEBUG: TypeError: ", end=' ')
+      print(event.channel, end=' ')
+      print(event.user)

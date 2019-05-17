@@ -1,11 +1,20 @@
 #Jury module created by Bonekin#
 
+import random, sys
 from event import Event
-import random
-try:
-  from basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+
+if sys.version_info > (3, 0, 0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+      from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
+
 class Jury(BaseModule):
   def post_init(self):
     jury = Event("__.jury__")
@@ -15,7 +24,7 @@ class Jury(BaseModule):
 
     # register ourself to our new jury event
     self.bot.register_event(jury, self)
-    
+
   def handle(self, event):
     if event.msg.startswith(".jury"):
       votes = 0

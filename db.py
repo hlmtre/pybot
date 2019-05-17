@@ -5,7 +5,7 @@ except ImportError:
   import sys
   imported = False
   if "lite" not in sys.modules:
-    print "Could not find MySQLdb and lite is not imported! Erroring out!"
+    print("Could not find MySQLdb and lite is not imported! Erroring out!")
     sys.exit(1)
 
 from datetime import datetime,timedelta
@@ -36,7 +36,7 @@ class DB:
     except mdb.OperationalError as e:
       self.dry_run = True
       self.bot.logger(Logger.WARNING, e)
-      print e
+      print(e)
       return
 
     self.cur = self.con.cursor()
@@ -88,8 +88,8 @@ class DB:
         e = self.cur.fetchall()
         self._close()
         return e
-    except Exception, e:
-      print e
+    except Exception as e:
+      print(e)
       self.con.rollback()
       self._close()
       return None
@@ -130,8 +130,8 @@ class DB:
         self.con.commit()
     except:
       self.bot.logger(Logger.WARNING, 'failed to insert ' + url)
-      print "failure"
-      print "Unexpected error:", sys.exc_info()[0]
+      print("failure")
+      print(("Unexpected error:", sys.exc_info()[0]))
       if not self.dry_run:
         self.con.rollback()
 
@@ -155,8 +155,8 @@ class DB:
       self.cur.execute("""SELECT * FROM admins WHERE username = %s""",[username])
       data = self.cur.fetchall()
       self._close()
-    except Exception, e:
-      print  e
+    except Exception as e:
+      print(e)
       self._close()
       return None
 
