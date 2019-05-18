@@ -21,7 +21,7 @@ class LastFM(BaseModule):
 
   def post_init(self):
     lastfm = Event("__.lastfm__")
-    lastfm.define(msg_definition="^\.lastfm")
+    lastfm.define(msg_definition=r"^\.lastfm")
     lastfm.subscribe(self)
     self.help = ".lastfm add <lastfm username> then .last"
 
@@ -45,13 +45,13 @@ class LastFM(BaseModule):
         url = "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user="+username+"&api_key="+api_key+"&format=json"
         response = urllib.request.urlopen(url)
         text = response.read()
-        j = json.loads(text)
+        j = json.loads(text.decode())
         if "@attr" in j["recenttracks"]["track"][0]:
           if j["recenttracks"]["track"][0]["@attr"]["nowplaying"] == "true":
-            output = j["recenttracks"]["track"][0]['artist']['#text'] + " - " + j["recenttracks"]["track"][0]['name'] 
+            output = j["recenttracks"]["track"][0]['artist']['#text'] + " - " + j["recenttracks"]["track"][0]['name']
             self.say(event.channel, event.user + " is now playing: " + output) # What you are currently listening to
         else:
-          output = j["recenttracks"]["track"][0]['artist']['#text'] + " - " + j["recenttracks"]["track"][0]['name'] 
+          output = j["recenttracks"]["track"][0]['artist']['#text'] + " - " + j["recenttracks"]["track"][0]['name']
           self.say(event.channel, event.user + " recently played: " + output) # If not listening anymore, what you were listening to
 
       except IndexError as e:
