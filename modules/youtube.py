@@ -50,7 +50,7 @@ class Youtube(BaseModule):
             api_key = "None"
         yc = PhonyYc()
 
-    self.api_key = yc.api_key    
+    self.api_key = yc.api_key
     self.api_url = "https://www.googleapis.com/youtube/v3/videos?id="
     #self.api_url = "https://www.googleapis.com/youtube/v3/videos?id=2k_9mXpNdgU&key=&part=snippet"
 
@@ -65,7 +65,7 @@ class Youtube(BaseModule):
       return
 
     try:
-      jsonified = json.loads(response)["items"][0]
+      jsonified = json.loads(response.decode())["items"][0]
     except IndexError as e:
       self.bot.logger.write(logger.Logger.WARNING, "IndexError pulling youtube videos. Zero results for: ")
       self.bot.logger.write(logger.Logger.WARNING, url)

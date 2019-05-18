@@ -24,8 +24,8 @@ class Dance(BaseModule):
 
   def handle(self, event):
     try:
-      self.printer("PRIVMSG " + event.channel + " : :D-\-< " + '\n') #Prints this dancing guy out to proper channel
-      self.printer("PRIVMSG " + event.channel + " : :D-|-< " + '\n')
-      self.printer("PRIVMSG " + event.channel + " : :D-/-< " + '\n')
+      self.say(event.channel, ":D-\-< ") #Prints this dancing guy out to proper channel
+      self.say(event.channel, ":D-|-< ")
+      self.say(event.channel, ":D-/-< ")
     except TypeError:
       pass
