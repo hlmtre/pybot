@@ -43,7 +43,10 @@ class LastFM(BaseModule):
         username = self.bot.db.e("SELECT lastfm_username FROM lastfm WHERE nick = '" + event.user + "'")[0][0]
         api_key = "80688df02fc5af99f1ed97b5f667f0c4"
         url = "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user="+username+"&api_key="+api_key+"&format=json"
-        response = urllib.request.urlopen(url)
+        if sys.version_info > (3, 0, 0): # py3 has requests built in, and incorporates requests
+          response = urllib.request.urlopen(url)
+        else:
+          response = urllib.urlopen(url)
         text = response.read()
         j = json.loads(text.decode())
         if "@attr" in j["recenttracks"]["track"][0]:
