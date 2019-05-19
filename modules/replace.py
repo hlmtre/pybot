@@ -26,16 +26,17 @@ class Replace(BaseModule):
     self.bot.register_event(replace, self)
 
     self.help = ".r <search string> | <replacement text> OR s/<search string>/<replacement string>"
-    self.MAX_BUFFER_SIZE = 300 
+    self.MAX_BUFFER_SIZE = 300
     self.MAX_HISTORY_SIZE = 10
 
-  def add_buffer(self, event=None, debug=False): 
+  def add_buffer(self, event=None, debug=False):
     """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
     for future access. The dict will have channel as key. The value to that key will be a list
-    of formatted lines of activity. 
+    of formatted lines of activity.
     If the buffer size is not yet exceeded, lines are just added. If the buffer
     is maxed out, the oldest line is removed and newest one inserted at the beginning.
     """
+    debug = True
     if debug:
       print("Line: " + event.line)
       print("Verb: " + event.verb)
@@ -50,7 +51,7 @@ class Replace(BaseModule):
     #correct behavior and could very well lead to quits/nick changes that are not visible
     #showing up in a quote, but it's the best we can do at the moment
     if not event.channel:
-      #discard events with unwanted verbs 
+      #discard events with unwanted verbs
       if event.verb not in ["QUIT", "NICK"]:
         return
       try:
@@ -60,7 +61,7 @@ class Replace(BaseModule):
           line = self.format_line(event)
           if line:
             self.bot.mem_store['replace'][chan].insert(0, line)
-      except KeyError as IndexError:
+      except (KeyError, IndexError):
         print("Replace add_buffer() error when no event channel")
     #now we continue with normal, per channel line addition
     #create a dictionary associating the channel with an empty list if it doesn't exist yet
@@ -74,7 +75,7 @@ class Replace(BaseModule):
           self.bot.mem_store['replace'][event.channel].pop()
         #get a line by passing event to format_line
         #insert the line into the first position in the list
-        line = self.format_line(event) 
+        line = self.format_line(event)
         if line:
           self.bot.mem_store['replace'][event.channel].insert(0, line)
       except IndexError:
@@ -87,7 +88,7 @@ class Replace(BaseModule):
       return ''
     elif event.verb == "PRIVMSG":
       #special formatting for ACTION strings
-      if event.msg.startswith('\001ACTION'): 
+      if event.msg.startswith('\001ACTION'):
         #strip out the word ACTION from the msg
         return ' * %s %s\n' % (event.user, event.msg[7:])
       else:
@@ -105,7 +106,7 @@ class Replace(BaseModule):
     if len(find_msg) == 0 or not channel:
       #print "find_msg is empty"
       return None
-    #search for a matching string and saves the index of that entry. 
+    #search for a matching string and saves the index of that entry.
     #Searches from most recent to oldest.
     found_index = -1
     for index, line in enumerate(self.bot.mem_store['replace'][channel]):
@@ -124,7 +125,7 @@ class Replace(BaseModule):
     #returns the entire line
     submission = self.bot.mem_store['replace'][channel][found_index]
     return submission
-    
+
   def handle(self, event):
     #first we see if we're going to try a replace or just add a line to the mem_store
     if event.msg.startswith(".r "):
@@ -137,7 +138,7 @@ class Replace(BaseModule):
         return
       #looking for a message containing our search string
       newString = self.get_replacement_message(event.channel, find_msg)
-      
+
       #because the mem_store line shows "<user> message", we have to split up the username and their message
       #this actually works to our advantage so we dont have to do additional calls to find out who sent what
       msg_index = newString.find(">")
@@ -157,7 +158,7 @@ class Replace(BaseModule):
         return
       #looking for a message containing our search string
       newString = self.get_replacement_message(event.channel, find_msg)
-      
+
       #because the mem_store line shows "<user> message", we have to split up the username and their message
       #this actually works to our advantage so we dont have to do additional calls to find out who sent what
       msg_index = newString.find(">")
