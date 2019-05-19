@@ -1,4 +1,4 @@
-import ast, sys
+import sys
 from event import Event
 
 if sys.version_info > (3, 0, 0):
@@ -42,7 +42,10 @@ class Debugger(BaseModule):
 
   def pretty(self, d, event, indent=0):
     for key, value in d.items():
-      self.say(event.user, '\t' * indent + key.encode('utf-8','ignore'))
+      if sys.version_info > (3, 0, 0):
+        self.say(event.user, '\t' * indent + key)
+      else:
+        self.say(event.user, '\t' * indent + key.encode('utf-8','ignore'))
       if isinstance(value, dict):
         self.pretty(value, event, indent+1)
       else:

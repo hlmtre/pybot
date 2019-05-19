@@ -31,7 +31,7 @@ class Tzone(BaseModule):
     self.bot.register_event(tzone, self)
 
   def handle(self, event):
-    if pytz == None:
+    if pytz:
       print("tzone requires pytz pip module")
       return
 
@@ -55,6 +55,6 @@ class Tzone(BaseModule):
           tz_time = time.strftime('%X %x %Z') #The format in which the time is printed out
           self.say(event.channel, tz_time)
     except IndexError: #Handles the 2 errors I have found based on user error
-      self.say(event.channel, "Idk what your did, but it was wrong")
+      self.say(event.channel, "Idk what you did, but it was wrong.")
     except ValueError:
         self.say(event.channel, "Not a valid timezone, .tzone <insert timezone>, timezone options: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones")

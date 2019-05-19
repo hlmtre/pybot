@@ -36,7 +36,6 @@ class Replace(BaseModule):
     If the buffer size is not yet exceeded, lines are just added. If the buffer
     is maxed out, the oldest line is removed and newest one inserted at the beginning.
     """
-    debug = True
     if debug:
       print("Line: " + event.line)
       print("Verb: " + event.verb)
@@ -100,11 +99,11 @@ class Replace(BaseModule):
   def get_replacement_message(self, channel=None, find_msg=''):
     """Looks through the mem_store to find the most recent message containing find_msg"""
     if not channel:
-      #print "couldnt find channel"
+      print("couldnt find channel")
       return None
     #must have at least one msg to search for and channel to look it up in
     if len(find_msg) == 0 or not channel:
-      #print "find_msg is empty"
+      print ("find_msg is empty")
       return None
     #search for a matching string and saves the index of that entry.
     #Searches from most recent to oldest.
@@ -113,11 +112,16 @@ class Replace(BaseModule):
       message = line
       msg_index = message.find(">")
       message = message[msg_index:]
-      #print line
+      print(line)
       #if the current entry of mem_store contains our string, we set the index and then BREAK to stop looking
-      if find_msg.decode('utf-8','ignore') in message:
-        found_index = index
-        break
+      if sys.version_info < (3, 0, 0):
+        if find_msg.decode('utf-8','ignore') in message:
+          found_index = index
+          break
+      else:
+        if find_msg in message:
+          found_index = index
+          break
     #check to see if index values are positive. if not, string was not found and we're done
     if found_index == -1 :
       #print "couldnt find a good match"
@@ -134,7 +138,8 @@ class Replace(BaseModule):
       find_msg = string_token[0].rstrip()
       try:
         replace_msg = string_token[1].lstrip() #if there's nothing after the pipe, then this resolves to '' which is fine
-      except IndexError:
+      except IndexError as e:
+        print(e)
         return
       #looking for a message containing our search string
       newString = self.get_replacement_message(event.channel, find_msg)
@@ -159,6 +164,7 @@ class Replace(BaseModule):
       #looking for a message containing our search string
       newString = self.get_replacement_message(event.channel, find_msg)
 
+      print(newString)
       #because the mem_store line shows "<user> message", we have to split up the username and their message
       #this actually works to our advantage so we dont have to do additional calls to find out who sent what
       msg_index = newString.find(">")
