@@ -42,7 +42,7 @@ class Youtube(BaseModule):
 
 
     # for the new v3 google api >:(
-    try: 
+    try:
         from youtube_credentials import YoutubeCredentials as yc
     except (ImportError, SystemError):
         print("Warning: youtube module requires credentials in modules/youtube_credentials.py")

@@ -31,7 +31,7 @@ class Tzone(BaseModule):
     self.bot.register_event(tzone, self)
 
   def handle(self, event):
-    if pytz:
+    if not pytz: # if NOT pytz.. this was a bug.
       print("tzone requires pytz pip module")
       return
 
