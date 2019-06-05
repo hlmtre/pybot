@@ -7,7 +7,7 @@ import sys
 try:
   from requests_html import HTMLSession
 except (ImportError, SystemError):
-  requests_html = None
+  HTMLSession = None
 import random
 try:
   if sys.version_info > (3, 0, 0):
@@ -28,9 +28,9 @@ class Bofh(BaseModule):
     self.bot.register_event(b_event, self)
     self.help = ".bofh (prints random quote)"
   def handle(self, event):
+    if not HTMLSession:
+      return
     try:
-      if not requests_html:
-        return
       session = HTMLSession()
       r = session.get('http://pages.cs.wisc.edu/~ballard/bofh/excuses')
       r_text = (r.text)
