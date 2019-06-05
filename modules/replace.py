@@ -112,7 +112,7 @@ class Replace(BaseModule):
       message = line
       msg_index = message.find(">")
       message = message[msg_index:]
-      print(line)
+      #print(line)
       #if the current entry of mem_store contains our string, we set the index and then BREAK to stop looking
       if sys.version_info < (3, 0, 0):
         if find_msg.decode('utf-8','ignore') in message:
