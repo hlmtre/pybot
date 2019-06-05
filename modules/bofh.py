@@ -1,8 +1,13 @@
 #BOFH quote module created by hlmtre#
+# depends on requests-html, which runs only on python 3
+# perhaps TODO FIXME ?
 
 from event import Event
 import sys
-from requests_html import HTMLSession
+try:
+  from requests_html import HTMLSession
+except (ImportError, SystemError):
+  requests_html = None
 import random
 try:
   if sys.version_info > (3, 0, 0):
@@ -24,6 +29,8 @@ class Bofh(BaseModule):
     self.help = ".bofh (prints random quote)"
   def handle(self, event):
     try:
+      if not requests_html:
+        return
       session = HTMLSession()
       r = session.get('http://pages.cs.wisc.edu/~ballard/bofh/excuses')
       r_text = (r.text)
