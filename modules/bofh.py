@@ -1,14 +1,16 @@
 #BOFH quote module created by hlmtre#
-# depends on requests-html, which runs only on python 3
-# perhaps TODO FIXME ?
 
 from event import Event
 import sys
-try:
-  from requests_html import HTMLSession
-except (ImportError, SystemError):
-  HTMLSession = None
 import random
+import re
+
+try:
+  import requests
+except (ImportError, SystemError):
+  print("bofh requires requests pip module")
+  requests = None
+
 try:
   if sys.version_info > (3, 0, 0):
     from .basemodule import BaseModule
@@ -28,14 +30,10 @@ class Bofh(BaseModule):
     self.bot.register_event(b_event, self)
     self.help = ".bofh (prints random quote)"
   def handle(self, event):
-    if not HTMLSession:
-      return
     try:
-      session = HTMLSession()
-      r = session.get('http://pages.cs.wisc.edu/~ballard/bofh/excuses')
-      r_text = (r.text)
+      r = requests.get('http://pages.cs.wisc.edu/~ballard/bofh/excuses')
+      r_text = r.text
       r_list = r_text.split('\n')
-      random_quote = random.randrange(0, len(r_list))
-      self.say(event.channel, "BOFH: " + r_list[random_quote])
+      self.say(event.channel, "BOFH: " + r_list[random.randrange(0, len(r_list))])
     except:
       pass

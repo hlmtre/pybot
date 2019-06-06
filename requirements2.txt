@@ -4,3 +4,4 @@ python-twitter
 imgurpython
 isodate
 pytz
+requests
