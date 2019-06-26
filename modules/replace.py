@@ -2,6 +2,7 @@
 #adding a bold character for '<user> MEANT so say'
 
 import requests, sys
+from logger import Logger
 from event import Event
 
 if sys.version_info > (3, 0, 0):
@@ -18,7 +19,8 @@ else:
 class Replace(BaseModule):
   def post_init(self):
 
-    self.bot.mem_store['replace'] = {}
+    if not 'replace' in self.bot.mem_store:
+      self.bot.mem_store['replace'] = {}
     replace = Event("__.r__")
     replace.define(msg_definition=".*")
     replace.subscribe(self)
@@ -61,7 +63,8 @@ class Replace(BaseModule):
           if line:
             self.bot.mem_store['replace'][chan].insert(0, line)
       except (KeyError, IndexError):
-        print("Replace add_buffer() error when no event channel")
+        self.bot.logger.write(Logger.WARNING, line="couldn't find channel in modules.replace")
+        self.bot.logger.write(Logger.WARNING, line="Replace add_buffer() error when no event channel")
     #now we continue with normal, per channel line addition
     #create a dictionary associating the channel with an empty list if it doesn't exist yet
     # END if not event.channel:
@@ -78,7 +81,7 @@ class Replace(BaseModule):
         if line:
           self.bot.mem_store['replace'][event.channel].insert(0, line)
       except IndexError:
-        print("Replace add_buffer() error. Couldn't access the list index.")
+        self.bot.logger.write(Logger.WARNING, line="Replace add_buffer() error. Couldn't access the list index.")
 
   def format_line(self, event):
     """Takes an event and formats a string appropriate for quotation from it"""
@@ -99,11 +102,11 @@ class Replace(BaseModule):
   def get_replacement_message(self, channel=None, find_msg=''):
     """Looks through the mem_store to find the most recent message containing find_msg"""
     if not channel:
-      print("couldn't find channel")
+      self.bot.logger.write(Logger.WARNING, line="couldn't find channel")
       return None
     #must have at least one msg to search for and channel to look it up in
     if len(find_msg) == 0 or not channel:
-      print ("find_msg is empty")
+      self.bot.logger.write(Logger.WARNING, line="find_msg is empty")
       return None
     #search for a matching string and saves the index of that entry.
     #Searches from most recent to oldest.
@@ -112,7 +115,6 @@ class Replace(BaseModule):
       message = line
       msg_index = message.find(">")
       message = message[msg_index:]
-      #print(line)
       #if the current entry of mem_store contains our string, we set the index and then BREAK to stop looking
       if sys.version_info < (3, 0, 0):
         if find_msg.decode('utf-8','ignore') in message:
@@ -124,7 +126,6 @@ class Replace(BaseModule):
           break
     #check to see if index values are positive. if not, string was not found and we're done
     if found_index == -1 :
-      #print "couldnt find a good match"
       return None
     #returns the entire line
     submission = self.bot.mem_store['replace'][channel][found_index]
@@ -139,7 +140,7 @@ class Replace(BaseModule):
       try:
         replace_msg = string_token[1].lstrip() #if there's nothing after the pipe, then this resolves to '' which is fine
       except IndexError as e:
-        print(e)
+        self.bot.logger.write(Logger.WARNING, line=e)
         return
       #looking for a message containing our search string
       newString = self.get_replacement_message(event.channel, find_msg)
@@ -154,6 +155,7 @@ class Replace(BaseModule):
       self.say(event.channel, user + " MEANT to say: " + message)
     # because both .r and s// are valid formats now
     if event.msg.startswith("s/"):
+      self.bot.logger.write(Logger.WARNING, line="i am a log entry from within s/ in modules.replace")
       #alternative notation: s/<substring to replace>/<substring to replace with>
       string_token = event.msg[2:].split('/', 1)
       find_msg = string_token[0]
@@ -164,7 +166,6 @@ class Replace(BaseModule):
       #looking for a message containing our search string
       newString = self.get_replacement_message(event.channel, find_msg)
 
-      print(newString)
       #because the mem_store line shows "<user> message", we have to split up the username and their message
       #this actually works to our advantage so we dont have to do additional calls to find out who sent what
       msg_index = newString.find(">")
