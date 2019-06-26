@@ -99,7 +99,7 @@ class Replace(BaseModule):
   def get_replacement_message(self, channel=None, find_msg=''):
     """Looks through the mem_store to find the most recent message containing find_msg"""
     if not channel:
-      print("couldnt find channel")
+      print("couldn't find channel")
       return None
     #must have at least one msg to search for and channel to look it up in
     if len(find_msg) == 0 or not channel:
