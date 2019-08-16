@@ -27,6 +27,17 @@ class Diabeetus(BaseModule):
         self.api_url = "https://bonkscout.herokuapp.com/api/v1/entries/current.json"
         self.LOW = 69
         self.HIGH = 200
+        self.trend = {
+            "Flat": "→",
+            "FortyFiveDown":"↘",
+            "FortyFiveUp":"↗",
+            "SingleDown":"↓",
+            "SingleUp":"↑",
+            "DoubleDown":"⇊",
+            "DoubleUp":"⇈",
+            "TripleDown":"⇓",
+            "TripleUp":"⇑"
+        }
 
     def get_glucose(self, channel):
         """get the glucose"""
@@ -38,7 +49,6 @@ class Diabeetus(BaseModule):
             return
         entry = r.json()
         try:
-            print("Got to trying the json parse")
             #grab the relevant data we want for formatting
             glucose = entry[0]['sgv']
             if (glucose <= self.LOW):
@@ -47,13 +57,13 @@ class Diabeetus(BaseModule):
                 color = '\x0308'
             else:
                 color = '\x0303'
-            trend = entry[0]['direction'].lower()
-            date = entry[0]['date']
+            arrow = self.trend[entry[0]['direction']]
+            
         except KeyError:
             self.say(channel, "Unable to get glucose data from results. Sorry.")
             return
         #return the formatted string
-        return "Bonk's blood sugar is " + color + str(glucose) + '\x03' + " mg/dL and trending " + trend  
+        return "Bonk's blood sugar is " + color + str(glucose) + "\x0F mg/dL, trending " + arrow 
 
   
     def handle(self, event):
