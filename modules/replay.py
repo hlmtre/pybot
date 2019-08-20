@@ -33,11 +33,11 @@ class Replay:
 	def get_replacement_message(self, channel=None, find_msg=''):
 		"""Looks through the mem_store to find the most recent message containing find_msg"""
 		if not channel:
-			print "couldnt find channel"
+			print("couldnt find channel")
 			return None
 		#must have at least one msg to search for and channel to look it up in
 		if len(find_msg) == 0 or not channel:
-			print "find_msg is empty"
+			print("find_msg is empty")
 			return None
 		#search for a matching string and saves the index of that entry. 
 		#Searches from most recent to oldest.
@@ -46,14 +46,14 @@ class Replay:
 			message = line.decode('utf-8','ignore')
 			msg_index = message.find(">")
 			message = message[msg_index:]
-			print line
+			print(line)
 			#if the current entry of mem_store contains our string, we set the index and then BREAK to stop looking
 			if find_msg.decode('utf-8','ignore') in message:
 				found_index = index
 				break
 		#check to see if index values are positive. if not, string was not found and we're done
 		if found_index == -1 :
-			print "couldnt find a good match"
+			print("couldnt find a good match")
 			return None
 		#returns the entire line
 		submission = self.bot.mem_store['replace'][channel][found_index]
@@ -77,7 +77,7 @@ class Replay:
 				msg = int(msg)
 				if msg > l: 
 					msg = l - 1
-				self.printer("PRIVMSG " + event.channel + ' :' + user + ", I'm sending you a message with the last " + `msg` + ' recorded messages. \n')
+				self.printer("PRIVMSG " + event.channel + ' :' + user + ", I'm sending you a message with the last " + repr(msg) + ' recorded messages. \n')
 			else:
 				self.printer("PRIVMSG " + event.channel + ' :Invalid argument \n')
 				

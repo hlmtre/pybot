@@ -1,24 +1,27 @@
 # -*- coding: utf-8 -*-
+import sys
+import os
 from collections import defaultdict
 import webwriter
 import time
-import logger 
+import logger
 import datetime
-import urllib2
+if sys.version_info > (3,0,0):
+  import urllib.request, urllib.error, urllib.parse
+  from urllib.parse import urlparse, parse_qsl
+else:
+  import urllib2
+  from urlparse import urlparse, parse_qsl
 import json
-from urlparse import urlparse, parse_qsl
 import re
 from xml.dom.minidom import parseString
-#import db
 from datetime import datetime, timedelta
-import sys
-import os
 import lite
 
 class BotBrain:
   BRAINDEBUG = False
-  
-  def __init__(self, microphone, bot=None):             
+
+  def __init__(self, microphone, bot=None):
 
     self.microphone = microphone
     self.bot = bot
@@ -38,7 +41,7 @@ class BotBrain:
 
   def _updateSeen(self, user, statement, event):
     self.db.updateSeen(user, statement, event)
-  
+
   def _insertImg(self, user, url, channel):
     self.db.insertImg(user, url, channel)
 
@@ -49,12 +52,12 @@ class BotBrain:
     try:
       s = thing.encode('utf-8', 'ignore')
     except UnicodeEncodeError as e:
-      print e
-      print thing
+      print(e)
+      print(thing)
       return None
     except UnicodeDecodeError as d:
-      print d
-      print thing
+      print(d)
+      print(thing)
       return None
 
     outstring = 'PRIVMSG ' + channel + ' :' + s.decode('utf-8','ignore') + '\n'
@@ -87,7 +90,7 @@ class BotBrain:
   def __quit(self, usr):
     if self._isAdmin(usr):
       self.__bareSay("QUIT :quitting")
-      print "quitting as per " + usr
+      print(("quitting as per " + usr))
       sys.exit()
 
   

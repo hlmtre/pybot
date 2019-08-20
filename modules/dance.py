@@ -1,10 +1,14 @@
 ##Hold me closer tiny dancer##
 
+import sys
 from event import Event
 
 try:
-  from basemodule import BaseModule
-except ImportError:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Dance(BaseModule):
@@ -15,13 +19,13 @@ class Dance(BaseModule):
     dance.subscribe(self)
     self.cmd = ".dance"
     self.help = ".dance (bot dances)"
-    
+
     self.bot.register_event(dance, self)
-  
+
   def handle(self, event):
     try:
-      self.printer("PRIVMSG " + event.channel + " : :D-\-< " + '\n') #Prints this dancing guy out to proper channel
-      self.printer("PRIVMSG " + event.channel + " : :D-|-< " + '\n')
-      self.printer("PRIVMSG " + event.channel + " : :D-/-< " + '\n')
+      self.say(event.channel, ":D-\-< ") #Prints this dancing guy out to proper channel
+      self.say(event.channel, ":D-|-< ")
+      self.say(event.channel, ":D-/-< ")
     except TypeError:
       pass

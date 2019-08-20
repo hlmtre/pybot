@@ -1,10 +1,10 @@
 import requests
-import version
+from . import version
 try:
   import praw
   successful_import = True
-except ImportError:
-  print "WARNING: redditinfo requires praw (https://github.com/praw-dev/praw/, or pip install praw)."
+except (ImportError, SystemError):
+  print("WARNING: redditinfo requires praw (https://github.com/praw-dev/praw/, or pip install praw).")
   successful_import = False
 
 if successful_import is True:

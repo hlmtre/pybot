@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import argparse, os, sys, time
 import confman, util, logger, bot
@@ -23,9 +23,9 @@ if __name__ == "__main__":
     pid = os.fork()
     if pid == 0: # child
       if os.name == "posix":
-        print "starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
+        print("starting bot in the background, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC)
       else:
-        print "starting bot in the background, pid " + str(os.getpid())
+        print("starting bot in the background, pid " + str(os.getpid()))
 
       cm = confman.ConfManager(config)
       net_list = cm.getNetworks()
@@ -37,13 +37,13 @@ if __name__ == "__main__":
       sys.exit(0)
   else: # don't background; either we're in debug (foreground) mode, or on windows TODO
     if os.name == 'nt':
-      print 'in debug mode; backgrounding currently unsupported on windows.'
+      print('in debug mode; backgrounding currently unsupported on windows.')
     DEBUG = True
-    print "starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC
+    print("starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC)
     try:
       f = open(os.path.expanduser(config))
     except IOError:
-      print "Could not open conf file " + config
+      print("Could not open conf file " + config)
       sys.exit(1)
 
     cm = confman.ConfManager(config)
@@ -61,7 +61,7 @@ if __name__ == "__main__":
       l.write(logger.Logger.INFO, "killed by ctrl+c or term signal")
       for b in botslist:
         b.save_persistence()
-        b.s.send("QUIT :because I got killed\n")
-      print
-      print "keyboard interrupt caught; exiting"
+        b.s.send(("QUIT :because I got killed\n").encode())
+      print()
+      print("keyboard interrupt caught; exiting")
       sys.exit(1)

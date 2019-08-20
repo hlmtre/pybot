@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import requests 
+import requests
 import re
 import json
+import sys
 from event import Event
-try:
-    from basemodule import BaseModule
-except ImportError:
-    from modules.basemodule import BaseModule
+
+if sys.version_info > (3, 0, 0):
+    try:
+        from .basemodule import BaseModule
+    except (ImportError, SystemError):
+        from modules.basemodule import BaseModule
+else:
+    try:
+        from basemodule import BaseModule
+    except (ImportError, SystemError):
+        from modules.basemodule import BaseModule
 
 class Weather2(BaseModule):
 
@@ -20,7 +28,7 @@ class Weather2(BaseModule):
         # now using openweathermap as wunderground ended theirs :(
         self.api_key = "6dc001f4e77cc0985c5013283368be51"
         self.api_url = "https://api.openweathermap.org/data/2.5/weather"
-    
+
 
     def api_request(self, location, channel, command="conditions"):
         """location is a search string after the .weather command. This function
@@ -60,7 +68,7 @@ class Weather2(BaseModule):
             self.say(channel, "Unable to get weather data from results. Sorry.")
             return
         #return the formatted string of weather data
-        return location + ': ' + conditions + ', ' + temp_f + u'° F' 
+        return location + ': ' + conditions + ', ' + temp_f + '° F' 
 
   
     def handle(self, event):

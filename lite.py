@@ -37,8 +37,8 @@ class SqliteDB:
         e = self.cur.fetchall()
         self.con.close()
         return e
-    except Exception, e:
-      print e
+    except Exception as e:
+      print(e)
       self.con.rollback()
       self.con.close()
       return None
@@ -71,7 +71,7 @@ class SqliteDB:
       self.cur.execute("SELECT * FROM admins WHERE username = ?",(username,))
       data = self.cur.fetchall()
       self.con.close()
-    except Exception,e:
+    except Exception as e:
       self.con.close()
       return None
 

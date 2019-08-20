@@ -5,11 +5,19 @@ import random
 import string
 import time
 import re
+import sys
 
-try:
-  from basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+if sys.version_info > (3,0,0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 
 class recap(BaseModule):
     def post_init(self):
@@ -95,7 +103,7 @@ class recap(BaseModule):
                     listline[x] = listline[x].upper()
                 return ''.join(listline)
             elif drama == 69:
-                return u'( ͡° ͜ʖ ͡°) (ง ͠° ͟ل͜ ͡°)ง ᕦ( ͡° ͜ʖ ͡°)ᕤ ( ͡~ ͜ʖ ͡°)'
+                return '( ͡° ͜ʖ ͡°) (ง ͠° ͟ل͜ ͡°)ง ᕦ( ͡° ͜ʖ ͡°)ᕤ ( ͡~ ͜ʖ ͡°)'
             elif drama == 750:
                 return line[::-1] #reversed string
             else:

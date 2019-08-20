@@ -4,7 +4,7 @@
   },
   "irc.zero9f9.com": {
     "channels": [
-    "#bots" 
+    "#bot-dev" 
     ], 
     "port":"6667",
     "nick": "testohai", 

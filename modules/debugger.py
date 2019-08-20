@@ -1,9 +1,17 @@
+import sys
 from event import Event
-import ast
-try:
-  from basemodule import BaseModule
-except ImportError:
-  from modules.basemodule import BaseModule
+
+if sys.version_info > (3, 0, 0):
+  try:
+    from .basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+else:
+  try:
+    from basemodule import BaseModule
+  except (ImportError, SystemError):
+    from modules.basemodule import BaseModule
+
 class Debugger(BaseModule):
   def post_init(self):
     debug_event = Event("__.debug__")
@@ -20,7 +28,7 @@ class Debugger(BaseModule):
 
   def recurse(self, obj):
     if type(obj) is not dict:
-      print obj
+      print(obj)
     else:
       for k in obj:
         self.recurse(k)
@@ -33,10 +41,13 @@ class Debugger(BaseModule):
       return True
 
   def pretty(self, d, event, indent=0):
-    for key, value in d.iteritems():
-      self.say(event.user, '\t' * indent + key.encode('utf-8','ignore'))
+    for key, value in d.items():
+      if sys.version_info > (3, 0, 0):
+        self.say(event.user, '\t' * indent + key)
+      else:
+        self.say(event.user, '\t' * indent + key.encode('utf-8','ignore'))
       if isinstance(value, dict):
-        pretty(value, event, indent+1)
+        self.pretty(value, event, indent+1)
       else:
         try:
           self.say(event.user, '\t' * (indent+1) + str(value))
@@ -75,5 +86,5 @@ class Debugger(BaseModule):
 #      outstr = ", ".join(self.bot.mem_store[key])
 #      self.say(event.user, outstr)
     except IndexError:
-      print "ERROR: "
-      print event.msg
+      print("ERROR: ")
+      print(event.msg)

@@ -5,12 +5,12 @@ import json
 from event import Event
 try:
   import requests
-except ImportError:
-  print "Warning: isup module requires requests"
+except (ImportError, SystemError):
+  print("Warning: isup module requires requests")
   requests = object
 try:
   from modules.basemodule import BaseModule
-except ImportError:
+except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Isup(BaseModule):
