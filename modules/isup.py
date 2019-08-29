@@ -47,7 +47,9 @@ class Isup(BaseModule):
     if len(event.msg.split()) == 2: # Looks for the command and hopefully a valid website (*.com,*.net, etc.)
       try:
         """Needed to set user agent so request would not be blocked, without this a 503 status code is returned"""
-        headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',}
+        headers = {
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+                }
         r = requests.get(self.url + event.msg.split()[1], headers=headers)# Takes our static URL and appends your site to the end to make our get request
         j = json.loads(r.text) # Converts our JSON to python object
         if str(j["isDown"]) == "True": # Converts our parameter to a string to compare against our "isDown" parameter
