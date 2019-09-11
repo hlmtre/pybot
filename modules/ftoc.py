@@ -16,6 +16,7 @@ else:
   except (ImportError, SystemError):
     from modules.basemodule import BaseModule
 
+class Ftoc(BaseModule):
   def post_init(self):
     ftoc = Event("__.ftoc__")
     ftoc.define(msg_definition="^\.ftoc")
