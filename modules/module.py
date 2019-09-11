@@ -6,6 +6,7 @@ class Module:
     self.printer = printer_handle
     self.bot = bot
     self.interests = []
+    self.say = say
 
     self.cmd = None
     self.help = None
@@ -39,8 +40,13 @@ class Module:
         self.bot.brain.notice(event.channel, "failed to load " + event.msg.split()[2])
 
     if event.msg == ".module eventslist":
+      events_set = set()
       for m in self.bot.events_list:
-        print(m._type)
+        events_set.add(m._type)
+      message = ""
+      for s in sorted(events_set):
+        message += s + ", "
+      self.say(event.user, message[:-2] + '\n') # needs newline at the end, and we remove the final comma
 
     if event.msg.startswith(".module list"):
       # the set prevents a module with multiple events being printed more than once
@@ -49,23 +55,24 @@ class Module:
         for s in m.subscribers:
           modules_set.add(s.__class__.__name__)
 
-      print(modules_set)
+      message = ""
+      for s in sorted(modules_set):
+        message += s + ", "
+      self.say(event.user, message[:-2] + '\n') # needs newline at the end, and we remove the final comma
       return
 
     if event.msg.startswith(".module unload"):
-      for m in self.bot.events_list:
-        for s in m.subscribers:
-          if event.msg.split()[2].lower() == s.__class__.__name__.lower():
-            self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
-            # the events themselves hold onto the subscribing modules, so just remove that one.
-            m.subscribers.remove(s)
-      return
+      if self.unload(event.msg.split()[2]):
+        self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
+      else:
+        self.printer("NOTICE " + event.channel + " :failed to unload " + event.msg.split()[2] + '\n')
+
 
     if event.msg.startswith(".module reload"): # perform both unloading and reloading
       # first unload
       for m in self.bot.events_list:
         for s in m.subscribers:
-          try: 
+          try:
             if event.msg.split()[2].lower() == s.__class__.__name__.lower():
               #self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
               # the events themselves hold onto the subscribing modules, so just remove that one.
@@ -81,7 +88,17 @@ class Module:
       else:
         self.bot.logger.write(Logger.WARNING, " failed to reload " + event.msg.split()[2], self.bot.NICK)
         self.bot.brain.notice(event.channel, "failed to reload " + event.msg.split()[2])
-      
+
+  def unload(self, modulename):
+    unloaded_successfully = False
+    for m in self.bot.events_list:
+      for s in m.subscribers:
+        if modulename == s.__class__.__name__.lower():
+          # the events themselves hold onto the subscribing modules, so just remove that one.
+          m.subscribers.remove(s)
+          unloaded_successfully = True
+    return unloaded_successfully
+
 
   def load(self, modulename):
 # this may seem redundant, but modules may become unloaded in between calls.

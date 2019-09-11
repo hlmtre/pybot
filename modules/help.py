@@ -16,10 +16,10 @@ class Help(BaseModule):
     help.define(msg_definition="^\.help")
     help.subscribe(self)
     self.cmd = ".help"
-    
+
     # register ourself to our new custom event
     self.bot.register_event(help, self)
-  
+
   def handle(self, event):
     try:
       my_modules = list()
@@ -33,7 +33,7 @@ class Help(BaseModule):
       for sm in modules_set:
         if hasattr(sm, "help") and sm.help is not None:
           line_list.append(sm.help)
-      
+
       """
       This jenky block controls how many modules to print per line
       To change the amount of modules print per line change the first 'q' to whatever number and match the incremented 'q and f' to the same number
