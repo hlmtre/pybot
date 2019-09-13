@@ -27,7 +27,7 @@ class R6(BaseModule):
     r6.define(msg_definition=r"^\.r6")
     r6.subscribe(self)
     self.help = ".r6 <stat> <gamer tag>"
-    # register ourself to our new r6_track event
+    # register ourself to our new r6 event
     self.bot.register_event(r6, self)
 
     self.url = "https://r6tab.com/api/search.php?platform=uplay&search=" # URL which outputs JSON data
