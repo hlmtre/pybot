@@ -68,6 +68,9 @@ class Module:
         self.printer("NOTICE " + event.channel + " :failed to unload " + event.msg.split()[2] + '\n')
 
 
+    """careful here: XXX - unloading looks it up by class name, and the bot's loading module looks it up by filename
+    - this can lead to situations where you just reload a module over and over instead of unloading it
+    because the module name and class name differ """
     if event.msg.startswith(".module reload"): # perform both unloading and reloading
       # first unload
       for m in self.bot.events_list:
