@@ -20,7 +20,7 @@ class Part(BaseModule):
     part.define(msg_definition="^\.part")
     part.subscribe(self)
     self.help = ".part <channel> 'use as pm to the bot'"
-    
+
     # register ourself to our new custom event
     self.bot.register_event(part, self)
 

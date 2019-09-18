@@ -274,6 +274,7 @@ class Bot(threading.Thread):
       return 0
     return 1
     # end magic.
+    # this really is fucking magic.
 
   def send(self, message):
     """
