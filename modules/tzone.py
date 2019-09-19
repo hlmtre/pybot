@@ -1,16 +1,13 @@
 ##Simple module to spit out the time in a certain area/timezone, poorly thrown together by mech##
 
-"""More to come, add some regex in and make it easier to find the timezone without being super specific"""
-
-
-import os, time, sys
+import sys
+import json
 from event import Event
 try:
-  import pytz
+  import requests
 except (ImportError, SystemError):
-  print("tzone requires pytz pip module")
-  pytz = None
-
+  print("Warning: tzone module requires requests")
+  requests = object
 
 try:
   if sys.version_info > (3, 0, 0):
@@ -26,35 +23,42 @@ class Tzone(BaseModule):
     tzone.define(msg_definition="^\.tzone")
     tzone.subscribe(self)
     self.cmd = ".tzone"
-    self.help = ".tzone <Insert timezone> timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+    self.help = ".tzone <Insert location name>"
 
     self.bot.register_event(tzone, self)
 
   def handle(self, event):
-    if not pytz: # if NOT pytz.. this was a bug.
-      print("tzone requires pytz pip module")
-      return
-
-    lower_list = []  #Empty list for TZ list with no capitalization
-    tz_list = pytz.all_timezones #List of all available timezones
+#    lat_long_url = "https://geocode.xyz/Hauptstr.,+57632+%s?json=1" % location # placeholder for optional user defined location
+#    location_url = "http://api.geonames.org/timezoneJSON?lat=%s&lng=%s&username=demo" % (lat,lon) # placeholder for optional user defined location
     try:
       if event.msg.startswith(".tzone"): #Splits the option from the ".tzone" command to be used to find the proper timezone
+        headers = {
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+                }
         split_tz = event.msg.split()
         tz = split_tz[1].lower()
-
-        for x in pytz.all_timezones: #Adds all timezones with no capitalization so the user will not have to worry about that
-          lower_list.append(x.lower())
-
-        ll_index = lower_list.index(tz) #Grabs the index number of the timezone requested to be applied to the main timezone list
-
-        if tz not in lower_list: #If the timezone requested is not in the lower list it will spit this out
-          self.say(event.channel, "This is not a valid timezone option, timezone options: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones")
-        else:
-          os.environ['TZ'] = tz_list[ll_index] #If the timezone is found in the lower list it will be fed into here to spit out the local time
-          time.tzset()
-          tz_time = time.strftime('%X %x %Z') #The format in which the time is printed out
-          self.say(event.channel, tz_time)
+        lat_long_url = "https://geocode.xyz/Hauptstr.,+57632+%s?json=1" % tz # placeholder for optional user defined location
+        r1 = requests.get(lat_long_url, headers=headers)
+        j1 = json.loads(r1.text)
+        lat = str(j1["latt"])
+        lon = str(j1["longt"])
+        location_url = "http://api.geonames.org/timezoneJSON?lat=%s&lng=%s&username=test1" % (lat,lon) #Username registered is muhmail (test1 is placeholder)
+        r2 = requests.get(location_url, headers=headers)
+        j2 = json.loads(r2.text)
+        time = str(j2["time"])
+#        print(j1)
+#        print(lat_long_url)
+#        print(split_tz)
+#        print(tz)
+        print(lat)
+        print(lon)
+        print(j2)
+        print(location_url)
+        print(time)
+        self.say(event.channel, time)
     except IndexError: #Handles the 2 errors I have found based on user error
       self.say(event.channel, "Idk what you did, but it was wrong.")
     except ValueError:
-        self.say(event.channel, "Not a valid timezone, .tzone <insert timezone>, timezone options: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones")
+      self.say(event.channel, "If this error message came up then this is still valid and you should make a better message you muppet!")
+    except KeyError:
+      self.say(event.channel, "Not a valid location or multiple results, try being more specific.")
