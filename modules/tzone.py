@@ -23,9 +23,11 @@ class Tzone(BaseModule):
     tzone.define(msg_definition="^\.tzone")
     tzone.subscribe(self)
     self.cmd = ".tzone"
-    self.help = ".tzone <Insert location name>"
+    self.help = ".tzone <Insert location name/zip>"
     self.bot.register_event(tzone, self)
- 
+    self.url = "https://dev.virtualearth.net/REST/v1/TimeZone/query="
+    self.key = "?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
+
   def handle(self, event):
     try:
       if event.msg.startswith(".tzone"): #Splits the option from the ".tzone" command to be used to find the proper timezone
@@ -39,17 +41,20 @@ class Tzone(BaseModule):
         else:
           tz = split_tz[1].lower()
         link = "https://dev.virtualearth.net/REST/v1/TimeZone/query=%s?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx" % tz
-#        print(link)
+        print(link)
         r = requests.get(link, headers=headers)
         j = json.loads(r.text)
-#        test_local_time = j["resourceSets"][0]["resources"][0]["__type"]["timeZoneAtLocation"]
-#        print(len(test_local_time))
-        local_time_date = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"][0]["convertedTime"]["localTime"]
-        local_time = local_time_date.split("T")
-        self.say(event.channel, local_time[1])
-    except IndexError: #Handles the 2 errors I have found based on user error
-      self.say(event.channel, "Idk what you did, but it was wrong.")
+        test_local_time = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"]
+        if len(test_local_time) > 1:
+          self.say(event.channel, "You need to be more specific...")
+        else:
+#          print(len(test_local_time))
+          local_time_date = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"][0]["convertedTime"]["localTime"]
+          local_time = local_time_date.split("T")
+          self.say(event.channel, local_time[1])
+    except IndexError:
+      self.say(event.channel, "Not a valid request, try again.")
     except ValueError:
-      self.say(event.channel, "If this error message came up then this is still valid and you should make a better message you muppet!")
+      self.say(event.channel, "Not a valid request, try again.")
     except KeyError:
       self.say(event.channel, "Not a valid location or multiple results, try being more specific.")
