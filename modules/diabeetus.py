@@ -52,7 +52,7 @@ class Diabeetus(BaseModule):
             #grab the relevant data we want for formatting
             glucose = entry[0]['sgv']
             if (glucose <= self.LOW):
-                color = '\x0309'
+                color = '\x0304'
             elif (glucose >= self.HIGH):
                 color = '\x0308'
             else:

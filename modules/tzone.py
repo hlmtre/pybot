@@ -41,7 +41,7 @@ class Tzone(BaseModule):
         else:
           tz = split_tz[1].lower()
         link = "https://dev.virtualearth.net/REST/v1/TimeZone/query=%s?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx" % tz
-        print(link)
+        #print(link)
         r = requests.get(link, headers=headers)
         j = json.loads(r.text)
         test_local_time = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"]
