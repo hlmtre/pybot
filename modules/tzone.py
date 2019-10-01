@@ -1,17 +1,14 @@
-##Simple module to spit out the time in a certain area/timezone, poorly thrown together by mech##
-
-"""More to come, add some regex in and make it easier to find the timezone without being super specific"""
-
-
-import os, time, sys
+##Simple module to spit out the time in a city specified by user, poorly thrown together by mech##
+ 
+import sys
+import json
 from event import Event
 try:
-  import pytz
+  import requests
 except (ImportError, SystemError):
-  print("tzone requires pytz pip module")
-  pytz = None
-
-
+  print("Warning: tzone module requires requests")
+  requests = object
+ 
 try:
   if sys.version_info > (3, 0, 0):
     from .basemodule import BaseModule
@@ -19,42 +16,45 @@ try:
     from basemodule import BaseModule
 except (ImportError, SystemError):
   from modules.basemodule import BaseModule
-
+ 
 class Tzone(BaseModule):
   def post_init(self):
     tzone = Event("__.tzone__")
     tzone.define(msg_definition="^\.tzone")
     tzone.subscribe(self)
     self.cmd = ".tzone"
-    self.help = ".tzone <Insert timezone> timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
-
+    self.help = ".tzone <Insert location name/zip>"
     self.bot.register_event(tzone, self)
+    self.url = "https://dev.virtualearth.net/REST/v1/TimeZone/query="
+    self.key = "?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
 
   def handle(self, event):
-    if not pytz: # if NOT pytz.. this was a bug.
-      print("tzone requires pytz pip module")
-      return
-
-    lower_list = []  #Empty list for TZ list with no capitalization
-    tz_list = pytz.all_timezones #List of all available timezones
     try:
       if event.msg.startswith(".tzone"): #Splits the option from the ".tzone" command to be used to find the proper timezone
+        headers = {
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+                }
         split_tz = event.msg.split()
-        tz = split_tz[1].lower()
-
-        for x in pytz.all_timezones: #Adds all timezones with no capitalization so the user will not have to worry about that
-          lower_list.append(x.lower())
-
-        ll_index = lower_list.index(tz) #Grabs the index number of the timezone requested to be applied to the main timezone list
-
-        if tz not in lower_list: #If the timezone requested is not in the lower list it will spit this out
-          self.say(event.channel, "This is not a valid timezone option, timezone options: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones")
+#        print(split_tz)
+        if len(split_tz) > 2:
+          tz = "+".join(split_tz[1:])
         else:
-          os.environ['TZ'] = tz_list[ll_index] #If the timezone is found in the lower list it will be fed into here to spit out the local time
-          time.tzset()
-          tz_time = time.strftime('%X %x %Z') #The format in which the time is printed out
-          self.say(event.channel, tz_time)
-    except IndexError: #Handles the 2 errors I have found based on user error
-      self.say(event.channel, "Idk what you did, but it was wrong.")
+          tz = split_tz[1].lower()
+        link = "https://dev.virtualearth.net/REST/v1/TimeZone/query=%s?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx" % tz
+        print(link)
+        r = requests.get(link, headers=headers)
+        j = json.loads(r.text)
+        test_local_time = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"]
+        if len(test_local_time) > 1:
+          self.say(event.channel, "You need to be more specific...")
+        else:
+#          print(len(test_local_time))
+          local_time_date = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"][0]["convertedTime"]["localTime"]
+          local_time = local_time_date.split("T")
+          self.say(event.channel, local_time[1])
+    except IndexError:
+      self.say(event.channel, "Not a valid request, try again.")
     except ValueError:
-        self.say(event.channel, "Not a valid timezone, .tzone <insert timezone>, timezone options: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones")
+      self.say(event.channel, "Not a valid request, try again.")
+    except KeyError:
+      self.say(event.channel, "Not a valid location or multiple results, try being more specific.")
