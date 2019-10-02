@@ -22,7 +22,7 @@ class Tzone(BaseModule):
     tzone.define(msg_definition="^\.tzone")
     tzone.subscribe(self)
     self.cmd = ".tzone"
-    self.help = ".tzone <Insert location name/zip/airport>"
+    self.help = ".tzone <Insert location name/zip/airport(SFO,PDX,etc.)>"
     self.bot.register_event(tzone, self)
     self.url = "https://dev.virtualearth.net/REST/v1/TimeZone/query="
     self.key = "?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
