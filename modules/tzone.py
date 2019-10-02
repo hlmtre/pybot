@@ -1,5 +1,4 @@
-##Simple module to spit out the time in a city specified by user, poorly thrown together by mech##
- 
+#Simple module to spit out the time in a city specified by user, poorly thrown together by mech
 import sys
 import json
 from event import Event
@@ -23,38 +22,47 @@ class Tzone(BaseModule):
     tzone.define(msg_definition="^\.tzone")
     tzone.subscribe(self)
     self.cmd = ".tzone"
-    self.help = ".tzone <Insert location name/zip>"
+    self.help = ".tzone <Insert location name/zip/airport>"
     self.bot.register_event(tzone, self)
     self.url = "https://dev.virtualearth.net/REST/v1/TimeZone/query="
     self.key = "?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
+#TODO put in a minor work around for places like Chico california not working with just '.tzone Chico'
+#TODO split out verifying the location request is properly formatted into its own function.
+  def request_api(self, location, channel):
+    """Takes the location provided and determines whether its a valid request
+    and will return either the time of the location or a message instructing you
+    how to the make the proper call"""
+    url_query = None
+    try:
+      headers = {
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+      }
+      url_query = self.url + location + self.key
+      r = requests.get(url_query, headers=headers)
+      j = json.loads(r.text)
+      local_time_date = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"][0]["convertedTime"]["localTime"].split("T")
+      place = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["placeName"]
+      """Checks to see if request is specific enough for one timezone"""
+      multiple_locations = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"]
+      if len(multiple_locations) > 1:
+        self.say(channel, "Multiple timezones returned, try being more specific.")
+      else:
+        return place + ": " + local_time_date[1]
+    except IndexError:
+      self.say(channel, "Not a valid request, try again.")
+    except ValueError:
+      self.say(channel, "Not a valid request, try again.")
+    except KeyError:
+      self.say(channel, "Not a valid request, try again.")
 
   def handle(self, event):
     try:
-      if event.msg.startswith(".tzone"): #Splits the option from the ".tzone" command to be used to find the proper timezone
-        headers = {
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-                }
+      if event.msg.startswith(".tzone"):
         split_tz = event.msg.split()
-#        print(split_tz)
         if len(split_tz) > 2:
           tz = "+".join(split_tz[1:])
         else:
           tz = split_tz[1].lower()
-        link = "https://dev.virtualearth.net/REST/v1/TimeZone/query=%s?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx" % tz
-        print(link)
-        r = requests.get(link, headers=headers)
-        j = json.loads(r.text)
-        test_local_time = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"]
-        if len(test_local_time) > 1:
-          self.say(event.channel, "You need to be more specific...")
-        else:
-#          print(len(test_local_time))
-          local_time_date = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"][0]["convertedTime"]["localTime"]
-          local_time = local_time_date.split("T")
-          self.say(event.channel, local_time[1])
-    except IndexError:
-      self.say(event.channel, "Not a valid request, try again.")
-    except ValueError:
-      self.say(event.channel, "Not a valid request, try again.")
-    except KeyError:
-      self.say(event.channel, "Not a valid location or multiple results, try being more specific.")
+      self.say(event.channel, self.request_api(tz, event.channel))
+    except TypeError:
+      pass # Error gets caught above as well as its not a valid request
