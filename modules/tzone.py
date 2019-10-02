@@ -65,4 +65,4 @@ class Tzone(BaseModule):
           tz = split_tz[1].lower()
       self.say(event.channel, self.request_api(tz, event.channel))
     except TypeError:
-      pass # Error gets caught above as well as its not a valid request
+      pass # Error get caught here and in ValueError in request_api function
