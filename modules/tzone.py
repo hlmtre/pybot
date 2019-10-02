@@ -28,7 +28,7 @@ class Tzone(BaseModule):
     self.key = "?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
 #TODO put in a minor work around for places like Chico california not working with just '.tzone Chico'
 #TODO split out verifying the location request is properly formatted into its own function.
-  def request_api(self, location, channel):
+  def request_api(self, location):
     """Takes the location provided and determines whether its a valid request
     and will return either the time of the location or a message instructing you
     how to the make the proper call"""
@@ -45,15 +45,15 @@ class Tzone(BaseModule):
       """Checks to see if request is specific enough for one timezone"""
       multiple_locations = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"]
       if len(multiple_locations) > 1:
-        self.say(channel, "Multiple timezones returned, try being more specific.")
+        return "Multiple timezones returned, try being more specific"
       else:
-        return place + ": " + local_time_date[1]
+        return str(place + ": " + local_time_date[1])
     except IndexError:
-      self.say(channel, "Not a valid request, try again.")
+      return "Not a valid request, try again."
     except ValueError:
-      self.say(channel, "Not a valid request, try again.")
+      return "Not a valid request, try again."
     except KeyError:
-      self.say(channel, "Not a valid request, try again.")
+      return "Not a valid request, try again."
 
   def handle(self, event):
     try:
@@ -63,6 +63,6 @@ class Tzone(BaseModule):
           tz = "+".join(split_tz[1:])
         else:
           tz = split_tz[1].lower()
-      self.say(event.channel, self.request_api(tz, event.channel))
+      self.say(event.channel, self.request_api(tz))
     except TypeError:
-      pass # Error get caught here and in ValueError in request_api function
+      pass # Error gets caught here and in ValueError in request_api function
