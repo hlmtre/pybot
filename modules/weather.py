@@ -26,29 +26,27 @@ class Weather2(BaseModule):
 
         self.bot.register_event(weather2, self)
         # now using openweathermap as wunderground ended theirs :(
+        self.bing_api_url = "http://dev.virtualearth.net/REST/v1/Locations?query="
+        self.bing_api_key_string = "&key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
         self.api_key = "6dc001f4e77cc0985c5013283368be51"
         self.api_url = "https://api.openweathermap.org/data/2.5/weather"
+        self.headers = {
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+        }
 
+    def get_lat_long_from_bing(self, location):
+        u = self.bing_api_url + location + self.bing_api_key_string
+        j = json.loads(requests.get(u, self.headers).text)
 
-    def api_request(self, location, channel, command="conditions"):
-        """location is a search string after the .weather command. This function
-        will determine whether it is a zip code or a named location and return an
-        appropriate API call"""
-        query = None
         try:
-          # test if is a zipcode or a single city name
-          a = float(location.split()[0])
-          if a and len(location.split()[0]) < 5:
-            self.say(channel,"valid zipcode required, numbnuts")
-            return None
-          zipcode = re.match('[0-9]{5}', location)
-          query = '?zip='+zipcode.string
-        except ValueError: #  broken encoding on numbers or something or they tried a city name
-            self.say(channel, "city name no longer supported due to wunderground API shutdown :(")
+            x = j['resourceSets'][0]['resources'][0]['geocodePoints'][0]['coordinates'][0]
+            y = j['resourceSets'][0]['resources'][0]['geocodePoints'][0]['coordinates'][1]
+        except IndexError:
+            return (0, 0)
+        return (x, y)
 
-        if query:
-            return self.api_url+query+"&appid="+self.api_key+"&units=imperial"
-        return None
+    def get_api_request(self, x, y):
+        return self.api_url + "?lat=" + str(x) + "&lon=" + str(y) + "&units=imperial" + "&appid=" + self.api_key
 
     def get_conditions(self, query, channel):
         """given a fully formed query to the OpenWeatherMap API, format an output string"""
@@ -75,11 +73,9 @@ class Weather2(BaseModule):
         #split the line beginning with .weather into 2 parts, the command and the search string
         weather_line = event.msg.split(None, 1)
         if len(weather_line) > 1:
-            #if we're sure there's actually a search string, then continue
-            query = self.api_request(weather_line[1], event.channel)
-            if not query:
-                return
-            weather = self.get_conditions(query, event.channel)
+            ##if we're sure there's actually a search string, then continue
+            x, y = self.get_lat_long_from_bing(weather_line[1])
+            weather = self.get_conditions(self.get_api_request(x, y), event.channel)
             if not weather:
                 return
             self.say(event.channel, weather)
