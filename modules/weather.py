@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import requests
-import re
 import json
 import sys
+import requests
 from event import Event
 
 if sys.version_info > (3, 0, 0):
@@ -17,7 +16,7 @@ else:
     except (ImportError, SystemError):
         from modules.basemodule import BaseModule
 
-class Weather2(BaseModule):
+class Weather(BaseModule):
 
     def post_init(self):
         weather2 = Event('__.weather2__')
@@ -25,7 +24,6 @@ class Weather2(BaseModule):
         weather2.subscribe(self)
 
         self.bot.register_event(weather2, self)
-        # now using openweathermap as wunderground ended theirs :(
         self.bing_api_url = "http://dev.virtualearth.net/REST/v1/Locations?query="
         self.bing_api_key_string = "&key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
         self.api_key = "6dc001f4e77cc0985c5013283368be51"
@@ -35,6 +33,10 @@ class Weather2(BaseModule):
         }
 
     def get_lat_long_from_bing(self, location):
+        """ 
+        go grab the latitude/longitude from bing's really excellent location API.
+        Returns: tuple of x,y coordinates - (0,0) on error
+        """
         u = self.bing_api_url + location + self.bing_api_key_string
         j = json.loads(requests.get(u, self.headers).text)
 
@@ -46,6 +48,9 @@ class Weather2(BaseModule):
         return (x, y)
 
     def get_api_request(self, x, y):
+        """
+        Simple form the query string and return it.
+        """
         return self.api_url + "?lat=" + str(x) + "&lon=" + str(y) + "&units=imperial" + "&appid=" + self.api_key
 
     def get_conditions(self, query, channel):
