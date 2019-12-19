@@ -22,7 +22,7 @@ Take care of dependencies. If you don't use MySQL and don't care about certain m
     source pybot-venv/bin/activate
 
 Python 2: `pip install -r requirements2.txt`\
-Python 3: `pip install -r requirements3.txt`\
+Python 3: `pip install -r requirements3.txt`
 
 * python-dev
 * libmysqlclient-dev (aka mysql-python in pip)
