@@ -8,8 +8,7 @@ pybot is a python irc bot. he is a project.
 
 he is modular, extensible, multi-threaded (for network independence!), and configurable.
 
-pybot runs on python 2.7, on both windows and linux.
-python versions > 3 are in the works.
+pybot runs on python 2.7 and >3.5, on both windows and linux, though current development is all geared towards >3.5.
 
 **master branch should be stable. feature branches can be broken at any time.**
 
@@ -17,9 +16,12 @@ python versions > 3 are in the works.
 (Now probably more than) 10-second TL;DR:
 =========================================
 
-Take care of dependencies. If you don't use MySQL and don't care about certain modules breaking, you don't need anything but python 2.7 and standard libs.
+Take care of dependencies. If you don't use MySQL and don't care about certain modules breaking, you don't need anything but python 2.7/3.5 and standard libs.
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-`sudo pip install -r requirements.txt`
+`python -m venv pybot-venv`
+`source pybot-venv/bin/activate`
+Python 2: `pip install -r requirements2.txt`
+Python 3: `pip install -r requirements3.txt`
 
 * python-dev
 * libmysqlclient-dev (aka mysql-python in pip)
