@@ -18,13 +18,11 @@ pybot runs on python 2.7 and >3.5, on both windows and linux, though current dev
 
 Take care of dependencies. If you don't use MySQL and don't care about certain modules breaking, you don't need anything but python 2.7/3.5 and standard libs.
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-`python -m venv pybot-venv`
+`python -m venv pybot-venv`\
+source pybot-venv/bin/activate`\
 
-`source pybot-venv/bin/activate`
-
-Python 2: `pip install -r requirements2.txt`
-
-Python 3: `pip install -r requirements3.txt`
+Python 2: `pip install -r requirements2.txt`\
+Python 3: `pip install -r requirements3.txt`\
 
 * python-dev
 * libmysqlclient-dev (aka mysql-python in pip)
