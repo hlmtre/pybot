@@ -12,7 +12,6 @@ sphinx:
 # Build documentation with MkDocs
 #mkdocs:
 #  configuration: mkdocs.yml
-master_doc = 'index'
 
 # Optionally build your docs in additional formats such as PDF and ePub
 formats: all
