@@ -164,7 +164,7 @@ class meme:
         #check for HTTP errors
         try:
             meme.raise_for_status()
-        except request.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError as e:
             self.bot.debug_print("HTTPError in create_meme(): ")
             self.bot.debug_print(str(e))
             return
