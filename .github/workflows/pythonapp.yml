@@ -15,7 +15,7 @@ jobs:
         python-version: 3.7
     - name: Install dependencies
       run: |
-        apt install -y default-libmysqlclient-dev
+        sudo apt install -y default-libmysqlclient-dev
         python -m pip install --upgrade pip
         pip install -r requirements3.txt
     - name: Lint with flake8
