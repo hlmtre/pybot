@@ -1,7 +1,0 @@
-wheel
-praw
-mysqlclient
-python-twitter
-imgurpython
-isodate
-requests
