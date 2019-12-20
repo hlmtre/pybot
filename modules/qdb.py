@@ -65,7 +65,7 @@ class QDB:
             except UnboundLocalError as e:
                 self.bot.debug_print("UnboundLocalError: ")
                 self.bot.debug_print(str(e))
-            except requests.ConnectionError as e:
+            except requests.exceptions.ConnectionError as e:
                 self.bot.debug_print("ConnectionError: ")
                 self.bot.debug_print(str(e))
         return replacement_values
@@ -272,7 +272,7 @@ class QDB:
         payload = {'q':'new', 'quote': qdb_submission.rstrip('\n')}
         try:
           qdb = requests.post(url, payload)
-        except ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:
           self.bot.debug_print("ConnectionError: ")
           self.bot.debug_print(str(e))
         #check for any HTTP errors and return False if there were any
