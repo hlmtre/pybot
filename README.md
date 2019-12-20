@@ -35,7 +35,7 @@ Python 3: `pip install -r requirements3.txt`
 
 Local Development (with sqlite3)
 --------------------------------
-1. Copy pybotrc to the user who will run the bot (you can probably do `cp pybotrc ~/.pybotrc`)
+1. Copy pybotrc to the user who will run the bot ****(you can probably do `cp pybotrc ~/.pybotrc`)*
 2. Modify ~/.pybotrc with your network, owner, and nickname.
 3. `./pybot.py`
 4. laugh at mysql guys.
