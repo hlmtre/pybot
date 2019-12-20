@@ -71,7 +71,7 @@ class SqliteDB:
       self.cur.execute("SELECT * FROM admins WHERE username = ?",(username,))
       data = self.cur.fetchall()
       self.con.close()
-    except Exception as e:
+    except Exception:
       self.con.close()
       return None
 

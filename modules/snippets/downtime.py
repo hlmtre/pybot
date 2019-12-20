@@ -1,5 +1,3 @@
-import time
-from datetime import datetime, timedelta
 import random
 
 from util import commands, parse_line

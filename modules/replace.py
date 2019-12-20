@@ -1,7 +1,7 @@
 ##NEEDS
 #adding a bold character for '<user> MEANT so say'
 
-import requests, sys
+import sys
 from logger import Logger
 from event import Event
 

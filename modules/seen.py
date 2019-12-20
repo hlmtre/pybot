@@ -1,5 +1,4 @@
 import sys
-from event import Event
 from util import __prettyDate as prettydate
 from util import strip_nick
 from datetime import datetime

@@ -2,7 +2,6 @@ from util import commands
 from util import parse_line
 import sys
 from logger import Logger
-import inspect
 
 @commands(".snippet", ".snippets")
 def reload(bot, message, channel):

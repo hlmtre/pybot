@@ -12,7 +12,7 @@ if sys.version_info > (3, 0, 0):
     from modules.basemodule import BaseModule
 else:
   try:
-    from basemodule import BaseMOdule
+      from basemodule import BaseModule
   except (ImportError, SystemError):
     from modules.basemodule import BaseModule
 

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from event import Event
 import random
-import string
 import time
 import re
 import sys

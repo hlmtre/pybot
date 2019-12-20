@@ -14,8 +14,6 @@ else:
   except (ImportError, SystemError):
     from modules.basemodule import BaseModule
 
-from xml.dom.minidom import parseString
-from datetime import datetime, timedelta
 from collections import OrderedDict
 import time
 import logger

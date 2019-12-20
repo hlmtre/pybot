@@ -1,4 +1,3 @@
-from event import Event
 class BaseModule(object):
   """
   A base module class for deriving modules (anything you fine folk write, probably) to inherit from.
@@ -46,4 +45,3 @@ class BaseModule(object):
     """
     Called after init is set up and builds out our basic module's needs. Allows you to do your own post-processing when inheriting from BaseModule.
     """
-    pass

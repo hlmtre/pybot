@@ -1,5 +1,4 @@
 import sys
-from event import Event
 try:
   if sys.version_info > (3, 0, 0):
     from .basemodule import BaseModule
