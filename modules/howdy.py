@@ -1,4 +1,4 @@
-import random, sys
+import sys
 from event import Event
 if sys.version_info > (3, 0, 0):
   try:

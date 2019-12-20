@@ -1,22 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
-from collections import defaultdict
-import webwriter
-import time
-import logger
-import datetime
-if sys.version_info > (3,0,0):
-  import urllib.request, urllib.error, urllib.parse
-  from urllib.parse import urlparse, parse_qsl
-else:
-  import urllib2
-  from urlparse import urlparse, parse_qsl
-import json
 import re
-from xml.dom.minidom import parseString
-from datetime import datetime, timedelta
-import lite
+import webwriter
 
 class BotBrain:
   BRAINDEBUG = False
@@ -25,7 +11,6 @@ class BotBrain:
 
     self.microphone = microphone
     self.bot = bot
-    yth = dict()
     self.db = self.bot.db
     self.ww = webwriter.WebWriter()
 
@@ -78,7 +63,7 @@ class BotBrain:
 
   def _join(self, usr, message):
     if self._isAdmin(usr):
-      if len(message.split()) is 3:
+      if len(message.split()) == 3:
         channel = message.split()[1]
         extraArg = message.split()[-1]
         self.__bareSay("JOIN " + channel + " " + extraArg)

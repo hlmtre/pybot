@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import requests
-import re
-import json
 import sys
 from event import Event
 

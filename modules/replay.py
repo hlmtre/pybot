@@ -2,9 +2,6 @@
 #adding a bold character for '<user> MEANT so say'
 
 from event import Event
-import requests
-import difflib
-import math
 
 class Replay:
 	def __init__(self, events=None, printer_handle=None, bot=None, say=None):

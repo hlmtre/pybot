@@ -7,7 +7,7 @@ import imp
 @commands(".reflect")
 def reflect_reload(bot, message, channel):
   logger = bot.logger
-  parsed = parse_line(message)
+  parse_line(message)
   #for k,v in parsed.__dict__.iteritems():
   #  print k, ": ", v
   body = message.split(":")[2:]

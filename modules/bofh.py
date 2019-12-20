@@ -3,7 +3,6 @@
 from event import Event
 import sys
 import random
-import re
 
 try:
   import requests
@@ -15,7 +14,6 @@ try:
   if sys.version_info > (3, 0, 0):
     from .basemodule import BaseModule
   else:
-    import urlllib2 as urllib
     from basemodule import BaseModule
 except (ImportError, SystemError):
   from modules.basemodule import BaseModule

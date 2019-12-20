@@ -1,6 +1,6 @@
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from event import Event
 try:
   if sys.version_info > (3, 0, 0):

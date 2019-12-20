@@ -157,11 +157,10 @@ class Event:
     self.channel = ""
     self.verb = ""
     ind = 0
-    privmsg_index = 0
     for e in l:
       ind+=1
       if e == "PRIVMSG":
-        privmsg_index = ind
+        pass
       if e.startswith("#"):
         self.channel = e
         break

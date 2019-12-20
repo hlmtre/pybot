@@ -1,4 +1,3 @@
-from event import Event
 import random
 import difflib
 import time
