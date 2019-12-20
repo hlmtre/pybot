@@ -13,6 +13,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../modules'))
 
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +23,7 @@ copyright = 'lolol 2013-2019, hlmtre'
 author = 'hlmtre'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.1'
+release = '1.0.2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -32,6 +33,7 @@ release = '1.0.1'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.apidoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
