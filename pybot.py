@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 
-import argparse, os, sys, time
-import confman, util, logger, bot
-
 if __name__ == "__main__":
+  import argparse
+  import os
+  import sys
+  import time
+
+  import bot
+  import confman
+  import logger
+  import util
   DEBUG = False
 
   parser = argparse.ArgumentParser(description="a python irc bot that does stuff")
@@ -35,7 +41,7 @@ if __name__ == "__main__":
 
     elif pid > 0:
       sys.exit(0)
-  else: # don't background; either we're in debug (foreground) mode, or on windows TODO
+  else:  # don't background; either we're in debug (foreground) mode, or on windows TODO
     if os.name == 'nt':
       print('in debug mode; backgrounding currently unsupported on windows.')
     DEBUG = True
