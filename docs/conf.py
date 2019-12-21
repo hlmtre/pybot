@@ -12,9 +12,9 @@
 #
 import os
 import sys
-sys.path.insert(0, '/home/hlmtre/pybot')
-sys.path.insert(0, '/home/hlmtre/pybot/modules')
-sys.path.insert(0, '/home/hlmtre/pybot/modules/snippets')
+sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../modules'))
+sys.path.insert(0, os.path.abspath('../modules/snippets'))
 
 
 # -- Project information -----------------------------------------------------
