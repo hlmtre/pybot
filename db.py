@@ -6,7 +6,6 @@ except ImportError:
   imported = False
   if "lite" not in sys.modules:
     print("Could not find MySQLdb and lite is not imported! Erroring out!")
-    sys.exit(1)
 
 from datetime import datetime,timedelta
 
