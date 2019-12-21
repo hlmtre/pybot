@@ -55,7 +55,7 @@ class meme:
         url = "https://api.imgflip.com/get_memes"
         try:
             top_memes = requests.get(url)
-        except ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:
             self.bot.debug_print("ConnectionError in get_top_memes(): ")
             self.bot.debug_print(str(e))
         #check for HTTP errors
@@ -156,7 +156,7 @@ class meme:
                    'password':self.imgflip_password, 'text0':top_line, 'text1':bottom_line}
         try:
             meme = requests.post(url, payload)
-        except ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:
             self.bot.debug_print("ConnectionError in create_meme(): ")
             self.bot.debug_print(str(e))
             return
