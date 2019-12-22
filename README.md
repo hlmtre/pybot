@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/hlmtre/pybot.svg?branch=master)](https://travis-ci.org/hlmtre/pybot)
 [![Documentation Status](https://readthedocs.org/projects/pybot/badge/?version=master)](https://pybot.readthedocs.io/en/master/?badge=master)
 ![Github action build status](https://github.com/hlmtre/pybot/workflows/Python%20application/badge.svg)
+[![Scrutinizer coverage](https://scrutinizer-ci.com/g/hlmtre/pybot/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/hlmtre/pybot/?branch=master)
 
 [ReadTheDocs documentation](http://pybot.readthedocs.org/en/master/ "ReadTheDocs pybot documentation")
 
