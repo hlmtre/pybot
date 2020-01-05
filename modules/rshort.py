@@ -1,74 +1,64 @@
 ## Reddit shortener and info ##
-
-import sys
-import requests
-import re
-from event import Event
-
-try:
+import version
+try: # Checks to make sure praw has everything it needs before importing the rest of the module
   import praw
+  reddit = praw.Reddit('pybot', user_agent='pybot ' + version.__version__ + ' by /u/hlmtre; https://github.com/hlmtre/pybot')
+  successful_import = True
 except (ImportError, SystemError):
-    print("Warning: rshort module requires praw https://github.com/praw-dev/praw/")
-    praw = object
-if sys.version_info > (3, 0, 0):
-  try:
-    from .basemodule import BaseModule
-  except (ImportError, SystemError):
-    from modules.basemodule import BaseModule
-else:
-  try:
-    from basemodule import BaseModule
-  except (ImportError, SystemError):
-    from modules.basemodule import BaseModule
+  print("Warning: rshort module requires praw https://github.com/praw-dev/praw/")
+  successful_import = False
+except praw.exceptions.ClientException:
+  print('Warning: rshort requires the "praw.ini" file in the top pybot directory\
+  to be filled in with the client_id and client_secret')
+  successful_import = False
 
-class Rshort(BaseModule):
-  
-  def post_init(self):
-    rshort = Event("__rshort__")
-    rshort.define(msg_definition="https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+|https?://old.reddit.com/[\S]+")
-    rshort.subscribe(self)
-    self.help = None
-
-    # register ourself to our new rshort event
-    self.bot.register_event(rshort, self)
-
-  def handle(self, event):
-   reddit = praw.Reddit(client_id='ara8VhZCeKcdQw',
-                        client_secret='Te_QLIUF1aSh_99ZOzVOCwbgB_s',
-                        user_agent="'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'"
-                        )
-   url = re.search(r"https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+", event.line).group(0)
-   try:
-     sub = reddit.submission(url='https://'+url)
-     output = '[REDDIT] ' + sub.title + ' | r/' +  sub.subreddit.display_name
+if successful_import is True:
+  import sys
+  import requests
+  import re
+  from datetime import datetime 
+  from event import Event
       
-   except praw.exceptions.ClientException:
-     self.say(event.channel, "Fucked link my guy")
-   self.say(event.channel, output)
+  if sys.version_info > (3, 0, 0):
+    try:
+      from .basemodule import BaseModule
+    except (ImportError, SystemError):
+      from modules.basemodule import BaseModule
+  else:
+    try:
+      from basemodule import BaseModule
+    except (ImportError, SystemError):
+      from modules.basemodule import BaseModule
 
+  class Rshort(BaseModule):
+    
+    def post_init(self):
+      rshort = Event("__rshort__")
+      rshort.define(msg_definition="https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+|https?://old.reddit.com/[\S]+")
+      rshort.subscribe(self)
+      self.help = None
 
+      # register ourself to our new rshort event
+      self.bot.register_event(rshort, self)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def handle(self, event):
+      url = re.search(r"https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+|https?://old.reddit.com/[\S]+", event.line).group(0)
+      try: 
+        sub = reddit.submission(url='https://'+url)
+      except praw.exceptions.ClientException: # If the link is broken we should not do anything at all
+        return
+      sub_time = datetime.utcfromtimestamp(sub.created).strftime('%Y-%m-%d//%H:%M:%S')
+      message = '[REDDIT] ' + sub.title
+      if sub.is_self:
+        message = message + ' (self.' + sub.subreddit.display_name + ')'
+      else:
+        message = message + ' to r/' + sub.subreddit.display_name
+      if sub.author:
+        author = 'u/' + sub.author.name
+      else:
+        author = '[deleted]'
+      if sub.over_18:
+        message = message + ' 05[NSFW]'
+        #TODO implement per-channel settings db, and make this able to kick
+      message = (message + ' | ' + author + ' ' + sub_time)
+      self.say(event.channel, message)
