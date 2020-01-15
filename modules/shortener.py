@@ -28,7 +28,7 @@ class Shortener(BaseModule):
       target = re.search("https?://[\S]+", event.line).group(0)
       url = 'https://is.gd/create.php'
       payload = {'format':'simple', 'url':target}
-      if len(target) > 60 and re.match(self.r_pattern, target) is None: # Only shorten if not reddit link
+      if len(target) > 60 and re.match(self.r_pattern, target) is None: # Post only shortened link if NOT reddit link
         r = requests.get(url, params=payload)
         self.say(event.channel, r.text)
       else:
@@ -36,7 +36,7 @@ class Shortener(BaseModule):
     except requests.exceptions.HTTPError as e:
       self.bot.debug_print("HTTPError")
       self.bot.debug_print(str(e))
-
+  
   def reddit_link(self, link): # Called from the rshort module to shorten the link to put in link description
     url = 'https://is.gd/create.php'
     payload = {'format':'simple', 'url':link}
@@ -46,3 +46,4 @@ class Shortener(BaseModule):
     except requests.exceptions.HTTPError as e:
       self.bot.debug_print("HTTPError")
       self.bot.debug_print(str(e))
+#TODO Try to use code already available instead of using the same code again, aka d.r.y.

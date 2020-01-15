@@ -13,7 +13,9 @@ except praw.exceptions.ClientException:
   to be filled in with the client_id and client_secret.')
   successful_import = False
 
-if successful_import is True:
+if not successful_import:
+  pass
+else:
   import sys
   import requests
   import re
@@ -51,7 +53,7 @@ if successful_import is True:
         sub = reddit.submission(url='https://'+url)
       except praw.exceptions.ClientException: # If the link is broken we should not do anything at all
         return
-      sub_time = datetime.utcfromtimestamp(sub.created).strftime('%Y/%m/%d--%H:%M') # converts from POSIX timestamp to human readable
+      sub_time = datetime.utcfromtimestamp(sub.created).strftime('%Y/%m/%d@%H:%M') # converts from POSIX timestamp to human readable
       message = '[REDDIT] ' + sub.title
       if sub.is_self:
         message = message + ' (self.' + sub.subreddit.display_name + ')'
