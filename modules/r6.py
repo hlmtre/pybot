@@ -29,6 +29,7 @@ class R6(BaseModule):
     self.help = ".r6 <kd,level,rank> <gamer-tag>"
     # register ourself to our new r6 event
     self.bot.register_event(r6, self)
+    self.player_ids = []
 
     self.url = "https://r6.apitab.com/search/uplay/" # URL which outputs JSON data
 
@@ -58,22 +59,44 @@ class R6(BaseModule):
         headers = {
                 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
                 }
-        r = requests.get(self.url + event.msg.split()[2], headers=headers)# Takes our static URL and appends your site to the end to make our get request
+        r = requests.get(self.url + event.msg.split()[2] + "INSERT API KEY HERE", headers=headers)# Takes our static URL and appends your site to the end to make our get request
         j = json.loads(r.text) # Converts our JSON to python object
-        if j['foundmatch'] == False:
-          self.say(event.channel, "Player not found.")
-          return
-        for value in j['players']: # Each player has a unique player ID that needs to be grabbed to drill down to the rest of the data
+        for value in j['players']:
           p_id = value
-        level = str(j['players'][p_id]['stats']['level']) # Different parameters to choose from
-        kd = str(j['players'][p_id]['ranked']['kd'])
-        rank = str(j['players'][p_id]['ranked']['mmr'])
-        if event.msg.split()[1] == "rank":
-          self.say(event.channel, rank)
-        elif event.msg.split()[1] == "kd":
-          self.say(event.channel, kd)
-        elif event.msg.split()[1] == "level":
-          self.say(event.channel, level)
+          self.player_ids.append(p_id)
+        if len(self.player_ids) < 1:
+          self.say(event.channel, "No player found.")
+        elif len(self.player_ids) == 1:
+          level = str(j['players'][self.player_ids[0]]['stats']['level']) # Different parameters to choose from
+          kd = str(j['players'][self.player_ids[0]]['ranked']['kd'])
+          rank = str(j['players'][self.player_ids[0]]['ranked']['mmr'])
+          if event.msg.split()[1] == "rank":
+            self.say(event.channel, rank)
+            self.player_ids.clear()
+          elif event.msg.split()[1] == "kd":
+            self.say(event.channel, kd)
+            self.player_ids.clear()
+          elif event.msg.split()[1] == "level":
+            self.say(event.channel, level)
+            self.player_ids.clear()
+        else:
+          for i in self.player_ids:
+            print(j['players'][i]['profile']['p_name'])
+
+        # if j['foundmatch'] == False:
+        #   self.say(event.channel, "Player not found.")
+        #   return
+        # for value in j['players']: # Each player has a unique player ID that needs to be grabbed to drill down to the rest of the data
+        #   p_id = value
+        # level = str(j['players'][p_id]['stats']['level']) # Different parameters to choose from
+        # kd = str(j['players'][p_id]['ranked']['kd'])
+        # rank = str(j['players'][p_id]['ranked']['mmr'])
+        # if event.msg.split()[1] == "rank":
+        #   self.say(event.channel, rank)
+        # elif event.msg.split()[1] == "kd":
+        #   self.say(event.channel, kd)
+        # elif event.msg.split()[1] == "level":
+        #   self.say(event.channel, level)
 
       except requests.ConnectionError:
         self.say(event.channel, "Connection error.")
