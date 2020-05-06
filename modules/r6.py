@@ -64,41 +64,33 @@ class R6(BaseModule):
         for value in j['players']:
           p_id = value
           self.player_ids.append(p_id)
-        if len(self.player_ids) < 1:
-          self.say(event.channel, "No player found.")
-        elif len(self.player_ids) == 1:
-          level = str(j['players'][self.player_ids[0]]['stats']['level']) # Different parameters to choose from
-          kd = str(j['players'][self.player_ids[0]]['ranked']['kd'])
-          rank = str(j['players'][self.player_ids[0]]['ranked']['mmr'])
-          if event.msg.split()[1] == "rank":
-            self.say(event.channel, rank)
-            self.player_ids.clear()
-          elif event.msg.split()[1] == "kd":
-            self.say(event.channel, kd)
-            self.player_ids.clear()
-          elif event.msg.split()[1] == "level":
-            self.say(event.channel, level)
-            self.player_ids.clear()
+        if j['foundmatch'] == True:
+           level = str(j['players'][self.player_ids[0]]['stats']['level']) # Different parameters to choose from
+           kd = str(j['players'][self.player_ids[0]]['ranked']['kd'])
+           rank = str(j['players'][self.player_ids[0]]['ranked']['mmr'])
+           if event.msg.split()[1] == "rank":
+             self.say(event.channel, rank)
+             self.player_ids.clear()
+           elif event.msg.split()[1] == "kd":
+             self.say(event.channel, kd)
+             self.player_ids.clear()
+           elif event.msg.split()[1] == "level":
+             self.say(event.channel, level)
+             self.player_ids.clear()
         else:
-          for i in self.player_ids:
-            print(j['players'][i]['profile']['p_name'])
-
-        # if j['foundmatch'] == False:
-        #   self.say(event.channel, "Player not found.")
-        #   return
-        # for value in j['players']: # Each player has a unique player ID that needs to be grabbed to drill down to the rest of the data
-        #   p_id = value
-        # level = str(j['players'][p_id]['stats']['level']) # Different parameters to choose from
-        # kd = str(j['players'][p_id]['ranked']['kd'])
-        # rank = str(j['players'][p_id]['ranked']['mmr'])
-        # if event.msg.split()[1] == "rank":
-        #   self.say(event.channel, rank)
-        # elif event.msg.split()[1] == "kd":
-        #   self.say(event.channel, kd)
-        # elif event.msg.split()[1] == "level":
-        #   self.say(event.channel, level)
+          if len(j['players']) == 0:
+            self.say(event.channel, "No player found.")
+          else:
+            for i in self.player_ids:
+              check_case = event.msg.split()[2] is j['players'][i]['profile']['p_name']
+              if check_case == True:
+                print(event.msg.split()[2]+ " " + j['players'][i]['profile']['p_name'] + " " + "FOUND MATCH")
+              else:
+                continue
+            self.player_ids.clear()
+            self.say(event.channel, "Multiple matches found, check spelling and case.")
 
       except requests.ConnectionError:
         self.say(event.channel, "Connection error.")
       except KeyError:
-        self.say(event.channel, "Player not found.")
+        self.say(event.channel, "Player not found. KEY ERROR")
