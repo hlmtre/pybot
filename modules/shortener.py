@@ -14,7 +14,7 @@ except (ImportError, SystemError):
   from modules.basemodule import BaseModule
 
 class Shortener(BaseModule):
-  
+
   def post_init(self):
     shortener = Event("__urls__")
     shortener.define(msg_definition = "https?://[\S]+") # What to look for to trigger event
@@ -36,7 +36,7 @@ class Shortener(BaseModule):
     except requests.exceptions.HTTPError as e:
       self.bot.debug_print("HTTPError")
       self.bot.debug_print(str(e))
-  
+
   def reddit_link(self, link): # Called from the rshort module to shorten the link to put in link description
     url = 'https://is.gd/create.php'
     payload = {'format':'simple', 'url':link}
