@@ -38,8 +38,10 @@ class R6_Cred:
 """
 try: 
     from modules.r6_cred import RsixCred as rc
+    key_check = True
 except (ImportError, SystemError):
     print("Warning: r6 module requires API key in modules/r6_cred.py")
+    key_check = False
 
 class R6(BaseModule):
   """ Takes specified stats from r6tab and prints them to irc channel """
@@ -78,7 +80,7 @@ class R6(BaseModule):
       (5000,9999): "Champions"
     })
 
-# Returns the data that has been requested
+# Deals with presenting data that has been requested
   def print_stats(self, ids, js, choice):
     level = str(js['players'][ids]['stats']['level']) 
     kd = str(js['players'][ids]['ranked']['kd'])
@@ -90,7 +92,7 @@ class R6(BaseModule):
     elif choice == "level":
       return level
 
-# The JSON data from the API
+# Retrieves the JSON data from the API
   def api_get(self, name):
     """Needed to set user agent so request would not be blocked, without this a 503 status code is returned"""
     headers = {
@@ -120,31 +122,35 @@ class R6(BaseModule):
     AS_champ	0
     """
   def handle(self, event):
-    if len(event.msg.split()) == 3: # Looks for the command and hopefully a valid website (*.com,*.net, etc.)
-      option = event.msg.split()[1]
-      player = event.msg.split()[2]
-      try:
-        for value in self.api_get(player)['players']: # Adds all player ID's to list
-          p_id = value
-          self.player_ids.append(p_id)
-        if self.api_get(player)['foundmatch'] == True and len(self.player_ids) == 1: # If only one match is found, print the requested data
-          self.print_stats(self.player_ids[0], self.api_get(player), option)
-          self.say(event.channel, self.print_stats(self.player_ids[0], self.api_get(player), option))
-          self.player_ids.clear()
-        elif len(self.player_ids) == 0: # If no ids are found for requested player name tell the user
-          self.player_ids.clear()
-          self.say(event.channel, "No player found.")
-        else: # If multiple options are found we compare against the requested player and the found ones.
-          for i in self.player_ids:
-            if player == self.api_get(player)['players'][i]['profile']['p_name']: # If exact player is found we print the data
-              self.print_stats(i, self.api_get(player), option)
-              self.say(event.channel, self.print_stats(self.player_ids[0], self.api_get(player), option))
-              self.player_ids.clear()
-            else:
-              continue
-          self.player_ids.clear()
-          
-      except requests.ConnectionError:
-        self.say(event.channel, "Connection error.")
-      except KeyError:
-        self.say(event.channel, "No API key found")
+    if key_check == True:
+      if len(event.msg.split()) == 3: # Looks for the properly formatted command
+        option = event.msg.split()[1]
+        player = event.msg.split()[2]
+        try:
+          for value in self.api_get(player)['players']: # Adds all player ID's to a list
+            p_id = value
+            self.player_ids.append(p_id)
+          if self.api_get(player)['foundmatch'] == True and len(self.player_ids) == 1: # If only one match is found, print the requested data
+            self.print_stats(self.player_ids[0], self.api_get(player), option)
+            self.say(event.channel, self.print_stats(self.player_ids[0], self.api_get(player), option))
+            self.player_ids.clear()
+          elif len(self.player_ids) == 0: # If no ids are found for requested player name tell the user
+            self.player_ids.clear()
+            self.say(event.channel, "No player found.")
+          else: # If multiple options are found we compare against the requested player and the found ones.
+            for i in self.player_ids:
+              if player == self.api_get(player)['players'][i]['profile']['p_name']: # If exact player is found we print the data
+                self.print_stats(i, self.api_get(player), option)
+                self.say(event.channel, self.print_stats(self.player_ids[0], self.api_get(player), option))
+                self.player_ids.clear()
+              elif self.player_ids.index(i) < len(self.player_ids) - 1: # If not at end of list keep looping and comparing
+                print(self.player_ids.index(i) + len(self.player_ids))
+                continue
+              else: # If we run out of players to compare against then he does not exist and we let the user know
+                self.say(event.channel, "No player found.")
+            self.player_ids.clear()
+            
+        except requests.ConnectionError:
+          self.say(event.channel, "Connection error.")
+    else:
+      self.say(event.channel, "No API key found. Put in request at https://tabstats.com/contact")
