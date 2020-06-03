@@ -37,7 +37,7 @@ class R6_Cred:
  
 """
 try: 
-    from modules.r6_cred import RsixCred as rc
+    from modules.r6_cred import R6_Cred as rc
     key_check = True
 except (ImportError, SystemError):
     print("Warning: r6 module requires API key in modules/r6_cred.py")

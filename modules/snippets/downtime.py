@@ -11,4 +11,3 @@ def _downtime(bot, message, channel):
     bot.say(channel, action_string + ' gets ' + user + ' one bourbon, one scotch, one beer'+ "\001\n")
   else:
     bot.say(channel, action_string + ' gets ' + user + ' ' + random.choice(drinks)+ "\001\n")
-    
