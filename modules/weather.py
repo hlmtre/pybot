@@ -67,7 +67,7 @@ class Weather(BaseModule):
             location = weather['name']
             conditions = weather['weather'][0]['main']
             temp_f = round(weather['main']['temp'], 1)
-            temp_c = round((temp_f - 32) * (5.0/9.0))
+            temp_c = round((temp_f - 32) * (5.0/9.0), 1)
         except KeyError:
             self.say(channel, "Unable to get weather data from results. Sorry.")
             return
