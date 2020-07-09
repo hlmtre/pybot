@@ -47,7 +47,7 @@ class Tell(BaseModule):
 
     # register ourself to our new custom event
     self.bot.register_event(tell, self)
-    
+
   def handle(self, event):
     try:
       if event.msg.startswith(".tell"):

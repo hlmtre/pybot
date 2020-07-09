@@ -45,6 +45,7 @@ def parse_line(line):
       self.message = None
       self.channel = None
       self.user = None
+      self.message_number = 0
 
     def startswith(self, thing):
       if self.message.startswith(thing):
@@ -54,6 +55,7 @@ def parse_line(line):
   parsed = Parsed()
 
   try:
+    parsed.message_number = line.split()[1]
     parsed.first_word = line.split(":", 2)[2]
     parsed.message = line.split(":",2)[2]
     parsed.channel = line.split()[2]
@@ -74,7 +76,7 @@ def __prettyDate(time):
   if type(time) is int:
     diff = now - datetime.fromtimestamp(time)
   elif isinstance(time,datetime):
-    diff = now - time 
+    diff = now - time
   second_diff = diff.seconds
   day_diff = diff.days
 
