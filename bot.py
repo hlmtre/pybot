@@ -14,6 +14,7 @@ import sys
 import threading
 import time
 import traceback
+from collections import deque
 
 import botbrain
 import util
@@ -50,6 +51,7 @@ class Bot(threading.Thread):
 #   to be a dict of dicts
     self.command_function_map = dict()
     self.snippets_list = set()
+    self.recent_lines = deque(maxlen=15)
 
     if self.conf.getDBType() == "sqlite":
       import lite
@@ -318,6 +320,9 @@ class Bot(threading.Thread):
     """
     self.send(('PONG ' + response + '\n').encode())
 
+  def bare_send(self, line):
+    self.send((line + '\n').encode())
+
   def processline(self, line):
     """
     Grab newline-delineated lines sent to us, and determine what to do with them.
@@ -329,6 +334,8 @@ class Bot(threading.Thread):
     line: string.
 
     """
+
+    self.recent_lines.appendleft(line)
     if self.DEBUG:
       if os.name == "posix": # because windows doesn't like the color codes.
         self.debug_print(util.bcolors.OKBLUE + "<< " + util.bcolors.ENDC + line)

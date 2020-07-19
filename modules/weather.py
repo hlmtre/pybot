@@ -33,7 +33,7 @@ class Weather(BaseModule):
         }
 
     def get_lat_long_from_bing(self, location):
-        """ 
+        """
         go grab the latitude/longitude from bing's really excellent location API.
         Returns: tuple of x,y coordinates - (0,0) on error
         """
@@ -66,14 +66,15 @@ class Weather(BaseModule):
             #grab the relevant data we want for formatting
             location = weather['name']
             conditions = weather['weather'][0]['main']
-            temp_f = str(round(weather['main']['temp'], 1))
+            temp_f = round(weather['main']['temp'], 1)
+            temp_c = round((temp_f - 32) * (5.0/9.0), 1)
         except KeyError:
             self.say(channel, "Unable to get weather data from results. Sorry.")
             return
         #return the formatted string of weather data
-        return location + ': ' + conditions + ', ' + temp_f + '° F' 
+        return location + ': ' + conditions + ', ' + str(temp_f) + '°F (' + str(temp_c)  + '°C)'
 
-  
+
     def handle(self, event):
         #split the line beginning with .weather into 2 parts, the command and the search string
         weather_line = event.msg.split(None, 1)

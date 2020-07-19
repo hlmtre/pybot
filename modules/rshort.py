@@ -13,14 +13,12 @@ except praw.exceptions.ClientException:
   to be filled in with the client_id and client_secret.')
   successful_import = False
 
-if not successful_import:
-  pass
-else:
+if successful_import:
   import sys
   import requests
   import re
   from shortener import Shortener
-  from datetime import datetime 
+  from datetime import datetime
   from event import Event
 
   if sys.version_info > (3, 0, 0):
@@ -44,12 +42,12 @@ else:
       self.r_pattern = r"https?://www.reddit.com/[\S]+|https?://reddit.com/[\S]+|reddit.com/[\S]+|https?://old.reddit.com/[\S]+"
       # register ourself to our new rshort event
       self.bot.register_event(rshort, self)
-      
+
 
     def handle(self, event):
 
       url = re.search(self.r_pattern, event.line).group(0)
-      try: 
+      try:
         sub = reddit.submission(url='https://'+url)
       except praw.exceptions.ClientException: # If the link is broken we should not do anything at all
         return
@@ -66,5 +64,5 @@ else:
       if sub.over_18:
         message = message + ' 05[NSFW]'
         #TODO implement per-channel settings db, and make this able to kick
-      message = (message + ' |' + author + '|' + sub_time)
-      self.say(event.channel, message + '| ' + Shortener.reddit_link(self,url))
+      message = (message + ' | ' + author + ' | ' + sub_time)
+      self.say(event.channel, message + ' | ' + Shortener.reddit_link(self,url))

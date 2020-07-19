@@ -54,7 +54,7 @@ class Isup(BaseModule):
         j = json.loads(r.text) # Converts our JSON to python object
         if str(j["isDown"]) == "True": # Converts our parameter to a string to compare against our "isDown" parameter
           self.say(event.channel, "Site looks down; it's not just you.") # Once state is determined it will be spit out into the channel
-        elif str(j["isDown"]) == "False":
+        elif str(j["isDown"]) == "False" and j["statusCode"] == 200:
           self.say(event.channel, "Site looks ok to me; it's just you.")
 
       except requests.ConnectionError:
