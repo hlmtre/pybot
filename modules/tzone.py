@@ -7,7 +7,7 @@ try:
 except (ImportError, SystemError):
   print("Warning: tzone module requires requests")
   requests = object
- 
+
 try:
   if sys.version_info > (3, 0, 0):
     from .basemodule import BaseModule
@@ -15,7 +15,7 @@ try:
     from basemodule import BaseModule
 except (ImportError, SystemError):
   from modules.basemodule import BaseModule
- 
+
 class Tzone(BaseModule):
   def post_init(self):
     tzone = Event("__.tzone__")
@@ -47,7 +47,7 @@ class Tzone(BaseModule):
       if len(multiple_locations) > 1:
         return "Multiple timezones returned, try being more specific"
       else:
-        return str(place + ": " + local_time_date[1])
+        return str(place + ": " + local_time_date[1] + " (" + multiple_locations[0]['convertedTime']['timeZoneDisplayAbbr'] + ")")
     except IndexError:
       return "Not a valid request, try again."
     except ValueError:
