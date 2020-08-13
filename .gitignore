@@ -13,3 +13,4 @@ modules/imgur_credentials.py
 pickle/*
 venv/*
 *.dat
+praw.ini

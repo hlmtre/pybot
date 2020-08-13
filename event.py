@@ -16,7 +16,7 @@ class Event:
   def __init__(self, _type):
     """
     Define your own type here. Make sure if you're making a broad event (all messages, for example) you use a sane type, as other modules that care about this kind of event can subscribe to it.
-    
+
     Args:
     _type: string. like "__youtube__" or "__weather__". Underscores are a convention.
     """
@@ -33,7 +33,7 @@ class Event:
     self.mode = ""
     self.is_pm = False
     self.message_id = -1
-    
+
   def subscribe(self, e):
     """
     Append passed-in event to our list of subscribing modules.
@@ -133,7 +133,7 @@ class Event:
     Fills out the object with all necessary information, then notifies subscribers with itself (an event with all the line information parsed out) as an argument.
     Args:
     line: string
-    
+
     """
     self.line = line
     if line == "null":
