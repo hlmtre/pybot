@@ -24,7 +24,7 @@ class BanList(BaseModule):
     try:
       l = event.msg.split(None, 1)
       if len(l) > 1:
-        resp = self.map_to_ops[l[1]]
+        resp = self.map_to_ops[l[1].lower()]
         self.say(event.channel, "Attack: " + resp[0] + ", Defense: " + resp[1])
     except:
       self.say(event.channel, "you goofed, you goof")
