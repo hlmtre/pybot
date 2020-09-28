@@ -20,7 +20,7 @@ class Weather(BaseModule):
 
     def post_init(self):
         weather2 = Event('__.weather2__')
-        weather2.define(msg_definition='^\.[Ww]eather|^\.w')
+        weather2.define(msg_definition='^\.[Ww]eather|^\.w ')
         weather2.subscribe(self)
 
         self.bot.register_event(weather2, self)
