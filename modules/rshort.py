@@ -1,13 +1,16 @@
 ## Reddit link information ##
 
 import version
+successful_import = False
 try: # Checks to make sure praw has everything it needs before importing the rest of the module
   import praw
-  reddit = praw.Reddit('pybot', user_agent='pybot ' + version.__version__ + ' by /u/hlmtre; https://github.com/hlmtre/pybot')
-  successful_import = True
+  try:
+    reddit = praw.Reddit('pybot', user_agent='pybot ' + version.__version__ + ' by /u/hlmtre; https://github.com/hlmtre/pybot')
+    successful_import = True
+  except:
+    pass
 except (ImportError, SystemError):
   print("Warning: rshort module requires praw https://github.com/praw-dev/praw/")
-  successful_import = False
 except praw.exceptions.ClientException:
   print('Warning: rshort requires the "praw.ini" file in the top pybot directory\
   to be filled in with the client_id and client_secret.')
