@@ -30,7 +30,7 @@ class ConfManager:
             self.conf_file = open(self.conf_path)
           except IOError:
             raise ConfError("could not open conf file '"+self.conf_path+"'")
-    
+
     self.parsed = json.load(self.conf_file)
 
   def getDBType(self):
@@ -38,7 +38,7 @@ class ConfManager:
       db_type = self.parsed["__pybot_conf"]["db_type"]
     except:
       return "mysql"
-    
+
     return db_type
 
   def getOwner(self, net):
@@ -48,7 +48,7 @@ class ConfManager:
     try:
       return int(self.parsed[net]["timeout"])
     except:
-      return 120 
+      return 120
 
   def getIRCPass(self, net):
     return self.parsed[net]["ircpass"]
@@ -77,7 +77,7 @@ class ConfManager:
       if n != "__pybot_conf":
         l.append(n)
     return l
-  
+
   def getNumNets(self):
     i = 0
     for n in list(self.parsed.keys()):

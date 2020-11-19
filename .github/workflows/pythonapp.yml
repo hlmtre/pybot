@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['2.x', '3.x']
+        python-version: ['3.x']
 
     steps:
     - uses: actions/checkout@v1
@@ -30,5 +30,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with nosetests
       run: |
-        pip install nose
-        nosetests
+        pip install nose2
+        nose2

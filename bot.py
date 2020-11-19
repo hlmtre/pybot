@@ -30,7 +30,7 @@ class Bot(threading.Thread):
     bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
     handles the core IRC protocol stuff, and passing lines to defined events, which dispatch to their subscribed modules.
   """
-  def __init__(self, conf=None, network=None, d=None):
+  def __init__(self, conf=None, network=None, d=None, local_nickname=None, local_channels=None):
     threading.Thread.__init__(self)
 
     self.HOST = None
@@ -45,7 +45,6 @@ class Bot(threading.Thread):
     self.JOINED = False
     self.OWNER = None
     self.chan_list = None
-    self.conf = conf
     self.pid = os.getpid()
     self.logger = Logger()
 #   to be a dict of dicts
@@ -53,14 +52,39 @@ class Bot(threading.Thread):
     self.snippets_list = set()
     self.recent_lines = deque(maxlen=15)
 
-    if self.conf.getDBType() == "sqlite":
+    if conf is None:
+      import getpass
+      u = getpass.getuser()
+      class Mockuconf:
+        def __init__(self, bot=None):
+          self.network = network
+        def getDBType(self, net=None):
+          return "sqlite"
+        def getNick(self, net=None):
+          return local_nickname
+        def getOwner(self, net=None):
+          return u
+        def getPort(self, net=None):
+          return 6667
+      conf = Mockuconf()
+
+    self.conf = conf
+
+    try:
+      if self.conf.getDBType() == "sqlite":
+        import lite
+        self.db = lite.SqliteDB(self)
+      else:
+        import db
+        self.db = db.DB(self)
+    except AttributeError:
       import lite
       self.db = lite.SqliteDB(self)
-    else:
-      import db
-      self.db = db.DB(self)
 
-    self.NICK = self.conf.getNick(self.network)
+    if not local_nickname:
+      self.NICK = self.conf.getNick(self.network)
+    else:
+      self.NICK = local_nickname
 
     self.logger.write(Logger.INFO, "\n", self.NICK)
     self.logger.write(Logger.INFO, " initializing bot, pid " + str(os.getpid()), self.NICK)
@@ -72,7 +96,10 @@ class Bot(threading.Thread):
     # after the mem_store is instantiated, reload pickled objects
     self.load_persistence()
 
-    self.CHANNELINIT = conf.getChannels(self.network)
+    if not local_channels:
+      self.CHANNELINIT = None
+    else:
+      self.CHANNELINIT = local_channels.split(",")
 # this will be the socket
     self.s = None # each bot thread holds its own socket open to the network
 
@@ -366,7 +393,11 @@ class Bot(threading.Thread):
         # patch contributed by github.com/thekanbo
         if self.JOINED is False and (message_number == "376" or message_number == "422"):
           # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exist
-          self.chan_list = self.conf.getChannels(self.network)
+          if not self.CHANNELINIT:
+            self.chan_list = self.conf.getChannels(self.network)
+          else:
+            print(self.CHANNELINIT)
+            self.chan_list = self.CHANNELINIT
           for c in self.chan_list:
             self.send(('JOIN '+c+' \n').encode())
           self.JOINED = True
@@ -401,21 +432,29 @@ class Bot(threading.Thread):
     self.NICK = self.conf.getNick(self.network)
 
     # we have to cast it to an int, otherwise the connection fails silently and the entire process dies
-    self.PORT = int(self.conf.getPort(self.network))
+    try:
+      self.PORT = int(self.conf.getPort(self.network))
+    except AttributeError:
+      self.PORT = 6667
     self.IDENT = 'mypy'
     self.REALNAME = 's1ash'
-    self.OWNER = self.conf.getOwner(self.network)
+    try:
+      self.OWNER = self.conf.getOwner(self.network)
+    except AttributeError:
+      import getpass
+      self.OWNER = getpass.getuser()
 
     # connect to server
     self.s = socket.socket()
     while not self.CONNECTED:
       try:
+        self.debug_print("attempting to connect to " + self.network + ":" + str(self.PORT))
 # low level socket TCP/IP connection
         self.s.connect((self.HOST, self.PORT)) # force them into one argument
         self.CONNECTED = True
         self.logger.write(Logger.INFO, "Connected to " + self.network, self.NICK)
         if self.DEBUG:
-          self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + "connected to " + self.network)
+          self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + "connected to " + self.network + ":" + str(self.PORT))
       except:
         if self.DEBUG:
           self.debug_print(util.bcolors.FAIL + ">> " + util.bcolors.ENDC + "Could not connect to " + self.HOST + " at " + str(self.PORT) + "! Retrying... ")
@@ -438,10 +477,15 @@ class Bot(threading.Thread):
 
       time.sleep(3) # allow services to catch up
 
-      self.s.send(('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n').encode())  # we're registered!
+      try:
+        self.s.send(('PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\n').encode())  # we're registered!
+        if self.DEBUG:
+          self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
+      except AttributeError:
+        self.s.send(('PRIVMSG nickserv identify 12345 \n').encode())  # we're registered!
+        if self.DEBUG:
+          self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify 12345 \\n')
 
-      if self.DEBUG:
-        self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network + ': PRIVMSG nickserv identify '+self.conf.getIRCPass(self.network)+'\\n')
 
     self.s.setblocking(1)
 
@@ -459,7 +503,10 @@ class Bot(threading.Thread):
       try:
         timeout += 1
         # if we haven't received anything for 120 seconds
-        time_since = self.conf.getTimeout(self.network)
+        try:
+          time_since = self.conf.getTimeout(self.network)
+        except AttributeError:
+          time_since = 120
         if timeout > time_since:
           if self.DEBUG:
             self.debug_print("Disconnected! Retrying... ")

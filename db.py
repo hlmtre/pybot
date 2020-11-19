@@ -19,7 +19,7 @@ class DB:
   def __init__(self, bot=None):
     self.bot = bot
     self.dry_run = False
-    
+
   def _open(self):
     if self.bot is not None:
       dbusername = self.bot.conf.getDBUsername(self.bot.network)
@@ -39,7 +39,7 @@ class DB:
       return
 
     self.cur = self.con.cursor()
-  
+
   def _close(self):
     self.con = None
     if not self.dry_run:
@@ -70,7 +70,7 @@ class DB:
   def replace(self, where, which, what):
     try:
       self._open()
-      self.cur.execute("""REPLACE INTO %s (%s) VALUES (%s)""",(where, which, what)) 
+      self.cur.execute("""REPLACE INTO %s (%s) VALUES (%s)""",(where, which, what))
       self._close()
     except:
       self._close()
@@ -79,7 +79,7 @@ class DB:
   def e(self, sql):
     try:
       self._open()
-      self.cur.execute(sql) 
+      self.cur.execute(sql)
       if "INSERT" in sql or "REPLACE" in sql:
         self.con.commit()
         self._close()
@@ -96,7 +96,7 @@ class DB:
   def insert(self, where, which, what):
     try:
       self._open()
-      self.cur.execute("""INSERT INTO %s (%s) VALUES (%s)""",(where, which, what)) 
+      self.cur.execute("""INSERT INTO %s (%s) VALUES (%s)""",(where, which, what))
       self._close()
     except:
       self._close()
@@ -117,7 +117,7 @@ class DB:
       self._close()
     else:
       self._close()
-      return None 
+      return None
 
   def insertImg(self, user, url, channel):
     self._open()

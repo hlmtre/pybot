@@ -34,9 +34,9 @@ Format it like this:
 
 class R6_Cred:
     api_key = "PuT ApI KeY Here"
- 
+
 """
-try: 
+try:
     from modules.r6_cred import R6_Cred as rc
     key_check = True
 except (ImportError, SystemError):
@@ -82,9 +82,9 @@ class R6(BaseModule):
 
 # Deals with presenting data that has been requested
   def print_stats(self, ids, js, choice):
-    level = str(js['players'][ids]['stats']['level']) 
+    level = str(js['players'][ids]['stats']['level'])
     kd = str(js['players'][ids]['ranked']['kd'])
-    rank = str(js['players'][ids]['ranked']['mmr']) 
+    rank = str(js['players'][ids]['ranked']['mmr'])
     if choice == "rank":
       return rank + " | " + self.ranks[int(rank)]
     elif choice == "kd":
@@ -106,7 +106,7 @@ class R6(BaseModule):
     Example to show json data parameters that can be pulled from with current URL get request:
 
     level	107
-    ranked	
+    ranked
     kd	0.7
     mmr	1881
     rank	6
@@ -149,7 +149,7 @@ class R6(BaseModule):
               else: # If we run out of players to compare against then he does not exist and we let the user know
                 self.say(event.channel, "No player found.")
             self.player_ids.clear()
-            
+
         except requests.ConnectionError:
           self.say(event.channel, "Connection error.")
     else:
