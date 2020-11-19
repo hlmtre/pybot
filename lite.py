@@ -14,7 +14,7 @@ class SqliteDB:
     self._open()
     if create_string:
       self.cur.execute(create_string)
-    self.cur.execute('CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username CHAR(32) DEFAULT NULL UNIQUE)') 
+    self.cur.execute('CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username CHAR(32) DEFAULT NULL UNIQUE)')
     self.cur.execute('CREATE TABLE IF NOT EXISTS img (id INTEGER PRIMARY KEY, url CHAR(128) DEFAULT NULL, user CHAR(32) DEFAULT NULL, time DATETIME DEFAULT CURRENT_TIMESTAMP, channel CHAR(32) DEFAULT NULL)')
     self.cur.execute('CREATE TABLE IF NOT EXISTS lastfm (lastfm_username CHAR(64) NOT NULL, nick CHAR(32) NOT NULL)')
     self.cur.execute('CREATE TABLE IF NOT EXISTS qdb (id INTEGER PRIMARY KEY, quote TEXT NOT NULL, date DATETIME DEFAULT CURRENT_TIMESTAMP)')
@@ -29,7 +29,7 @@ class SqliteDB:
   def e(self, sql):
     try:
       self._open()
-      self.cur.execute(sql) 
+      self.cur.execute(sql)
       if "INSERT" in sql or "REPLACE" in sql:
         self.con.commit()
         self.con.close()
