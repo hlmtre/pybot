@@ -30,7 +30,7 @@ class Bot(threading.Thread):
     bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
     handles the core IRC protocol stuff, and passing lines to defined events, which dispatch to their subscribed modules.
   """
-  def __init__(self, conf=None, network=None, d=None, local_nickname=None, local_channels=None):
+  def __init__(self, conf=None, network=None, d=None, local_nickname=None, local_channels=None, local_port=None, local_owner=None):
     threading.Thread.__init__(self)
 
     self.HOST = None
@@ -43,7 +43,7 @@ class Bot(threading.Thread):
     self.OFFLINE = False
     self.CONNECTED = False
     self.JOINED = False
-    self.OWNER = None
+    self.OWNER = local_owner
     self.chan_list = None
     self.pid = os.getpid()
     self.logger = Logger()
@@ -53,8 +53,6 @@ class Bot(threading.Thread):
     self.recent_lines = deque(maxlen=15)
 
     if conf is None:
-      import getpass
-      u = getpass.getuser()
       class Mockuconf:
         def __init__(self, bot=None):
           self.network = network
@@ -63,9 +61,15 @@ class Bot(threading.Thread):
         def getNick(self, net=None):
           return local_nickname
         def getOwner(self, net=None):
-          return u
+          if local_owner is not None:
+            return local_owner
+          else:
+            return "hlmtre"
         def getPort(self, net=None):
-          return 6667
+          if local_port is not None:
+            return local_port
+          else:
+            return 6667
       conf = Mockuconf()
 
     self.conf = conf
@@ -96,10 +100,8 @@ class Bot(threading.Thread):
     # after the mem_store is instantiated, reload pickled objects
     self.load_persistence()
 
-    if not local_channels:
-      self.CHANNELINIT = None
-    else:
-      self.CHANNELINIT = local_channels.split(",")
+    if local_channels is not None:
+      self.chan_list = local_channels.split(",")
 # this will be the socket
     self.s = None # each bot thread holds its own socket open to the network
 
@@ -257,8 +259,12 @@ class Bot(threading.Thread):
         # logging
         for k in list(autoloads.keys()):
           self.logger.write(Logger.INFO, "Autoloads found for network " + k, self.NICK)
+          if self.DEBUG:
+            self.debug_print(util.bcolors.OKGREEN + ">>" + util.bcolors.ENDC + " Autoloads found for network " + k)
       except IOError:
         self.logger.write(Logger.WARNING, "Could not load autoloads file.",self.NICK)
+        if self.DEBUG:
+          self.debug_print(util.bcolors.WARNING + ">>" + util.bcolors.ENDC + " Could not load autoloads file " + k)
     # create dictionary of things in the modules directory to load
     for fname in dir_list:
       name, ext = os.path.splitext(fname)
@@ -271,16 +277,22 @@ class Bot(threading.Thread):
             f, filename, descr = imp.find_module(name, [modules_path])
             mods[name] = imp.load_module(name, f, filename, descr)
             self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
+            if self.DEBUG:
+              self.debug_print(util.bcolors.OKGREEN + ">>" + util.bcolors.ENDC + " Loaded " + name + " for network " + self.network)
         else: # follow autoload's direction
           if ext == '.py' and not name == '__init__':
             if name == 'module':
               f, filename, descr = imp.find_module(name, [modules_path])
               mods[name] = imp.load_module(name, f, filename, descr)
               self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
+              if self.DEBUG:
+                self.debug_print(util.bcolors.OKGREEN + ">>" + util.bcolors.ENDC + " Loaded " + name + " for network " + self.network)
             elif ('include' in autoloads[self.network] and name in autoloads[self.network]['include']) or ('exclude' in autoloads[self.network] and name not in autoloads[self.network]['exclude']):
               f, filename, descr = imp.find_module(name, [modules_path])
               mods[name] = imp.load_module(name, f, filename, descr)
               self.logger.write(Logger.INFO, " loaded " + name + " for network " + self.network, self.NICK)
+              if self.DEBUG:
+                self.debug_print(util.bcolors.OKGREEN + ">>" + util.bcolors.ENDC + " Loaded " + name + " for network " + self.network)
       else:
         if name == specific: # we're reloading only one module
           if ext != '.pyc': # ignore compiled
@@ -393,11 +405,8 @@ class Bot(threading.Thread):
         # patch contributed by github.com/thekanbo
         if self.JOINED is False and (message_number == "376" or message_number == "422"):
           # wait until we receive end of MOTD before joining, or until the server tells us the MOTD doesn't exist
-          if not self.CHANNELINIT:
+          if not self.chan_list:
             self.chan_list = self.conf.getChannels(self.network)
-          else:
-            print(self.CHANNELINIT)
-            self.chan_list = self.CHANNELINIT
           for c in self.chan_list:
             self.send(('JOIN '+c+' \n').encode())
           self.JOINED = True
@@ -438,17 +447,16 @@ class Bot(threading.Thread):
       self.PORT = 6667
     self.IDENT = 'mypy'
     self.REALNAME = 's1ash'
-    try:
+    if not self.OWNER:
       self.OWNER = self.conf.getOwner(self.network)
-    except AttributeError:
-      import getpass
-      self.OWNER = getpass.getuser()
 
     # connect to server
     self.s = socket.socket()
     while not self.CONNECTED:
       try:
-        self.debug_print("attempting to connect to " + self.network + ":" + str(self.PORT))
+        if self.DEBUG:
+          self.debug_print(util.bcolors.YELLOW + ">>" + util.bcolors.ENDC + " attempting to connect to " + self.network + ":" + str(self.PORT))
+          self.debug_print(util.bcolors.GREEN + ">>" + util.bcolors.ENDC + " owner: " + self.OWNER)
 # low level socket TCP/IP connection
         self.s.connect((self.HOST, self.PORT)) # force them into one argument
         self.CONNECTED = True
