@@ -1,13 +1,7 @@
 language: python
-dist: xenial
-sudo: required
-addons:
-  apt:
-    packages:
-      - python3-pip
 
 before_install:
-  sudo python3 -m pip install nose2
+  python -m pip install nose2
 
 python:
   - "2.7"
