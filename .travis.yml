@@ -4,7 +4,6 @@ before_install:
   python -m pip install nose2
 
 python:
-  - "2.7"
   - "3.7"
 script: nose2
 notifications:
