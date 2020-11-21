@@ -7,7 +7,7 @@ class TestModules():
     import bot
     import confman
     from modules.basemodule import BaseModule
-    b = bot.Bot(confman.ConfManager("pybotrc"), TestModules.irc_server, True)
+    b = bot.Bot(confman.ConfManager("pybotrc"), TestModules.irc_server, d=False)
 
     class testExtended(BaseModule):
       def post_init(self):

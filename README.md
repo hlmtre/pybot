@@ -14,6 +14,14 @@ pybot runs on python 2.7 and >3.5, on both windows and linux, though current dev
 
 **master branch should be stable. feature branches can be broken at any time.**
 
+If You've Got Docker
+====================
+
+This is mucho easier-o. Just
+----------------------------
+
+    docker build . -t pybox
+    docker run -it pybox --nick <botnick> --server <yourserver> --port 6667 --channels "#c1, #c2" --owner <yournick>
 
 (Now probably more than) 10-second TL;DR:
 =========================================

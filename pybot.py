@@ -13,12 +13,14 @@ if __name__ == "__main__":
   DEBUG = False
 
   parser = argparse.ArgumentParser(description="a python irc bot that does stuff")
-  group = parser.add_mutually_exclusive_group()
-  group.add_argument('--config', '-c', nargs=1, help='path to config file (/your/path/to/pybotrc)', default=None)
-  group.add_argument('--nick', '-n', nargs=1, help='bot\'s irc nickname', default=None)
+  parser.add_argument('--config', '-c', nargs=1, help='path to config file (/your/path/to/pybotrc)', default=None)
+  parser.add_argument('--nick', '-n', nargs=1, help='bot\'s irc nickname', default=None)
+  parser.add_argument('--owner', '-o', nargs=1, help='who owns the bot (admin commands)', default=None)
   parser.add_argument('--server', '-s', nargs=1, help='server to connect to (irc.yourserver.com)', default=None)
+  parser.add_argument('--port', '-p', nargs=1, help='port at the address to connect to (yourserver.com:<port>)', default=None)
   parser.add_argument('--channels', nargs=1, help='channels to join ("#channel1, #channel2")', default=None)
   parser.add_argument('--debug', '-d', help='debug (foreground) mode', action='store_true')
+
 
   args = parser.parse_args()
   if args.debug:
@@ -28,7 +30,9 @@ if __name__ == "__main__":
   else:
     config = "~/.pybotrc"
 
-  if args.nick or args.server or args.channels:
+  if (args.nick or args.server or args.channels or args.owner or args.port) and not (args.nick and args.server and args.channels and args.owner and args.port):
+    parser.error("specifying any manual setting requires all be present!")
+  if args.nick or args.server or args.channels or args.owner or args.port:
     config = None
 
   botslist = list()
@@ -40,8 +44,8 @@ if __name__ == "__main__":
       else:
         print("starting bot in the background, pid " + str(os.getpid()))
 
-      if not config:
-        b = bot.Bot(network=args.server[0], local_nickname=args.nick[0], local_channels=args.channels[0])
+      if config is None:
+        b = bot.Bot(network=args.server[0], local_nickname=args.nick[0], local_channels=args.channels[0], local_owner=args.owner[0], local_port=args.port[0])
         b.start()
       else:
         cm = confman.ConfManager(config)
@@ -58,7 +62,7 @@ if __name__ == "__main__":
     DEBUG = True
     print("starting bot, pid " + util.bcolors.GREEN + str(os.getpid()) + util.bcolors.ENDC)
     if not config:
-      b = bot.Bot(d=True, network=args.server[0], local_nickname=args.nick[0], local_channels=args.channels[0])
+      b = bot.Bot(d=True, network=args.server[0], local_nickname=args.nick[0], local_channels=args.channels[0], local_owner=args.owner[0], local_port=args.port[0])
       b.daemon = True
       b.start()
       botslist.append(b)
