@@ -109,48 +109,6 @@ class Bot(threading.Thread):
 
     self.events_list = list()
 
-    # define events here and add them to the events_list
-
-    all_lines = Event("1__all_lines__")
-    all_lines.define(".*")
-    self.events_list.append(all_lines)
-
-    implying = Event("__implying__")
-    implying.define(">")
-
-    #command = Event("__command__")
-   # this is an example of passing in a regular expression to the event definition
-    #command.define("fo.bar")
-
-    #unloads = Event("__module__")
-    #unloads.define("^\.module")
-
-    bofh = Event("__.bofh__")
-    bofh.define("\.bofh")
-
-    #youtube = Event("__youtubes__")
-    #youtube.define("youtube.com[\S]+")
-
-    weather = Event("__.weather__")
-    weather.define("\.weather")
-
-    steam = Event("__.steam__")
-    steam.define("\.steam")
-
-  # example
-  #  test = Event("__test__")
-  #  test.define(msg_definition="^\.test")
-
-    # add your defined events here
-    # tell your friends
-    #self.events_list.append(youtube)
-    self.events_list.append(bofh)
-    self.events_list.append(weather)
-    self.events_list.append(steam)
-    #self.events_list.append(unloads)
-  # example
-  #  self.events_list.append(test)
-
     self.load_modules()
     self.logger.write(Logger.INFO, "bot initialized.", self.NICK)
 
