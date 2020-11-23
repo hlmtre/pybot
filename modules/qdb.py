@@ -1,5 +1,6 @@
 import re
 import difflib
+from event import Event
 
 try:
   import imgurpython
@@ -38,9 +39,16 @@ class QDB:
         #define a key for _recent since that will not be a potential channel name
         self.bot.mem_store['qdb']['_recent'] = []
 
-        for event in events:
-          if event._type in self.interests:
-            event.subscribe(self)
+        qdb_event = Event('__.qdb__')
+        qdb_event.define(msg_definition='^\.qdb')
+        qdb_event.subscribe(self)
+
+        all_lines = Event('1__all_lines__')
+        all_lines.define('.*')
+        all_lines.subscribe(self)
+
+        self.bot.register_event(qdb_event, self)
+        self.bot.register_event(all_lines, self)
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
         self.MAX_BUFFER_SIZE = 500
@@ -60,7 +68,7 @@ class QDB:
                 resp = client.upload_from_url(url)
                 replacement_values.append(resp)
             except imgurpython.helpers.error.ImgurClientError as e:
-                self.bot.debug_print("ImgurClientError: ") 
+                self.bot.debug_print("ImgurClientError: ")
                 self.bot.debug_print(str(e))
             except UnboundLocalError as e:
                 self.bot.debug_print("UnboundLocalError: ")
@@ -69,7 +77,7 @@ class QDB:
                 self.bot.debug_print("ConnectionError: ")
                 self.bot.debug_print(str(e))
         return replacement_values
-      
+
     def _detect_url(self, quote):
         """
         for tsd printouts and imgflip (.meme)
@@ -107,15 +115,15 @@ class QDB:
         if if_url:
           new_quote = re.sub(if_regex, repl[0]['link'], quote)
         return new_quote
-    
+
     def strip_formatting(self, msg):
         """Uses regex to replace any special formatting in IRC (bold, colors) with nothing"""
         return re.sub('([\x02\x1D\x1F\x16\x0F]|\x03([0-9]{2})?)', '', msg)
 
-    def add_buffer(self, event=None, debug=False): 
+    def add_buffer(self, event=None, debug=False):
         """Takes a channel name and line passed to it and stores them in the bot's mem_store dict
         for future access. The dict will have channel as key. The value to that key will be a list
-        of formatted lines of activity. 
+        of formatted lines of activity.
         If the buffer size is not yet exceeded, lines are just added. If the buffer
         is maxed out, the oldest line is removed and newest one inserted at the beginning.
         """
@@ -133,7 +141,7 @@ class QDB:
         #correct behavior and could very well lead to quits/nick changes that are not visible
         #showing up in a quote, but it's the best we can do at the moment
         if not event.channel:
-            #discard events with unwanted verbs 
+            #discard events with unwanted verbs
             if event.verb not in ["QUIT", "NICK"]:
                 return
             try:
@@ -157,7 +165,7 @@ class QDB:
                     self.bot.mem_store['qdb'][event.channel].pop()
                 #get a line by passing event to format_line
                 #insert the line into the first position in the list
-                line = self.format_line(event) 
+                line = self.format_line(event)
                 if line:
                     self.bot.mem_store['qdb'][event.channel].insert(0, line)
             except IndexError:
@@ -175,7 +183,7 @@ class QDB:
             return ''
         elif event.verb == "PRIVMSG":
             #special formatting for ACTION strings
-            if event.msg.startswith('\001ACTION'): 
+            if event.msg.startswith('\001ACTION'):
                 #strip out the word ACTION from the msg
                 return ' * %s %s\n' % (event.user, event.msg[7:])
             else:
@@ -195,7 +203,7 @@ class QDB:
             #thing before the event message begins
             target = event.line.split(":", 2)[1].split()[-1]
             return ' <--- %s has kicked %s from %s (%s)\n' % (event.user, target, event.channel, event.msg)
-        elif event.verb == "NOTICE": 
+        elif event.verb == "NOTICE":
             return ' --NOTICE from %s: %s\n' % (event.user, event.msg)
         else:
             #no matching verbs found. just ignore the line
@@ -258,8 +266,8 @@ class QDB:
 
     def submit(self, qdb_submission, debug=False):
         """Given a string, qdb_submission, this function will upload the string to hlmtre's qdb
-        server. Returns a string with status of submission. If it worked, includes a link to new quote. 
-        """ 
+        server. Returns a string with status of submission. If it worked, includes a link to new quote.
+        """
         if debug:
             print("Submission is:")
             print(qdb_submission)
@@ -290,7 +298,7 @@ class QDB:
             self.add_recently_submitted(q_url['id'], qdb_submission)
             return "QDB submission successful! https://qdb.zero9f9.com/quote.php?id=" + str(q_url['id'])
         except (KeyError, UnicodeDecodeError):
-            return "Error getting status of quote submission." 
+            return "Error getting status of quote submission."
         return "That was probably successful since no errors came up, but no status available."
 
     def delete(self, user, post_id='', passcode=''):
@@ -315,7 +323,7 @@ class QDB:
               return "QDB deletion succeeded."
             return "QDB deletion failed."
         except (KeyError, UnicodeDecodeError):
-            return "Error getting status of quote deletion." 
+            return "Error getting status of quote deletion."
 
     def recently_submitted(self, submission):
         """Checks to see if the given submission is string is at least 75% similar to the strings
@@ -337,7 +345,7 @@ class QDB:
             return -1
         except IndexError:
             return -1
-        return -1 
+        return -1
 
     def add_recently_submitted(self, q_id, submission):
         """Takes a string, submission, and adds it to the list of recent submissions.
@@ -367,7 +375,7 @@ class QDB:
 
         if event.msg.startswith(".qdb ") or event.msg.startswith(".qdbs "):
             #split the msg with '.qdb[s] ' stripped off beginning and divide into 1 or 2 search strings
-            #e.g. ".qdb string1|string2" -> [".qdb", "string1|string2"] 
+            #e.g. ".qdb string1|string2" -> [".qdb", "string1|string2"]
             cmd_parts = event.msg.split(None,1)
             if len(cmd_parts) < 2:
                 #do something here to handle '.qdb[s]'
@@ -402,7 +410,7 @@ class QDB:
                 self.printer("PRIVMSG " + event.channel + " :QDB Error: A quote of >75% similarity has already been posted here: " + q_url + "\n")
                 return
             #if there's nothing found for the submission, then we alert the channel and gtfo
-            if not s: 
+            if not s:
                 self.printer("PRIVMSG " + event.channel + ' :QDB Error: Could not find requested quotes or parameters were not specific enough.\n')
                 return
             #print the link to the new submission
