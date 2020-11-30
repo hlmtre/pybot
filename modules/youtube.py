@@ -1,23 +1,25 @@
-import re, sys, json
-if sys.version_info > (3, 0, 0):
-  from urllib.parse import urlparse, parse_qsl
-  import urllib.request, urllib.error, urllib.parse
-  try:
-    from modules.basemodule import BaseModule
-  except (ImportError, SystemError):
-    from .basemodule import BaseModule
-else:
-  from urlparse import urlparse, parse_qsl
-  import urllib2 as urllib
-  try:
-    from basemodule import BaseModule
-  except (ImportError, SystemError):
-    from modules.basemodule import BaseModule
+#Youtube module 2.0 updated to use requests
 
-from collections import OrderedDict
+import sys, re, json
 import time
 import logger
 from event import Event
+from collections import OrderedDict
+from urllib.parse import urlparse, parse_qsl
+
+try:
+  import requests
+except (ImportError, SystemError):
+  print("Warning: youtube module requires requests")
+  requests = object
+
+try:
+  if sys.version_info > (3, 0, 0):
+    from .basemodule import BaseModule
+  else:
+    from basemodule import BaseModule
+except (ImportError, SystemError):
+  from modules.basemodule import BaseModule
 
 try:
   import isodate
@@ -37,49 +39,50 @@ class Youtube(BaseModule):
     self.bot.register_event(youtube2, self)
 
     self.bot.mem_store['youtube'] = OrderedDict()
-
-
+    
     # for the new v3 google api >:(
     try:
-        from youtube_credentials import YoutubeCredentials as yc
+      from youtube_credentials import YoutubeCredentials as yc
     except (ImportError, SystemError):
-        print("Warning: youtube module requires credentials in modules/youtube_credentials.py")
-        class PhonyYc:
-            api_key = "None"
-        yc = PhonyYc()
+      print("Warning: youtube module requires credentials in modules/youtube_credentials.py")
+      class PhonyYc:
+        api_key = "None"
+      yc = PhonyYc()
 
     self.api_key = yc.api_key
-    self.api_url = "https://www.googleapis.com/youtube/v3/videos?id="
-    #self.api_url = "https://www.googleapis.com/youtube/v3/videos?id=2k_9mXpNdgU&key=&part=snippet"
-
+    self.url = "https://www.googleapis.com/youtube/v3/videos?id="
+  
   def print_video_title(self, event, url, video_tag):
+    headers = {
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+            }
     if event.user == self.bot.conf.getNick(self.bot.network): #ignore himself
       return
     if event.msg.startswith("YouTube:"):
       return
     try:
-      response = urllib.request.urlopen(self.api_url+video_tag+"&key="+self.api_key+"&part=contentDetails,snippet").read()
-    except urllib.error.HTTPError:
+      response = requests.get(url + video_tag + "&key=" + self.api_key + "&part=contentDetails,snippet", headers=headers)
+    except requests.exceptions.HTTPError:
       return
-
     try:
-      jsonified = json.loads(response.decode())["items"][0]
+      jsonified = json.loads(response.text) #Converts our JSON to Python object
+      duration_string = jsonified["items"][0]["contentDetails"]["duration"]
+      vid_title = jsonified["items"][0]["snippet"]["title"]
     except IndexError as e:
       self.bot.logger.write(logger.Logger.WARNING, "IndexError pulling youtube videos. Zero results for: ")
       self.bot.logger.write(logger.Logger.WARNING, url)
       return
-
-    duration_string = jsonified['contentDetails']['duration']
-    title = jsonified['snippet']['title']
+    
 
     if isodate:
       duration = isodate.parse_duration(duration_string)
     else:
       duration = dict()
       duration['seconds'] = 00
+    
+    self.say(event.channel, "YouTube: \"" + vid_title + "\" (" + time.strftime("%H:%M:%S", time.gmtime(duration.seconds)) + ")")
+    return
 
-    self.say(event.channel, "YouTube: \"" + title + "\" (" + time.strftime("%H:%M:%S", time.gmtime(duration.seconds)) + ")")
-    return 
 
   def handle(self, event):
 #   prevent bot from printing youtube information if a youtube link is in the channel topic (or elsewhere that isn't a message to a channel)
@@ -101,4 +104,4 @@ class Youtube(BaseModule):
       else:
         return
     if url and video_tag.__len__() > 1:
-      self.print_video_title(event, url, video_tag)
+      self.print_video_title(event, self.url, video_tag)
