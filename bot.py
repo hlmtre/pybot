@@ -16,6 +16,7 @@ import time
 import traceback
 from collections import deque
 
+import scheduler
 import botbrain
 import util
 from event import Event
@@ -51,6 +52,10 @@ class Bot(threading.Thread):
     self.command_function_map = dict()
     self.snippets_list = set()
     self.recent_lines = deque(maxlen=15)
+
+    self.scheduler = scheduler.Scheduler(self)
+    self.scheduler.daemon = True
+    self.scheduler.start()
 
     if conf is None:
       class Mockuconf:
@@ -526,6 +531,7 @@ class Bot(threading.Thread):
       except KeyboardInterrupt:
         print("keyboard interrupt caught; exiting ...")
         raise
+
   # end worker
 
   def debug_print(self, line, error=False):
