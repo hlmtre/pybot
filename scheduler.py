@@ -30,8 +30,6 @@ class Scheduler (threading.Thread):
         self.parent_bot.debug_print("polling " + str(len(self.task_list)) + " tasks...")
       now = datetime.now(timezone.utc)
       for t in self.task_list:
-        print(t.trigger_delay)
-        print(t.trigger_time)
         if t.trigger_delay is not None and now > t.trigger_delay:
           self.trigger(t)
           self.task_list.remove(t)

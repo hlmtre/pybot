@@ -32,7 +32,7 @@ class Sched(BaseModule):
     if event.msg.startswith(".schedule"):
       try:
         split = event.msg.split()
-        if len(split) <= 6:
+        if len(split) < 6:
           self.error(event.channel)
           return
         chan = split[4]
