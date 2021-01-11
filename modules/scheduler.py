@@ -23,6 +23,7 @@ class Sched(BaseModule):
     sched.define(msg_definition="^\.schedule")
     sched.subscribe(self)
     self.help = ".schedule in <1m|5h|32s|etc> say <#channel> <phrase>"
+    self.cmd = ".schedule"
 
     # register ourself to our new sched event
     self.bot.register_event(sched, self)

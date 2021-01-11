@@ -21,21 +21,14 @@ class Help(BaseModule):
     self.bot.register_event(help, self)
 
   def handle(self, event):
+    l = event.msg.split()
+    if l[0] == ".help" and len(l) > 1:
+      self.individual_help(l[1], event)
+      return
     try:
-      my_modules = list()
-      for m in self.bot.events_list:
-        for s in m.subscribers:
-          my_modules.append(s)
-
-      modules_set = set(my_modules)
-      line_list = list()
-
-      for sm in modules_set:
-        if hasattr(sm, "help") and sm.help is not None:
-          line_list.append(sm.help)
-
+      line_list = self.get_help_lines()
       """
-      This jenky block controls how many modules to print per line
+      This janky block controls how many modules to print per line
       To change the amount of modules print per line change the first 'q' to whatever number and match the incremented 'q and f' to the same number
       """
       #TODO make it better, probably pull out into a function
@@ -51,3 +44,29 @@ class Help(BaseModule):
     except:
       pass
 
+  def get_help_lines(self):
+    modules_set = set()
+    for m in self.bot.events_list:
+      for s in m.subscribers:
+        modules_set.add(s)
+
+    line_list = list()
+
+    for sm in modules_set:
+      if hasattr(sm, "help") and sm.help is not None:
+        line_list.append(sm.help)
+    return line_list
+
+  def individual_help(self, cmd, event):
+    line_list = self.get_help_lines()
+    matching_lines = list()
+    for line in line_list:
+      if line.startswith(cmd):
+        matching_lines.append(line)
+    if len(matching_lines) > 0:
+      self.bot.say(event.user, "Help for matching commands: \n")
+      for line in matching_lines:
+        self.bot.say(event.user, line + "\n")
+    else:
+      self.bot.say(event.user, "No matching commands :(")
+    return
