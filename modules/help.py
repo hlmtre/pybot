@@ -61,7 +61,7 @@ class Help(BaseModule):
     line_list = self.get_help_lines()
     matching_lines = list()
     for line in line_list:
-      if line.startswith(cmd):
+      if cmd in line:
         matching_lines.append(line)
     if len(matching_lines) > 0:
       self.bot.say(event.user, "Help for matching commands: \n")
