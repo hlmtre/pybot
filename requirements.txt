@@ -7,5 +7,6 @@ python-twitter
 imgurpython
 isodate
 requests
+pytimeparse
 # called range_key_dict in pip
 range-key-dict

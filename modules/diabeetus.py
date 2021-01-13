@@ -56,13 +56,12 @@ class Diabeetus(BaseModule):
             else:
                 color = '\x0303'
             arrow = self.trend[entry[0]['direction']]
-            
         except KeyError:
             self.say(channel, "Unable to get glucose data from results. Sorry.")
             return
         #return the formatted string
-        return "Bonk's blood sugar is " + color + str(glucose) + "\x0F mg/dL, trending " + arrow 
+        return "Bonk's blood sugar is " + color + str(glucose) + "\x0F mg/dL, trending " + arrow
 
-  
+
     def handle(self, event):
         self.say(event.channel, self.get_glucose(event.channel))
