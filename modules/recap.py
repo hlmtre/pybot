@@ -5,6 +5,8 @@ import time
 import re
 import sys
 
+from event import Event
+
 if sys.version_info > (3,0,0):
   try:
     from .basemodule import BaseModule
@@ -29,9 +31,12 @@ class recap(BaseModule):
         self.RECAP_LENGTH = 4 #number of lines to include in recap
         self.bot.mem_store['recap'] = {}
 
-        for event in self.events:
-          if event._type in self.interests:
-            event.subscribe(self)
+        recap_event = Event("__.recap__")
+        recap_event.define(msg_definition=".*")
+        recap_event.subscribe(self)
+
+        self.bot.register_event(recap_event, self)
+
 
     def create_ignore_nicks_tuple(self):
         """creates a tuple with all nicks from self.ignore_list in <>"""
@@ -68,11 +73,11 @@ class recap(BaseModule):
            Not an action line, longer than minimum length, not spoken by ignored nicks, no URLs"""
         #easy check to see if it's a line of someone speaking
         if line.startswith("<"):
-            if not (line.startswith(self.ignore_nicks) or 
+            if not (line.startswith(self.ignore_nicks) or
                     "TSDBot" in line or #rejects all printout requests, because that's a lotta noise
-                    self.contains_url(line) or 
+                    self.contains_url(line) or
                     len(line.split()) < self.MIN_WORDS or
-                    line.split(None,1)[1].startswith((".","#","s/"))): 
+                    line.split(None,1)[1].startswith((".","#","s/"))):
                 return True
         return False
 
@@ -132,7 +137,7 @@ class recap(BaseModule):
             else:
                 nick_letters[sel[0]] = repl
             #take that list of individual characters and slam it all back together into a string surrounded by <>
-            nick = '<' + ''.join(nick_letters) + '>'  
+            nick = '<' + ''.join(nick_letters) + '>'
             #take the old nick out of the submitted line and replace it with the new scramble one
             return nick
         except IndexError: # no vowels, probably
@@ -147,10 +152,10 @@ class recap(BaseModule):
         return False
 
     def check_rate(self, channel):
-        """Check to see if the given channel has allowed enough time to pass before calling recap again. Return True 
+        """Check to see if the given channel has allowed enough time to pass before calling recap again. Return True
            and set the new time limit if true. Return False if not."""
         try:
-            if self.get_timediff(channel) <= 0: 
+            if self.get_timediff(channel) <= 0:
                 self.bot.mem_store['recap'][channel] = int(time.time()) + self.RATE_LIMIT
                 return True
             else:
@@ -158,7 +163,7 @@ class recap(BaseModule):
         except KeyError:
             self.bot.mem_store['recap'][channel] = int(time.time()) + self.RATE_LIMIT
             return True
-    
+
     def reset_timer(self, channel):
         """If there's an error getting a recap, call this to reset lockdown timer"""
         self.bot.mem_store['recap'][channel] = int(time.time())
@@ -166,7 +171,7 @@ class recap(BaseModule):
     def get_timediff(self, channel):
         """Return how much time remains in the function lockdown"""
         return self.bot.mem_store['recap'][channel] - int(time.time())
-      
+
     def get_episode(self):
         """Return a list with two elements: a random show title and episode name"""
         titles = ["Internet Relay Chat",
@@ -244,7 +249,7 @@ class recap(BaseModule):
                     "The PUNisher",
                     "Dr. GV, PhD, although I guess if he was a medical doctor he wouldn't have a PhD? Or maybe they can, I don't know. I know he'd be called 'Dr.' though. I think they should make that clearer, like in the dictionary or wherever they spell things out like that. But I guess it wouldn't be an English thing it'd be a medical licensing and terminology thing? Uuuuuuugggggghhhh it's already so late and I was supposed to go to bed 23 minutes ago but then t"
                     ]
-                    
+
         return [random.choice(titles), random.choice(episodes)]
 
 
