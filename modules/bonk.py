@@ -69,8 +69,9 @@ class Bonk(BaseModule):
 
 
   def handle(self, event):
-    _z = event.msg.split() #Splits out the user to be bonked, if there is one, if not it spits out your mistake in proper channel
+    _z = event.msg.split()
+    bonkee = ' '.join(_z[1:])
     if len(_z) == 1:
       self.say(event.channel, "You must specify who you want me to bonk!")
     else:
-      self.say(event.channel, self.get_bonked(_z[1]))
+      self.say(event.channel, self.get_bonked(bonkee))
