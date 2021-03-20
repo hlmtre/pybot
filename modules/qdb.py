@@ -19,7 +19,6 @@ class QDB:
     def __init__(self, events=None, printer_handle=None, bot=None, say=None):
         self.events = events
         self.printer = printer_handle
-        self.interests = ['__.qdb__', '1__all_lines__']  # should be first event in the listing.. so lines being added is a priority
         self.bot = bot
         self.say = say
         try:
@@ -39,15 +38,12 @@ class QDB:
         #define a key for _recent since that will not be a potential channel name
         self.bot.mem_store['qdb']['_recent'] = []
 
-        qdb_event = Event('__.qdb__')
-        qdb_event.define(msg_definition='^\.qdb')
-        qdb_event.subscribe(self)
-
+        # subscribing to all lines ALSO catches lines matching ".qdb something something"
+        # so we don't need a second ".qdb" event
         all_lines = Event('1__all_lines__')
         all_lines.define('.*')
         all_lines.subscribe(self)
 
-        self.bot.register_event(qdb_event, self)
         self.bot.register_event(all_lines, self)
 
         self.help = ".qdb <search string of first line> | <search string of last line>"
