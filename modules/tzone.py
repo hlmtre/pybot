@@ -1,4 +1,5 @@
-#Simple module to spit out the time in a city specified by user, poorly thrown together by mech
+# Tzone module
+# Created by mech
 import sys
 import json
 from event import Event
@@ -59,10 +60,13 @@ class Tzone(BaseModule):
     try:
       if event.msg.startswith(".tzone"):
         split_tz = event.msg.split()
-        if len(split_tz) > 2:
-          tz = "+".join(split_tz[1:])
+        if split_tz[1].lower() == "i7":
+          self.say(event.channel, "We are playing at the same time we do every Saturday. 6am your time, 8pm ours.")
         else:
-          tz = split_tz[1].lower()
-      self.say(event.channel, self.request_api(tz))
+          if len(split_tz) > 2:
+            tz = "+".join(split_tz[1:])
+          else:
+            tz = split_tz[1].lower()
+          self.say(event.channel, self.request_api(tz))
     except TypeError:
       pass # Error gets caught here and in ValueError in request_api function
