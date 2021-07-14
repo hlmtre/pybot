@@ -292,7 +292,12 @@ class QDB:
         try:
             q_url = qdb.json()
             self.add_recently_submitted(q_url['id'], qdb_submission)
-            return "QDB submission successful! https://qdb.zero9f9.com/quote.php?id=" + str(q_url['id'])
+            if q_url['status'] == "success":
+              return "QDB submission successful! https://qdb.zero9f9.com/quote.php?id=" + str(q_url['id'])
+            else:
+              self.bot.debug_print("QDB error:")
+              print(q_url)
+              return "QDB submission unsuccessful :(. Check console output."
         except (KeyError, UnicodeDecodeError):
             return "Error getting status of quote submission."
         return "That was probably successful since no errors came up, but no status available."
