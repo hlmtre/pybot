@@ -51,9 +51,9 @@ class Debugger(BaseModule):
       else:
         try:
           self.say(event.user, '\t' * (indent+1) + str(value))
-        except: 
+        except:
           self.say(event.user,'\t' * (indent+1) + value.encode('utf-8','ignore'))
-    
+
   def handle(self, event):
     if not self.bot.brain._isAdmin(event.user):
       return
@@ -81,7 +81,7 @@ class Debugger(BaseModule):
         self.say(event.user, "no key by name " + key)
         # HIGHLY insecure; TODO
         #self.pretty(self.bot.mem_store[eval(neststring)])
-        
+
       #print self.bot.mem_store['qdb']['#fg']
 #      outstr = ", ".join(self.bot.mem_store[key])
 #      self.say(event.user, outstr)
