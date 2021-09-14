@@ -30,9 +30,10 @@ class BaseModule(object):
 
     # IMPORTANT: you must subscribe to events before you add your own below, or you'll subscribe twice.
     # register ourself for any events that we're interested in that exist already
-    for e in events:
-      if e._type in self.interests:
-        e.subscribe(self)
+    if events is not None:
+      for e in events:
+        if e._type in self.interests:
+          e.subscribe(self)
 
     self.help = None
 

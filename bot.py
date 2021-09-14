@@ -130,11 +130,12 @@ class Bot(threading.Thread):
       Returns:
       nothing.
     """
-    for e in self.events_list:
-      if e.definition == event.definition and e._type == event._type:
-        # if our event is already in the listing, don't add it again, just have our module subscribe
-        e.subscribe(module)
-        return
+    if self.events_list is not None:
+      for e in self.events_list:
+        if e.definition == event.definition and e._type == event._type:
+          # if our event is already in the listing, don't add it again, just have our module subscribe
+          e.subscribe(module)
+          return
 
     self.events_list.append(event)
     return

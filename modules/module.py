@@ -22,8 +22,7 @@ class Module:
     #    event.subscribe(self)
 
   def handle(self, event):
-    #if not self.bot.conf.getOwner(self.bot.network) == event.user:
-    if not self.bot.brain._isAdmin(event.user):
+    if not self.bot.brain._isAdmin(event.user): # guard the entire function under this
       return
 
     if event.msg.startswith(".module load"):
@@ -91,6 +90,20 @@ class Module:
       else:
         self.bot.logger.write(Logger.WARNING, " failed to reload " + event.msg.split()[2], self.bot.NICK)
         self.bot.brain.notice(event.channel, "failed to reload " + event.msg.split()[2])
+
+    if event.msg.startswith(".module eventdelete"):
+      if self.unload_event(event.msg.split()[2]):
+        self.bot.brain.notice(event.channel, " removed event " + event.msg.split()[2])
+
+  def unload_event(self, eventname):
+    try:
+      for e in self.bot.events_list:
+        if eventname == e._type:
+          self.bot.events_list.remove(e)
+          return True
+    except:
+      return False
+    return False
 
   def unload(self, modulename):
     unloaded_successfully = False
