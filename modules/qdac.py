@@ -20,28 +20,29 @@ class Qdac(BaseModule):
     qdac.subscribe(self)
     self.help = ".qdac <trigger> <action to take: [say]> <thing to say>"
 
-    # register ourself to our new qdac event
     self.bot.register_event(qdac, self)
 
   def handle(self, event):
+    def qdac_handle(event):
+      action = event.subscribers[0].action
+      trigger = event.subscribers[0].trigger
+      output = event.subscribers[0].output
+      action(event.channel, output)
+
     words = event.msg.split(" ", maxsplit=3)
     if not len(words) == 4:
       self.say(event.channel, "qdac: invalid command format")
       return
 
-    def qdac_handle(event):
-      print("QDAC_HANDLE CALLED")
-      print(event.msg)
-      print("ASLDKAJSLDK")
-      if event.msg.startswith(self.trigger):
-        self.action(event.channel, 'SOMETHING')
-
     trigger, action, output = words[1], words[2], words[3]
+    # TODO ADD MORE ABILITIES HERE
+    # we have to check it here to verify our actions are safe
+    if action == "say":
+      fn = self.say
     new_event = Event("__" + trigger + "__")
     new_event.define(msg_definition="^\\" + trigger)
-    action = self.say
-    new_module = type(trigger.strip(".").upper(), (BaseModule,),  {"handle": qdac_handle, "trigger": trigger, "action": action})
+    name = trigger.strip(".").upper()
+    new_module = type(name, (BaseModule,),  {"handle": qdac_handle, "trigger": trigger, "action": fn, "output": output})
     new_event.subscribe(new_module)
-    print(new_event.subscribers[0].trigger)
     self.bot.register_event(new_event, new_module)
-    self.say(event.channel, "command added")
+    self.say(event.channel, "Command '" + name + "' added with trigger " + trigger +".")
