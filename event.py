@@ -1,3 +1,4 @@
+# vim: tabstop=2 shiftwidth=2
 import re
 class Event:
   """
@@ -21,7 +22,7 @@ class Event:
     _type: string. like "__youtube__" or "__weather__". Underscores are a convention.
     """
     self._type = _type
-    self.subscribers = [] # this is a list of subscribers to notify
+    self.subscribers = []  # this is a list of subscribers to notify
     self.user = ""
     self.definition = ""
     self.msg_definition = ""
@@ -33,6 +34,7 @@ class Event:
     self.mode = ""
     self.is_pm = False
     self.message_id = -1
+    self.case_insensitive = False
 
   def subscribe(self, e):
     """
@@ -43,7 +45,7 @@ class Event:
     """
     self.subscribers.append(e)
 
-  def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None, mode=None):
+  def define(self, definition=None, msg_definition=None, user_definition=None, message_id=None, mode=None, case_insensitive=False):
     """
     Define ourself by general line (definition), msg_definition (what someone says in a channel or PM), user_definition (the user who said the thing), or message_id (like 376 for MOTD or 422 for no MOTD)
     Currently, an event is defined by only one type of definition. If one were to remove the returns after each self. set, an event could be defined and triggered by any of several definitions.
@@ -64,6 +66,7 @@ class Event:
       self.message_id = message_id
     if mode is not None:
       self.mode = mode
+    self.case_insensitive = case_insensitive
 
     return
 
@@ -107,8 +110,10 @@ class Event:
       return
 
     if len(self.msg_definition):
-      if re.search(self.msg_definition, msg):
-        return True
+      if self.case_insensitive:
+        return re.search(self.msg_definition, msg, re.IGNORECASE)
+      else:
+        return re.search(self.msg_definition, msg)
 
     if len(self.definition):
       if re.search(self.definition, line):
