@@ -31,7 +31,7 @@ class TestBase():
     assert e._type is not None and e._type == "__.test__"
     e.define(msg_definition="^test")
     assert e.msg_definition == "^test"
-    assert e.matches(":hlmtre!~hlmtre@bxr.bxr.bxr PRIVMSG #bots :test") == True
+    assert e.matches(":hlmtre!~hlmtre@bxr.bxr.bxr PRIVMSG #bots :test")
 
   def testLoad(self):
     import bot
