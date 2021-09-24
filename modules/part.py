@@ -3,31 +3,33 @@
 import sys
 from event import Event
 if sys.version_info > (3, 0, 0):
-  try:
-    from .basemodule import BaseModule
-  except (ImportError, SystemError):
-    from modules.basemodule import BaseModule
+    try:
+        from .basemodule import BaseModule
+    except (ImportError, SystemError):
+        from modules.basemodule import BaseModule
 else:
-  try:
-    from basemodule import BaseModule
-  except (ImportError, SystemError):
-    from modules.basemodule import BaseModule
+    try:
+        from basemodule import BaseModule
+    except (ImportError, SystemError):
+        from modules.basemodule import BaseModule
+
 
 class Part(BaseModule):
-  """This command should be used as a private message to the bot or else it will not work"""
-  def post_init(self):
-    part = Event("__.part__")
-    part.define(msg_definition="^\.part")
-    part.subscribe(self)
-    self.help = ".part <channel> 'use as pm to the bot'"
+    """This command should be used as a private message to the bot or else it will not work"""
 
-    # register ourself to our new custom event
-    self.bot.register_event(part, self)
+    def post_init(self):
+        part = Event("__.part__")
+        part.define(msg_definition="^\\.part")
+        part.subscribe(self)
+        self.help = ".part <channel> 'use as pm to the bot'"
 
-  def handle(self, event):
-    try:
-      if self.bot.conf.getOwner(self.bot.network) == event.line.split()[0].split("!",1)[0].replace(":","") and event.line.split()[2] == self.bot.conf.getNick(self.bot.network):
-        self.bot.send("PART " + event.line.split()[4] + '\n')
-    except:
-      pass
+        # register ourself to our new custom event
+        self.bot.register_event(part, self)
 
+    def handle(self, event):
+        try:
+            if self.bot.conf.getOwner(self.bot.network) == event.line.split()[0].split("!", 1)[
+                    0].replace(":", "") and event.line.split()[2] == self.bot.conf.getNick(self.bot.network):
+                self.bot.send("PART " + event.line.split()[4] + '\n')
+        except BaseException:
+            pass

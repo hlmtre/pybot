@@ -1,5 +1,6 @@
 from util import commands
 
-@commands(".test",".lel")
+
+@commands(".test", ".lel")
 def test_function(bot, message, channel):
-  bot.say(channel, "DUUDE I WORK")
+    bot.say(channel, "DUUDE I WORK")

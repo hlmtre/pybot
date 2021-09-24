@@ -19,7 +19,7 @@ else:
 class Schedule(BaseModule):
     def post_init(self):
         sched = Event("__.schedule__")
-        sched.define(msg_definition="^\.schedule")
+        sched.define(msg_definition="^\\.schedule")
         sched.subscribe(self)
         self.help = ".schedule in <1m|5h|32s|etc> say <#channel> <phrase>"
         self.cmd = ".schedule"

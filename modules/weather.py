@@ -16,11 +16,14 @@ else:
     except (ImportError, SystemError):
         from modules.basemodule import BaseModule
 
+
 class Weather(BaseModule):
 
     def post_init(self):
         weather2 = Event('__.weather2__')
-        weather2.define(msg_definition=r'^\.weather|^\.w', case_insensitive=True)
+        weather2.define(
+            msg_definition=r'^\.weather|^\.w',
+            case_insensitive=True)
         weather2.subscribe(self)
 
         self.bot.register_event(weather2, self)
@@ -29,7 +32,7 @@ class Weather(BaseModule):
         self.api_key = "6dc001f4e77cc0985c5013283368be51"
         self.api_url = "https://api.openweathermap.org/data/2.5/weather"
         self.headers = {
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
         }
 
     def get_lat_long_from_bing(self, location):
@@ -51,7 +54,9 @@ class Weather(BaseModule):
         """
         Simple form the query string and return it.
         """
-        return self.api_url + "?lat=" + str(x) + "&lon=" + str(y) + "&units=imperial" + "&appid=" + self.api_key
+        return self.api_url + "?lat=" + \
+            str(x) + "&lon=" + str(y) + \
+            "&units=imperial" + "&appid=" + self.api_key
 
     def get_conditions(self, query, channel):
         """given a fully formed query to the OpenWeatherMap API, format an output string"""
@@ -59,32 +64,42 @@ class Weather(BaseModule):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            self.say(channel, "Encountered an error contacting the OpenWeatherMap API")
+            self.say(
+                channel,
+                "Encountered an error contacting the OpenWeatherMap API")
             return
         weather = r.json()
         try:
-            #grab the relevant data we want for formatting
+            # grab the relevant data we want for formatting
             location = weather['name']
             conditions = weather['weather'][0]['main']
             temp_f = round(weather['main']['temp'], 1)
-            temp_c = round((temp_f - 32) * (5.0/9.0), 1)
+            temp_c = round((temp_f - 32) * (5.0 / 9.0), 1)
         except KeyError:
-            self.say(channel, "Unable to get weather data from results. Sorry.")
+            self.say(
+                channel,
+                "Unable to get weather data from results. Sorry.")
             return
-        #return the formatted string of weather data
-        return location + ': ' + conditions + ', ' + str(temp_f) + '°F (' + str(temp_c)  + '°C)'
-
+        # return the formatted string of weather data
+        return location + ': ' + conditions + ', ' + \
+            str(temp_f) + '°F (' + str(temp_c) + '°C)'
 
     def handle(self, event):
-        #split the line beginning with .weather into 2 parts, the command and the search string
+        # split the line beginning with .weather into 2 parts, the command and
+        # the search string
         weather_line = event.msg.split(None, 1)
         if len(weather_line) > 1:
-            ##if we're sure there's actually a search string, then continue
+            # if we're sure there's actually a search string, then continue
             x, y = self.get_lat_long_from_bing(weather_line[1])
-            weather = self.get_conditions(self.get_api_request(x, y), event.channel)
+            weather = self.get_conditions(
+                self.get_api_request(
+                    x, y), event.channel)
             if not weather:
                 return
             self.say(event.channel, weather)
         else:
-            #chastise the user for being silly and not actually searching for a location
-            self.say(event.channel, "It would help if you supplied an actual location to search for.")
+            # chastise the user for being silly and not actually searching for
+            # a location
+            self.say(
+                event.channel,
+                "It would help if you supplied an actual location to search for.")

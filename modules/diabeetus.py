@@ -15,11 +15,12 @@ else:
     except (ImportError, SystemError):
         from modules.basemodule import BaseModule
 
+
 class Diabeetus(BaseModule):
 
     def post_init(self):
         diabeetus = Event('__.diabeetus__')
-        diabeetus.define(msg_definition='^\.[Dd]iabeetus')
+        diabeetus.define(msg_definition='^\\.[Dd]iabeetus')
         diabeetus.subscribe(self)
         self.bot.register_event(diabeetus, self)
         self.api_url = "https://bonkscout.herokuapp.com/api/v1/entries/current.json"
@@ -27,14 +28,14 @@ class Diabeetus(BaseModule):
         self.HIGH = 200
         self.trend = {
             "Flat": "→",
-            "FortyFiveDown":"↘",
-            "FortyFiveUp":"↗",
-            "SingleDown":"↓",
-            "SingleUp":"↑",
-            "DoubleDown":"⇊",
-            "DoubleUp":"⇈",
-            "TripleDown":"⇓",
-            "TripleUp":"⇑"
+            "FortyFiveDown": "↘",
+            "FortyFiveUp": "↗",
+            "SingleDown": "↓",
+            "SingleUp": "↑",
+            "DoubleDown": "⇊",
+            "DoubleUp": "⇈",
+            "TripleDown": "⇓",
+            "TripleUp": "⇑"
         }
 
     def get_glucose(self, channel):
@@ -43,11 +44,13 @@ class Diabeetus(BaseModule):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            self.say(channel, "Encountered an error contacting the NightScout API")
+            self.say(
+                channel,
+                "Encountered an error contacting the NightScout API")
             return
         entry = r.json()
         try:
-            #grab the relevant data we want for formatting
+            # grab the relevant data we want for formatting
             glucose = entry[0]['sgv']
             if (glucose <= self.LOW):
                 color = '\x0304'
@@ -57,11 +60,13 @@ class Diabeetus(BaseModule):
                 color = '\x0303'
             arrow = self.trend[entry[0]['direction']]
         except KeyError:
-            self.say(channel, "Unable to get glucose data from results. Sorry.")
+            self.say(
+                channel,
+                "Unable to get glucose data from results. Sorry.")
             return
-        #return the formatted string
-        return "Bonk's blood sugar is " + color + str(glucose) + "\x0F mg/dL, trending " + arrow
-
+        # return the formatted string
+        return "Bonk's blood sugar is " + color + \
+            str(glucose) + "\x0F mg/dL, trending " + arrow
 
     def handle(self, event):
         self.say(event.channel, self.get_glucose(event.channel))
