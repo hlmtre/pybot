@@ -34,6 +34,7 @@ class Qdac(BaseModule):
         words = event.msg.split(" ", maxsplit=3)
         if not len(words) == 4:
             self.say(event.channel, "qdac: invalid command format")
+            self.say(event.channel, self.help)
             return
 
         trigger, action, output = words[1], words[2], words[3]

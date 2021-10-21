@@ -16,6 +16,7 @@ import time
 import traceback
 from collections import deque
 
+from util import parse_line
 import scheduler
 import botbrain
 import util
@@ -484,7 +485,7 @@ class Bot(threading.Thread):
             pass
         else:
             if first_word in self.command_function_map:
-                self.command_function_map[first_word](self, line, channel)
+                self.command_function_map[first_word](self, parse_line(line).message, channel)
 
         try:
             for e in self.events_list:

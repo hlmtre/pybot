@@ -22,7 +22,7 @@ class Weather(BaseModule):
     def post_init(self):
         weather2 = Event('__.weather2__')
         weather2.define(
-            msg_definition=r'^\.weather|^\.w',
+            msg_definition=r'^\.weather |^\.w ',
             case_insensitive=True)
         weather2.subscribe(self)
 
