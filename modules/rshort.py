@@ -1,5 +1,15 @@
 ## Reddit link information ##
 
+#
+# from https://old.reddit.com/prefs/apps/
+#
+# your praw.ini should look like this
+# [pybot]
+# client_id=ID_HERE
+# client_secret=SECRET_HERE
+#
+#
+
 import version
 successful_import = False
 try:  # Checks to make sure praw has everything it needs before importing the rest of the module
@@ -11,18 +21,17 @@ try:  # Checks to make sure praw has everything it needs before importing the re
             version.__version__ +
             ' by /u/hlmtre; https://github.com/hlmtre/pybot')
         successful_import = True
-    except BaseException:
+    except BaseException as e:
+        print(e.message)
         pass
 except (ImportError, SystemError):
     print("Warning: rshort module requires praw https://github.com/praw-dev/praw/")
 except praw.exceptions.ClientException:
     print('Warning: rshort requires the "praw.ini" file in the top pybot directory\
   to be filled in with the client_id and client_secret.')
-    successful_import = False
 
 if successful_import:
     import sys
-    import requests
     import re
     from shortener import Shortener
     from datetime import datetime
