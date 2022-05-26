@@ -26,7 +26,7 @@ class LastFM(BaseModule):
         lastfm = Event("__.lastfm__")
         lastfm.define(msg_definition=r"^\.lastfm")
         lastfm.subscribe(self)
-        self.help = ".lastfm add <lastfm username> then .last"
+        self.help = ".lastfm add <lastfm username> then .lastfm"
 
         # register ourself to our new custom event
         self.bot.register_event(lastfm, self)
