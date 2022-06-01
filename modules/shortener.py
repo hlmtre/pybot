@@ -33,10 +33,10 @@ class Shortener(BaseModule):
             if len(target) > 60 and re.match(
                     self.r_pattern, target) is None:  # Post only shortened link if NOT reddit link
                 r = requests.get(url, params=payload)
-                if len(r.text) < 18:
+                if re.search("https://is.gd*", r.text):
                     self.say(event.channel, r.text)
                 else:
-                    self.say(event.channel, "bad response from is.gd :(")
+                    self.say("Something went wrong :(")
             else:
                 return
         except requests.exceptions.HTTPError as e:
@@ -50,12 +50,11 @@ class Shortener(BaseModule):
         payload = {'format': 'simple', 'url': link}
         try:
             r = requests.get(url, params=payload)
-            if len(r.text) < 18:
+            if re.search("https://is.gd*", r.text):
                 return r.text
             else:
-                return "bad response from is.gd :("
+                return "Something went wrong :("
         except requests.exceptions.HTTPError as e:
             self.bot.debug_print("HTTPError")
             self.bot.debug_print(str(e))
 # TODO Try to use code already available instead of using the same code
-# again, aka d.r.y.
