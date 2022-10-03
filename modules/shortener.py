@@ -1,4 +1,4 @@
-#Shortener module created by hlmtre#
+# Shortener module created by hlmtre#
 
 import sys
 import requests
