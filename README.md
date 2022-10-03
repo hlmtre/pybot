@@ -87,3 +87,8 @@ If one server goes down, the other connections to other networks are unaffected.
 ![youtube module](http://i.imgur.com/kUYW3e5.png "youtube module")
 
 ![a totally not contrived example](http://i.imgur.com/jMpkjRf.png "a totally not contrived example")
+
+TODO
+----
+* add birthday module (save birthdays for your channel regulars!)
+* update scheduler to accept *at* commands - .schedule at 5pm say #development pick your child from daycare

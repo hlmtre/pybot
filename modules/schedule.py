@@ -21,7 +21,7 @@ class Schedule(BaseModule):
         sched = Event("__.schedule__")
         sched.define(msg_definition="^\\.schedule")
         sched.subscribe(self)
-        self.help = ".schedule in <1m|5h|32s|etc> say <#channel> <phrase>"
+        self.help = ".schedule in <1m|5h|32s|1w3d2h32m|etc> say <#channel> <phrase>. accepted units are s, m, h, and w (seconds, minutes, hours, and weeks)."
         self.cmd = ".schedule"
 
         # register ourself to our new sched event
@@ -38,7 +38,11 @@ class Schedule(BaseModule):
                 message = ' '.join(split[5:])
                 delay = split[2]
                 send_time = datetime.now(timezone.utc)
-                td = timedelta(seconds=parse(delay))
+                try:
+                    td = timedelta(seconds=parse(delay))
+                except:
+                    self.say(event.channel, "time parsing error. accepted units: seconds (s), minutes (m), hours (h), and weeks (w).")
+                    print(delay)
                 target = send_time + td
                 if not chan.startswith("#"):
                     self.say(event.channel, "invalid channel.")
