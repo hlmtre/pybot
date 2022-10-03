@@ -150,6 +150,15 @@ class Bot(threading.Thread):
         self.events_list.append(event)
         return
 
+    def has_event(self, event):
+        if self.events_list is not None:
+            for e in self.events_list:
+                if e.definition == event.definition and e._type == event._type:
+                    # if our event is already in the listing, don't add it
+                    # again, just have our module subscribe
+                    return True
+        return False
+
     def load_snippets(self):
         import imp
         snippets_path = self.modules_path + '/snippets'
@@ -170,6 +179,7 @@ class Bot(threading.Thread):
         self.persistence.append(namespace)
 
     def save_persistence(self):
+        print(self.persistence)
         if not os.path.exists('pickle/'):
             os.makedirs('pickle')
         for n in self.persistence:
@@ -184,6 +194,7 @@ class Bot(threading.Thread):
             if f == "." or f == "..":
                 continue
             self.mem_store[f] = pickle.load(open('pickle/' + f, 'rb'))
+            # XXX YOU'RE GOING TO SAVE QDACS WITH PERSIST
 
     def set_snippets(self):
         """

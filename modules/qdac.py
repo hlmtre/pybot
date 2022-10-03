@@ -1,6 +1,4 @@
-import random
 import sys
-from pprint import pprint
 from event import Event
 
 if sys.version_info > (3, 0, 0):
@@ -16,6 +14,22 @@ else:
 
 
 class Qdac(BaseModule):
+    class Qdaction():
+        def __init__(self, handle, trigger, action, output):
+            self.trigger = trigger
+            self.action = action
+            self.output = output
+
+    def generate_module(self, qd, event):
+        if qd.action == "say":
+            self.action = self.say
+        self.trigger = qd.trigger
+        self.output = qd.output
+        new_module = type(
+            qd.trigger, (BaseModule,), {
+                "handle": self.action, "trigger": self.trigger, "action": self.say, "output": self.output})
+        return new_module
+
     def post_init(self):
         qdac = Event("__.qdac__")
         qdac.define(msg_definition="^\\.qdac")
@@ -48,6 +62,22 @@ class Qdac(BaseModule):
         new_module = type(
             name, (BaseModule,), {
                 "handle": qdac_handle, "trigger": trigger, "action": fn, "output": output})
+
+        if self.bot.has_event(new_event):
+            self.say(event.channel, "command " + trigger + " already defined.")
+            return
+
+        simple_rep = self.Qdaction(qdac_handle, trigger, action, output)
+        if "qdac" not in self.bot.persistence:
+            qdac_namespace = set()
+        else:
+            qdac_namespace = self.bot.persistence["qdac"]
+
+        qdac_namespace.add(simple_rep)
+        # frozenset or kerblooie
+        # https://stackoverflow.com/a/13264725
+        self.bot.persist(qdac_namespace)
+
         new_event.subscribe(new_module)
         self.bot.register_event(new_event, new_module)
         self.say(
