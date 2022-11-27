@@ -22,6 +22,11 @@ class Module:
         # for event in events:
         #  if event._type in self.interests:
         #    event.subscribe(self)
+    """
+    def __eq__(self, other):
+        return (self.events == other.events) and (self.cmd == other.cmd)
+
+    """
 
     def handle(self, event):
         if not self.bot.brain._isAdmin(
@@ -115,7 +120,7 @@ class Module:
                     try:
                         if event.msg.split()[2].lower(
                         ) == s.__class__.__name__.lower():
-                            #self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
+                            # self.printer("NOTICE " + event.channel + " :unloaded " + event.msg.split()[2] + '\n')
                             # the events themselves hold onto the subscribing
                             # modules, so just remove that one.
                             m.subscribers.remove(s)

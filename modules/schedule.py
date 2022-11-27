@@ -22,12 +22,18 @@ class Schedule(BaseModule):
         sched.define(msg_definition="^\\.schedule")
         sched.subscribe(self)
         self.help = ".schedule in <1m|5h|32s|1w3d2h32m|etc> say <#channel> <phrase>. accepted units are s, m, h, and w (seconds, minutes, hours, and weeks)."
+        self.help += "\n .schedulelist <channelname>"
+        self.help += "\n example: .schedule in 30m say #fg remember to turn off the oven"
+        self.help += "\n example: .schedulelist #fg"
         self.cmd = ".schedule"
 
         # register ourself to our new sched event
         self.bot.register_event(sched, self)
 
     def handle(self, event):
+        if event.msg.startswith(".schedulelist"):
+            self.bot.scheduler.list_schedules(event.msg.split()[1], event.channel)
+            return
         if event.msg.startswith(".schedule"):
             try:
                 split = event.msg.split()

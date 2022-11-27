@@ -42,6 +42,22 @@ class Scheduler (threading.Thread):
                     self.task_list.remove(t)
             sleep(Scheduler.FREQUENCY)
 
+    def list_schedules(self, target_channel, channel):
+        task_string = "events for " + target_channel + ": "
+        events_found = False
+        for s in self.task_list:
+            if s.channel == target_channel:
+                events_found = True
+                task_string += s.message + " " + s.trigger_delay.strftime("%m/%d/%Y, %H:%M:%S" + ", ")
+
+        if not events_found:
+            task_string = "no events for channel " + target_channel
+            self.parent_bot.say(channel, task_string)
+            return
+
+        task_string = task_string[:-2] # strips the last comma and whitespace
+        self.parent_bot.say(channel, task_string)
+
     def schedule_task(self, channel, message, sender, trigger_time=None,
                       trigger_delay=None, send_time=None, source_channel=None):
         if self.parent_bot.DEBUG:
