@@ -20,6 +20,8 @@ class SqliteDB:
         self.cur.execute(
             'CREATE TABLE IF NOT EXISTS lastfm (lastfm_username CHAR(64) NOT NULL, nick CHAR(32) NOT NULL)')
         self.cur.execute(
+            'CREATE UNIQUE INDEX idx_irc_nick on lastfm on lastfm(nick)')
+        self.cur.execute(
             'CREATE TABLE IF NOT EXISTS qdb (id INTEGER PRIMARY KEY, quote TEXT NOT NULL, date DATETIME DEFAULT CURRENT_TIMESTAMP)')
         self.cur.execute(
             'CREATE TABLE IF NOT EXISTS qdb_votes (vote_id PRIMARY KEY, quote_id INTEGER NOT NULL, votes INTEGER DEFAULT 0)')

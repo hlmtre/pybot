@@ -27,6 +27,7 @@ class Weather(BaseModule):
         weather2.subscribe(self)
 
         self.bot.register_event(weather2, self)
+        # two apis because we get the lat/long from bing's actually really good location search
         self.bing_api_url = "http://dev.virtualearth.net/REST/v1/Locations?query="
         self.bing_api_key_string = "&key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
         self.api_key = "6dc001f4e77cc0985c5013283368be51"
@@ -69,12 +70,15 @@ class Weather(BaseModule):
                 "Encountered an error contacting the OpenWeatherMap API")
             return
         weather = r.json()
+        #print(weather)
         try:
             # grab the relevant data we want for formatting
             location = weather['name']
             conditions = weather['weather'][0]['main']
             temp_f = round(weather['main']['temp'], 1)
             temp_c = round((temp_f - 32) * (5.0 / 9.0), 1)
+            #sky = weather['weather'][0]['main']
+            #print(sky)
         except KeyError:
             self.say(
                 channel,
