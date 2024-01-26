@@ -28,15 +28,17 @@ class Shortener(BaseModule):
     def handle(self, event):
         try:
             target = re.search("https?://[\\S]+", event.line).group(0)
-            url = 'https://is.gd/create.php'
-            payload = {'format': 'simple', 'url': target}
+            url = 'https://u.aql.ink/new'
+            payload = target
             if len(target) > 60 and re.match(
                     self.r_pattern, target) is None:  # Post only shortened link if NOT reddit link
-                r = requests.get(url, params=payload)
-                if re.search("https://is.gd*", r.text):
+                r = requests.post(url, data=payload)
+                if re.search("https://u.aql.ink/*", r.text):
                     self.say(event.channel, r.text)
                 else:
-                    self.say("Something went wrong :(")
+                    self.bot.debug_print(payload)
+                    self.bot.debug_print(r)
+                    self.say(event.channel, "Something went wrong :(")
             else:
                 return
         except requests.exceptions.HTTPError as e:
@@ -46,11 +48,11 @@ class Shortener(BaseModule):
     # Called from the rshort module to shorten the link to put in link
     # description
     def reddit_link(self, link):
-        url = 'https://is.gd/create.php'
-        payload = {'format': 'simple', 'url': link}
+        url = 'https://u.aql.ink/new'
+        payload = link
         try:
-            r = requests.get(url, params=payload)
-            if re.search("https://is.gd*", r.text):
+            r = requests.post(url, data=payload)
+            if re.search("https://u.aql.ink/*", r.text):
                 return r.text
             else:
                 return "Something went wrong :("
