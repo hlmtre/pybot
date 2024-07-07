@@ -9,6 +9,7 @@ modules/twitter_credentials.py
 modules/youtube_credentials.py
 modules/meme_credentials.py
 modules/imgur_credentials.py
+modules/bing_credentials.py
 *.db
 pickle/*
 venv/*
