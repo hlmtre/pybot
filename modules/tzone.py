@@ -51,14 +51,10 @@ class Tzone(BaseModule):
         lat, long = b.get_lat_long_from_bing(location)
         url_query = None
         try:
-            headers = {
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-            }
             url_query = self.url + "?latitude=" + str(lat) + "&longitude=" + str(long)
             r = requests.get(url_query)
             j = json.loads(r.text)
-            print(json.dumps(j, indent=2))
-            local_time = j["current_local_datetime"].split("T")[-1]
+            local_time = j["current_local_datetime"].replace("T", " ")
             return str(location + ", (assumed to be timezone " + j["iana_timezone"] + ", " + j["offset"] + "): " + local_time)
         except IndexError:
             return "Not a valid request, try again."
