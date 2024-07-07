@@ -3,7 +3,6 @@ import requests
 
 
 class Bing:
-    print("instantiating Bing...")
     # from modules.bing_credentials import BingCredentials as bc
     try:
         from modules.bing_credentials import BingCredentials as bc
