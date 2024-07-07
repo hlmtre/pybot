@@ -25,35 +25,41 @@ class Tzone(BaseModule):
         tzone.subscribe(self)
         self.cmd = ".tzone"
         self.help = ".tzone <Insert location name/zip/airport(SFO,PDX,etc.)>"
+        try:
+            from bing_credentials import BingCredentials
+        except (ImportError, SystemError):
+            print(
+                "Warning: tzone module requires credentials in modules/bing_credentials.py")
+
+            class PhonyBc:
+                api_key = "None"
+
         self.bot.register_event(tzone, self)
-        self.url = "https://dev.virtualearth.net/REST/v1/TimeZone/query="
-        self.key = "?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
-# TODO put in a minor work around for places like Chico california not working with just '.tzone Chico'
+        self.url = "https://api.geotimezone.com/public/timezone"
+        # self.url = "https://dev.virtualearth.net/REST/v1/TimeZone/query="
+        # self.key = "?key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
 # TODO split out verifying the location request is properly formatted into
 # its own function.
 
+    """Take the location provided and determine whether it's a valid request
+    Then return either the time of the location or a message instructing you
+    how to the make the proper call"""
+
     def request_api(self, location):
-        """Takes the location provided and determines whether its a valid request
-        and will return either the time of the location or a message instructing you
-        how to the make the proper call"""
+        from modules.bing import Bing
+        b = Bing()
+        lat, long = b.get_lat_long_from_bing(location)
         url_query = None
         try:
             headers = {
                 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
             }
-            url_query = self.url + location + self.key
-            r = requests.get(url_query, headers=headers)
+            url_query = self.url + "?latitude=" + str(lat) + "&longitude=" + str(long)
+            r = requests.get(url_query)
             j = json.loads(r.text)
-            local_time_date = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][
-                0]["timeZone"][0]["convertedTime"]["localTime"].split("T")
-            place = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["placeName"]
-            """Checks to see if request is specific enough for one timezone"""
-            multiple_locations = j["resourceSets"][0]["resources"][0]["timeZoneAtLocation"][0]["timeZone"]
-            if len(multiple_locations) > 1:
-                return "Multiple timezones returned, try being more specific"
-            else:
-                return str(
-                    place + ": " + local_time_date[1] + " (" + multiple_locations[0]['convertedTime']['timeZoneDisplayAbbr'] + ")")
+            print(json.dumps(j, indent=2))
+            local_time = j["current_local_datetime"].split("T")[-1]
+            return str(location + ", (assumed to be timezone " + j["iana_timezone"] + ", " + j["offset"] + "): " + local_time)
         except IndexError:
             return "Not a valid request, try again."
         except ValueError:
@@ -65,15 +71,11 @@ class Tzone(BaseModule):
         try:
             if event.msg.startswith(".tzone"):
                 split_tz = event.msg.split()
-                if split_tz[1].lower() == "i7":
-                    self.say(
-                        event.channel,
-                        "We are playing at the same time we do every Saturday. 6am your time, 8pm ours.")
+                if len(split_tz) > 2:
+                    tz = "+".join(split_tz[1:])
                 else:
-                    if len(split_tz) > 2:
-                        tz = "+".join(split_tz[1:])
-                    else:
-                        tz = split_tz[1].lower()
-                    self.say(event.channel, self.request_api(tz))
-        except TypeError:
-            pass  # Error gets caught here and in ValueError in request_api function
+                    tz = split_tz[1].lower()
+                self.say(event.channel, self.request_api(tz))
+        except TypeError as e:
+            self.say(event.channel, "error!")
+            print(e)
