@@ -70,22 +70,37 @@ class Weather(BaseModule):
                 "Encountered an error contacting the OpenWeatherMap API")
             return
         weather = r.json()
-        #print(weather)
+        # print(weather)
         try:
             # grab the relevant data we want for formatting
             location = weather['name']
             conditions = weather['weather'][0]['main']
+
+            if conditions == "Clear":
+                icon = '\N{sun}'
+            elif conditions == "Rain" or conditions == "Drizzle":
+                icon = '\N{cloud with rain}'
+            elif conditions == "Thunderstorm":
+                icon = '\N{cloud with lightning}'
+            elif conditions == "Clouds":
+                icon = '\N{cloud}'
+            elif conditions == "Snow":
+                icon = '\N{cloud with snow}'
+            else:
+                icon = '\N{fire}'
+
             temp_f = round(weather['main']['temp'], 1)
             temp_c = round((temp_f - 32) * (5.0 / 9.0), 1)
-            #sky = weather['weather'][0]['main']
-            #print(sky)
+            # sky = weather['weather'][0]['main']
+            # print(sky)
         except KeyError:
             self.say(
                 channel,
                 "Unable to get weather data from results. Sorry.")
             return
         # return the formatted string of weather data
-        return location + ': ' + conditions + ', ' + \
+        # return location + ': ' + conditions + " 🌧️ " + ', ' + \
+        return location + ': ' + conditions + ' ' + icon + ', ' + \
             str(temp_f) + '°F (' + str(temp_c) + '°C)'
 
     def handle(self, event):
