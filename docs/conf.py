@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../modules/snippets'))
 # -- Project information -----------------------------------------------------
 
 project = 'pybot'
-copyright = '2019, hlmtre'
+copyright = 'none, 2024, hlmtre'
 author = 'hlmtre'
 
 # The full version, including alpha/beta/rc tags
