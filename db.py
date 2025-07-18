@@ -48,8 +48,8 @@ class DB:
 
     # should prevent mysql has gone away errors.. ideally
     def _handle(self):
-        global cur
-        global age
+        # global cur
+        # global age
         now = datetime.now()
         if now - self.age > timedelta(minutes=5):
             self.cur.close()
