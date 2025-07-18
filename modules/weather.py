@@ -16,6 +16,15 @@ else:
     except (ImportError, SystemError):
         from modules.basemodule import BaseModule
 
+try:
+    from owm_api import Owm_Api as oa
+except (ImportError, SystemError):
+    print("Warning: weather module requires credentials in $PYBOT_ROOT/owm_api.py")
+
+    class Phony_Owm_Api:
+        api_key = "None"
+    oa = Phony_Owm_Api()
+
 
 class Weather(BaseModule):
 
@@ -27,26 +36,26 @@ class Weather(BaseModule):
         weather2.subscribe(self)
 
         self.bot.register_event(weather2, self)
-        # two apis because we get the lat/long from bing's actually really good location search
-        self.bing_api_url = "http://dev.virtualearth.net/REST/v1/Locations?query="
-        self.bing_api_key_string = "&key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
-        self.api_key = "6dc001f4e77cc0985c5013283368be51"
+        # two apis because we get the lat/long from openmeteo
+        self.meteo_api_url = "https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name="
         self.api_url = "https://api.openweathermap.org/data/2.5/weather"
+        self.api_key = oa.api_key
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
         }
 
     def get_lat_long_from_bing(self, location):
         """
-        go grab the latitude/longitude from bing's really excellent location API.
         Returns: tuple of x,y coordinates - (0,0) on error
         """
-        u = self.bing_api_url + location + self.bing_api_key_string
+        u = self.meteo_api_url + location
+        # print(u)
         j = json.loads(requests.get(u, self.headers).text)
+        # print(j['results'][0])
 
         try:
-            x = j['resourceSets'][0]['resources'][0]['geocodePoints'][0]['coordinates'][0]
-            y = j['resourceSets'][0]['resources'][0]['geocodePoints'][0]['coordinates'][1]
+            x = j['results'][0]['latitude']
+            y = j['results'][0]['longitude']
         except IndexError:
             return (0, 0)
         return (x, y)
@@ -86,6 +95,8 @@ class Weather(BaseModule):
                 icon = '\N{cloud}'
             elif conditions == "Snow":
                 icon = '\N{cloud with snow}'
+            elif conditions == "Mist":
+                icon = '\N{fog}'
             else:
                 icon = '\N{fire}'
 
