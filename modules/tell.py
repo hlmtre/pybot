@@ -53,7 +53,7 @@ class Tell(BaseModule):
 
     def handle(self, event):
         try:
-            if event.msg.startswith(".tell"):
+            if event.msg.startswith(".tell") or event.msg.startswith(".tex"):
                 target = event.msg.split()[1]
                 thing = event.msg.split()[2:]
                 if target.lower() == self.bot.conf.getNick(self.bot.network).lower():
