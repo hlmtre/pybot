@@ -10,7 +10,7 @@ pybot is a python irc bot. he is a project.
 
 he is modular, extensible, multi-threaded (for network independence!), and configurable.
 
-pybot runs on python 2.7 and >3.5, on both windows and linux, though current development is all geared towards >3.5.
+pybot runs on python 2.7 and 3 < 3.11.15, on both windows and linux, though current development is all geared towards >3.5.
 
 **master branch should be stable. feature branches can be broken at any time.**
 
@@ -20,13 +20,13 @@ If You've Got Docker
 This is mucho easier-o. Just
 ----------------------------
 
-    docker build . -t pybox
-    docker run -it pybox --nick <botnick> --server <yourserver> --port 6667 --channels "#c1, #c2" --owner <yournick>
+    sudo docker build . -t pybox
+    sudo docker run -it pybox --nick <botnick> --server <yourserver> --port 6667 --channels "#c1, #c2" --owner <yournick>
 
 (Now probably more than) 10-second TL;DR:
 =========================================
 
-Take care of dependencies. If you don't use MySQL and don't care about certain modules breaking, you don't need anything but python 2.7/3.5 and standard libs.
+Take care of dependencies. If you don't use MySQL and don't care about certain modules breaking, you don't need anything but python <= 3.11.15 and standard libs.
 -----------------------------------------------------------------------------------------------------------------------------------------------------
     python -m venv pybot-venv
     source pybot-venv/bin/activate
