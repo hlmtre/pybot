@@ -1,5 +1,5 @@
 # thanks @MechMaster48
-FROM python:3.11.15-trixie
+FROM python:3
 
 WORKDIR /usr/src/app
 
@@ -11,5 +11,5 @@ COPY . .
 
 RUN mv pybotrc /root/.pybotrc
 
-# for example: docker run -it <your image name> --nick argbot --server irc.yourserver.com --channels "#channel1, #channel2"
+# for example: docker run -it <your image name> --nick argbot --server irc.yourserver.com --channels "#channel1, #channel2" --owner <yournick>
 ENTRYPOINT [ "python3", "./pybot.py", "-d" ]
