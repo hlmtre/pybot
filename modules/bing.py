@@ -17,7 +17,8 @@ class Bing:
     # bing_api_url = "http://dev.virtualearth.net/REST/v1/Locations?query="
     # bing_api_key_string = "&key=AuEaLSdFYvXwY4u1FnyP-f9l5u5Ul9AUA_U1F-eJ-8O_Fo9Cngl95z6UL0Lr5Nmx"
     bing_api_key_string = bc.subscription_key
-    bing_api_url = "https://atlas.microsoft.com/search/address/json?&subscription-key=" + bing_api_key_string + "&api-version=1.0&language=en-US&query="
+    bing_api_url = "https://atlas.microsoft.com/search/address/json?&subscription-key=" + \
+        bing_api_key_string + "&api-version=1.0&language=en-US&query="
     headers = {
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
     }

@@ -38,7 +38,7 @@ class Debugger(BaseModule):
         if not mem_store_key:
             return False
         if mem_store_key in self.bot.mem_store:
-            del(self.bot.mem_store[mem_store_key])
+            del (self.bot.mem_store[mem_store_key])
             return True
 
     def pretty(self, d, event, indent=0):

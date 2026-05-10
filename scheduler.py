@@ -55,7 +55,7 @@ class Scheduler (threading.Thread):
             self.parent_bot.say(channel, task_string)
             return
 
-        task_string = task_string[:-2] # strips the last comma and whitespace
+        task_string = task_string[:-2]  # strips the last comma and whitespace
         self.parent_bot.say(channel, task_string)
 
     def schedule_task(self, channel, message, sender, trigger_time=None,

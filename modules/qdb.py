@@ -180,7 +180,7 @@ class QDB:
 
         # first strip out printout urls and replace them with imgur mirrors
         # commenting out for now to avoid uploading to imgur so often
-        #event.msg = self._detect_url(event.msg)
+        # event.msg = self._detect_url(event.msg)
 
         # format all strings based on the verb
         if event.verb == "":

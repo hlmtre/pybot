@@ -1,4 +1,4 @@
-##Lastfm module created by hlmtre##
+## Lastfm module created by hlmtre##
 
 import json
 import sys

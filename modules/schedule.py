@@ -44,18 +44,22 @@ class Schedule(BaseModule):
                 message = ' '.join(split[5:])
                 delay = split[2]
                 send_time = datetime.now(timezone.utc)
-                td = timedelta(seconds = 0)
+                td = timedelta(seconds=0)
                 try:
                     seconds = parse(delay)
                 except Exception as e:
                     print(e.message)
-                    self.say(event.channel, "time parsing error. accepted units: seconds (s), minutes (m), hours (h), and weeks (w).")
+                    self.say(
+                        event.channel,
+                        "time parsing error. accepted units: seconds (s), minutes (m), hours (h), and weeks (w).")
                     return
                 try:
                     td = timedelta(seconds=seconds)
                 except TypeError as e:
                     print(e.message)
-                    self.say(event.channel, "time parsing error. accepted units: seconds (s), minutes (m), hours (h), and weeks (w).")
+                    self.say(
+                        event.channel,
+                        "time parsing error. accepted units: seconds (s), minutes (m), hours (h), and weeks (w).")
                     return
                 target = send_time + td
                 if not chan.startswith("#"):

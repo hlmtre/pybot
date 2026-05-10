@@ -154,7 +154,7 @@ class recap(BaseModule):
             # the new scramble one
             return nick
         except IndexError:  # no vowels, probably
-            #self.bot.debug_print("Error scrambling nick. Just moving on. Nick was: " + original_nick, error=True)
+            # self.bot.debug_print("Error scrambling nick. Just moving on. Nick was: " + original_nick, error=True)
             return nick  # if there's any problems at all, just don't scramble the nick. odd cases like no vowels
 
     def contains_url(self, line):

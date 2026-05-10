@@ -1,4 +1,4 @@
-#Prints to your Console when disconnected#
+# Prints to your Console when disconnected#
 
 import sys
 try:

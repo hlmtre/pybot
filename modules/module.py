@@ -127,7 +127,7 @@ class Module:
                     except IndexError:
                         return
             # then load
-            #self.bot.logger.write(Logger.INFO, " loading " + event.msg.split()[2] + "...")
+            # self.bot.logger.write(Logger.INFO, " loading " + event.msg.split()[2] + "...")
             retval = self.load(event.msg.split()[2])
             if retval == 0:
                 self.bot.logger.write(

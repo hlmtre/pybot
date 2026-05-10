@@ -55,7 +55,8 @@ class Tzone(BaseModule):
             r = requests.get(url_query)
             j = json.loads(r.text)
             local_time = j["current_local_datetime"].replace("T", " ")
-            return str(location + ", (assumed to be timezone " + j["iana_timezone"] + ", " + j["offset"] + "): " + local_time)
+            return str(location + ", (assumed to be timezone " +
+                       j["iana_timezone"] + ", " + j["offset"] + "): " + local_time)
         except IndexError:
             return "Not a valid request, try again."
         except ValueError:
