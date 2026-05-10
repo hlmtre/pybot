@@ -1,5 +1,5 @@
 # thanks @MechMaster48
-FROM python:3
+FROM python:3.11.15-trixie
 
 WORKDIR /usr/src/app
 
