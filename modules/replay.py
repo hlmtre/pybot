@@ -96,9 +96,9 @@ class Replay:
                 self.printer("PRIVMSG " + user + ' :' + msglist[x] + '\n')
                 x = x - 1
 
-            #msg_index = newString.find(">")
-            #message = newString[msg_index + 2:]
-            ##message = message.replay(find_msg, replace_msg)
-            #user = newString[1:msg_index]
+            # msg_index = newString.find(">")
+            # message = newString[msg_index + 2:]
+            # message = message.replay(find_msg, replace_msg)
+            # user = newString[1:msg_index]
             # pybot sends the new replacement message to the chat
-            #self.printer("PRIVMSG " + event.channel + ' :' + user + " MEANT to say: " + message + '\n')
+            # self.printer("PRIVMSG " + event.channel + ' :' + user + " MEANT to say: " + message + '\n')

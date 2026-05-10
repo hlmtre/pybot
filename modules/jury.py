@@ -1,4 +1,4 @@
-#Jury module created by Bonekin#
+# Jury module created by Bonekin#
 
 import random
 import sys

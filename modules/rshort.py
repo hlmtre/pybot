@@ -1,5 +1,4 @@
-## Reddit link information ##
-
+# Reddit link information #
 #
 # from https://old.reddit.com/prefs/apps/
 #
@@ -17,9 +16,7 @@ try:  # Checks to make sure praw has everything it needs before importing the re
     try:
         reddit = praw.Reddit(
             'pybot',
-            user_agent='pybot ' +
-            version.__version__ +
-            ' by /u/hlmtre; https://github.com/hlmtre/pybot')
+            user_agent='pybot ' + version.__version__ + ' by /u/hlmtre; https://github.com/hlmtre/pybot')
         successful_import = True
     except BaseException as e:
         print(e.message)
@@ -33,7 +30,7 @@ except praw.exceptions.ClientException:
 if successful_import:
     import sys
     import re
-    from shortener import Shortener
+    from modules.shortener import Shortener
     from datetime import datetime
     from event import Event
 
@@ -86,8 +83,4 @@ if successful_import:
             message = (message + ' | ' + author + ' | ' + sub_time)
             self.say(
                 event.channel,
-                message +
-                ' | ' +
-                Shortener.reddit_link(
-                    self,
-                    url))
+                message + ' | ' + Shortener.reddit_link(self, url))

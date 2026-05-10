@@ -27,4 +27,4 @@ class Example:
 
     def handle(self, event):
         self.say(event.channel, "welcome, " + event.user)
-        #self.printer("PRIVMSG " + event.channel + " :welcome, " + event.user + '\n')
+        # self.printer("PRIVMSG " + event.channel + " :welcome, " + event.user + '\n')

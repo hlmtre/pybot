@@ -1,4 +1,4 @@
-#Tell module created by hlmtre#
+# Tell module created by hlmtre#
 
 import sys
 from event import Event

@@ -1,4 +1,4 @@
-##Shows the URL to the glorious pybot repo##
+## Shows the URL to the glorious pybot repo##
 
 import sys
 from event import Event

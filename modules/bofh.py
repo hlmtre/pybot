@@ -1,4 +1,4 @@
-#BOFH quote module created by hlmtre#
+# BOFH quote module created by hlmtre#
 
 from event import Event
 import sys

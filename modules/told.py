@@ -1,4 +1,4 @@
-#Told Module created by Bonekin#
+# Told Module created by Bonekin#
 
 import random
 import sys

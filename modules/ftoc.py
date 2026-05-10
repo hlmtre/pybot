@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-##Converts farenheit to celcius##
+## Converts farenheit to celcius##
 
 import sys
 from event import Event

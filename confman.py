@@ -32,7 +32,7 @@ class ConfManager:
                 except IOError:
                     self.conf_path = os.environ['HOME'] + '/.pybotrc'
                     try:
-                        #self.conf_path = os.environ['HOME'] + conf
+                        # self.conf_path = os.environ['HOME'] + conf
                         self.conf_file = open(self.conf_path)
                     except IOError:
                         raise ConfError(

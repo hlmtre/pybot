@@ -1,5 +1,5 @@
 # Module created by Bonekin
-##Intended to bonk appropriate irc individual in various creative ways##
+## Intended to bonk appropriate irc individual in various creative ways##
 
 from event import Event
 import random

@@ -29,12 +29,20 @@ RETRY_COUNTER = 0
 
 class Bot(threading.Thread):
     """
-      bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
-      handles the core IRC protocol stuff, and passing lines to defined events, which dispatch to their subscribed modules.
+    bot instance. one bot gets instantiated per network, as an entirely distinct, sandboxed thread.
+    handles the core IRC protocol stuff, and passing lines to defined events, which dispatch to their subscribed modules.
     """
 
-    def __init__(self, conf=None, network=None, d=None, local_nickname=None,
-                 local_channels=None, local_port=None, local_owner=None):
+    def __init__(
+        self,
+        conf=None,
+        network=None,
+        d=None,
+        local_nickname=None,
+        local_channels=None,
+        local_port=None,
+        local_owner=None,
+    ):
         threading.Thread.__init__(self)
 
         self.HOST = None
@@ -51,7 +59,7 @@ class Bot(threading.Thread):
         self.chan_list = None
         self.pid = os.getpid()
         self.logger = Logger()
-#   to be a dict of dicts
+        #   to be a dict of dicts
         self.command_function_map = dict()
         self.snippets_list = set()
         self.recent_lines = deque(maxlen=15)
@@ -61,6 +69,7 @@ class Bot(threading.Thread):
         self.scheduler.start()
 
         if conf is None:
+
             class Mockuconf:
                 def __init__(self, bot=None):
                     self.network = network
@@ -82,6 +91,7 @@ class Bot(threading.Thread):
                         return local_port
                     else:
                         return 6667
+
             conf = Mockuconf()
 
         self.conf = conf
@@ -89,12 +99,15 @@ class Bot(threading.Thread):
         try:
             if self.conf.getDBType() == "sqlite":
                 import lite
+
                 self.db = lite.SqliteDB(self)
             else:
                 import db
+
                 self.db = db.DB(self)
         except AttributeError:
             import lite
+
             self.db = lite.SqliteDB(self)
 
         if not local_nickname:
@@ -103,9 +116,10 @@ class Bot(threading.Thread):
             self.NICK = local_nickname
 
         self.logger.write(Logger.INFO, "\n", self.NICK)
-        self.logger.write(Logger.INFO,
-                          " initializing bot, pid " + str(os.getpid()),
-                          self.NICK)
+        self.logger.write(
+            Logger.INFO, " initializing bot, pid " +
+            str(os.getpid()), self.NICK
+        )
 
         # arbitrary key/value store for modules
         # they should be 'namespaced' like bot.mem_store.module_name
@@ -116,7 +130,7 @@ class Bot(threading.Thread):
 
         if local_channels is not None:
             self.chan_list = local_channels.split(",")
-# this will be the socket
+        # this will be the socket
         self.s = None  # each bot thread holds its own socket open to the network
 
         self.brain = botbrain.BotBrain(self.send, self)
@@ -129,15 +143,15 @@ class Bot(threading.Thread):
     # conditionally subscribe to events list or add event to listing
     def register_event(self, event, module):
         """
-          Allows for dynamic, asynchronous event creation. To be used by modules, mostly, to define their own events in their initialization.
-          Prevents multiple of the same _type of event being registered.
+        Allows for dynamic, asynchronous event creation. To be used by modules, mostly, to define their own events in their initialization.
+        Prevents multiple of the same _type of event being registered.
 
-          Args:
-          event: an event object to be registered with the bot
-          module: calling module; ensures the calling module can be subscribed to the event if it is not already.
+        Args:
+        event: an event object to be registered with the bot
+        module: calling module; ensures the calling module can be subscribed to the event if it is not already.
 
-          Returns:
-          nothing.
+        Returns:
+        nothing.
         """
         if self.events_list is not None:
             for e in self.events_list:
@@ -150,17 +164,31 @@ class Bot(threading.Thread):
         self.events_list.append(event)
         return
 
+    # thanks https://docs.python.org/3/whatsnew/3.12.html#whatsnew312-removed-imp
+    def load_source(self, modname, filename):
+        import importlib.util
+        import importlib.machinery
+
+        loader = importlib.machinery.SourceFileLoader(modname, filename)
+        spec = importlib.util.spec_from_file_location(
+            modname, filename, loader=loader)
+        module = importlib.util.module_from_spec(spec)
+        # The module is always executed and not cached in sys.modules.
+        # Uncomment the following line to cache the module.
+        # sys.modules[module.__name__] = module
+        loader.exec_module(module)
+        return module
+
     def load_snippets(self):
-        import imp
-        snippets_path = self.modules_path + '/snippets'
-# load up snippets first
+        snippets_path = self.modules_path + "/snippets"
+        # load up snippets first
         for filename in os.listdir(snippets_path):
             name, ext = os.path.splitext(filename)
             try:
                 if ext == ".py":
                     # snippet is a module
-                    snippet = imp.load_source(
-                        name, snippets_path + '/' + filename)
+                    snippet = self.load_source(
+                        name, snippets_path + "/" + filename)
                     self.snippets_list.add(snippet)
             except Exception as e:
                 print(e)
@@ -170,20 +198,20 @@ class Bot(threading.Thread):
         self.persistence.append(namespace)
 
     def save_persistence(self):
-        if not os.path.exists('pickle/'):
-            os.makedirs('pickle')
+        if not os.path.exists("pickle/"):
+            os.makedirs("pickle")
         for n in self.persistence:
-            pickle.dump(self.mem_store[n], 'pickle/' + n, 'wb')
+            pickle.dump(self.mem_store[n], "pickle/" + n, "wb")
 
     def load_persistence(self):
-        if not os.path.exists('pickle/'):
-            os.makedirs('pickle')
-        for f in os.listdir('pickle'):
+        if not os.path.exists("pickle/"):
+            os.makedirs("pickle")
+        for f in os.listdir("pickle"):
             # don't unpickle current directory (.) or up one (..) because those
             # aren't pickled objects
             if f == "." or f == "..":
                 continue
-            self.mem_store[f] = pickle.load(open('pickle/' + f, 'rb'))
+            self.mem_store[f] = pickle.load(open("pickle/" + f, "rb"))
 
     def set_snippets(self):
         """
@@ -192,7 +220,7 @@ class Bot(threading.Thread):
         """
         for obj in self.snippets_list:
             for k, v in inspect.getmembers(obj, inspect.isfunction):
-                if inspect.isfunction(v) and hasattr(v, 'commands'):
+                if inspect.isfunction(v) and hasattr(v, "commands"):
                     for c in v.commands:
                         if c not in self.command_function_map:
                             self.command_function_map[c] = dict()
@@ -200,26 +228,26 @@ class Bot(threading.Thread):
 
     def load_modules(self, specific=None):
         """
-          Run through the ${bot_dir}/modules directory, dynamically instantiating each module as it goes.
+        Run through the ${bot_dir}/modules directory, dynamically instantiating each module as it goes.
 
-          Args:
-          specific: string name of module. if it is specified, the function attempts to load the named module.
+        Args:
+        specific: string name of module. if it is specified, the function attempts to load the named module.
 
-          Returns:
-          1 if successful, 0 on failure. In keeping with the perverse reversal of UNIX programs and boolean values.
+        Returns:
+        1 if successful, 0 on failure. In keeping with the perverse reversal of UNIX programs and boolean values.
         """
         nonspecific = False
         found = False
 
         self.loaded_modules = list()
 
-        self.modules_path = 'modules'
-        self.autoload_path = 'modules/autoloads'
+        self.modules_path = "./modules"
+        self.autoload_path = "modules/autoloads"
 
         # this is magic.
 
-        import imp
         import json
+        import importlib
 
         self.load_snippets()
         self.set_snippets()
@@ -235,26 +263,28 @@ class Bot(threading.Thread):
                 # logging
                 for k in list(autoloads.keys()):
                     self.logger.write(
-                        Logger.INFO, "Autoloads found for network " + k, self.NICK)
+                        Logger.INFO, "Autoloads found for network " + k, self.NICK
+                    )
                     if self.DEBUG:
                         self.debug_print(
-                            util.bcolors.OKGREEN +
-                            ">>" +
-                            util.bcolors.ENDC +
-                            " Autoloads found for network " +
-                            k)
+                            util.bcolors.OKGREEN
+                            + ">>"
+                            + util.bcolors.ENDC
+                            + " Autoloads found for network "
+                            + k
+                        )
             except IOError:
                 self.logger.write(
-                    Logger.WARNING,
-                    "Could not load autoloads file.",
-                    self.NICK)
+                    Logger.WARNING, "Could not load autoloads file.", self.NICK
+                )
                 if self.DEBUG:
                     self.debug_print(
-                        util.bcolors.WARNING +
-                        ">>" +
-                        util.bcolors.ENDC +
-                        " Could not load autoloads file " +
-                        k)
+                        util.bcolors.WARNING
+                        + ">>"
+                        + util.bcolors.ENDC
+                        + " Could not load autoloads file "
+                        + k
+                    )
         # create dictionary of things in the modules directory to load
         for fname in dir_list:
             name, ext = os.path.splitext(fname)
@@ -264,82 +294,79 @@ class Bot(threading.Thread):
                 # choose to either load all .py files or, available, just ones
                 # specified in autoloads
                 if self.network not in list(
-                        autoloads.keys()):  # if autoload does not specify for this network
-                    if ext == '.py' and not name == '__init__':
-                        f, filename, descr = imp.find_module(
-                            name, [self.modules_path])
-                        mods[name] = imp.load_module(name, f, filename, descr)
+                    autoloads.keys()
+                ):  # if autoload does not specify for this network
+                    if ext == ".py" and not name == "__init__":
+                        mods[name] = self.load_source(
+                            name, self.modules_path + "/" + fname
+                        )
                         self.logger.write(
                             Logger.INFO,
-                            " loaded " +
-                            name +
-                            " for network " +
-                            self.network,
-                            self.NICK)
+                            " loaded " + name + " for network " + self.network,
+                            self.NICK,
+                        )
                         if self.DEBUG:
                             self.debug_print(
-                                util.bcolors.OKGREEN +
-                                ">>" +
-                                util.bcolors.ENDC +
-                                " Loaded " +
-                                name +
-                                " for network " +
-                                self.network)
+                                util.bcolors.OKGREEN
+                                + ">>"
+                                + util.bcolors.ENDC
+                                + " Loaded "
+                                + name
+                                + " for network "
+                                + self.network
+                            )
                 else:  # follow autoload's direction
-                    if ext == '.py' and not name == '__init__':
-                        if name == 'module':
-                            f, filename, descr = imp.find_module(
-                                name, [self.modules_path])
-                            mods[name] = imp.load_module(
-                                name, f, filename, descr)
+                    if ext == ".py" and not name == "__init__":
+                        if name == "module":
+                            mods[name] = self.load_source(
+                                name, self.modules_path + "/" + fname
+                            )
                             self.logger.write(
                                 Logger.INFO,
-                                " loaded " +
-                                name +
-                                " for network " +
-                                self.network,
-                                self.NICK)
+                                " loaded " + name + " for network " + self.network,
+                                self.NICK,
+                            )
                             if self.DEBUG:
                                 self.debug_print(
-                                    util.bcolors.OKGREEN +
-                                    ">>" +
-                                    util.bcolors.ENDC +
-                                    " Loaded " +
-                                    name +
-                                    " for network " +
-                                    self.network)
+                                    util.bcolors.OKGREEN
+                                    + ">>"
+                                    + util.bcolors.ENDC
+                                    + " Loaded "
+                                    + name
+                                    + " for network "
+                                    + self.network
+                                )
                         elif (
-                                ('include' in autoloads[self.network]
-                                 and name in autoloads[self.network]['include'])
-                                or ('exclude' in autoloads[self.network]
-                                    and name not in autoloads[self.network]['exclude'])
-                                ):
-                            f, filename, descr = imp.find_module(
-                                name, [self.modules_path])
-                            mods[name] = imp.load_module(
-                                name, f, filename, descr)
+                            "include" in autoloads[self.network]
+                            and name in autoloads[self.network]["include"]
+                        ) or (
+                            "exclude" in autoloads[self.network]
+                            and name not in autoloads[self.network]["exclude"]
+                        ):
+                            mods[name] = self.load_source(
+                                name, self.modules_path + "/" + fname
+                            )
                             self.logger.write(
                                 Logger.INFO,
-                                " loaded " +
-                                name +
-                                " for network " +
-                                self.network,
-                                self.NICK)
+                                " loaded " + name + " for network " + self.network,
+                                self.NICK,
+                            )
                             if self.DEBUG:
                                 self.debug_print(
-                                    util.bcolors.OKGREEN +
-                                    ">>" +
-                                    util.bcolors.ENDC +
-                                    " Loaded " +
-                                    name +
-                                    " for network " +
-                                    self.network)
+                                    util.bcolors.OKGREEN
+                                    + ">>"
+                                    + util.bcolors.ENDC
+                                    + " Loaded "
+                                    + name
+                                    + " for network "
+                                    + self.network
+                                )
             else:
                 if name == specific:  # we're reloading only one module
-                    if ext != '.pyc':  # ignore compiled
-                        f, filename, descr = imp.find_module(
-                            name, [self.modules_path])
-                        mods[name] = imp.load_module(name, f, filename, descr)
+                    if ext != ".pyc":  # ignore compiled
+                        mods[name] = self.load_source(
+                            name, self.modules_path + "/" + fname
+                        )
                         found = True
 
         for k, v in list(mods.items()):
@@ -347,8 +374,7 @@ class Bot(threading.Thread):
                 # get the object from the namespace of 'mods'
                 obj = getattr(mods[k], name)
                 try:
-                    if inspect.isclass(
-                            obj):  # it's a class definition, initialize it
+                    if inspect.isclass(obj):  # it's a class definition, initialize it
                         # now we're passing in a reference to the calling bot
                         a = obj(self.events_list, self.send, self, self.say)
                         if a not in self.loaded_modules:  # don't add in multiple copies
@@ -373,85 +399,80 @@ class Bot(threading.Thread):
         """
         if self.OFFLINE:
             self.debug_print(
-                util.bcolors.YELLOW +
-                " >> " +
-                util.bcolors.ENDC +
-                self.getName() +
-                ": " +
-                message.encode(
-                    'utf-8',
-                    'ignore'))
+                util.bcolors.YELLOW
+                + " >> "
+                + util.bcolors.ENDC
+                + self.getName()
+                + ": "
+                + message.encode("utf-8", "ignore")
+            )
         else:
             if self.DEBUG is True:
                 self.logger.write(Logger.INFO, "DEBUGGING OUTPUT", self.NICK)
                 if isinstance(message, bytes):
                     self.logger.write(
                         Logger.INFO,
-                        self.getName() +
-                        " " +
-                        message.decode(
-                            'utf-8',
-                            'ignore'),
-                        self.NICK)
+                        self.getName() + " " + message.decode("utf-8", "ignore"),
+                        self.NICK,
+                    )
                 else:
                     self.logger.write(
-                        Logger.INFO, self.getName() + " " + message, self.NICK)
+                        Logger.INFO, self.getName() + " " + message, self.NICK
+                    )
                 if isinstance(message, bytes):
                     self.debug_print(
-                        util.bcolors.OKGREEN +
-                        ">> " +
-                        util.bcolors.ENDC +
-                        ": " +
-                        " " +
-                        message.decode(
-                            'utf-8',
-                            'ignore'))
+                        util.bcolors.OKGREEN
+                        + ">> "
+                        + util.bcolors.ENDC
+                        + ": "
+                        + " "
+                        + message.decode("utf-8", "ignore")
+                    )
                 else:
                     self.debug_print(
-                        util.bcolors.OKGREEN +
-                        ">> " +
-                        util.bcolors.ENDC +
-                        ": " +
-                        " " +
-                        message)
+                        util.bcolors.OKGREEN
+                        + ">> "
+                        + util.bcolors.ENDC
+                        + ": "
+                        + " "
+                        + message
+                    )
 
             if not isinstance(message, bytes):
-                self.s.send(message.encode('utf-8', 'ignore'))
+                self.s.send(message.encode("utf-8", "ignore"))
             else:
                 self.s.send(message)
             target = message.split()[1]
             if isinstance(target, bytes):
                 target = target.decode()
-            if target.startswith('#'):
+            if target.startswith("#"):
                 if isinstance(message, bytes):
                     self.processline(
-                        ':' +
-                        self.conf.getNick(
-                            self.network) +
-                        '!~' +
-                        self.conf.getNick(
-                            self.network) +
-                        '@fakehost.here ' +
-                        message.decode().rstrip())
+                        ":"
+                        + self.conf.getNick(self.network)
+                        + "!~"
+                        + self.conf.getNick(self.network)
+                        + "@fakehost.here "
+                        + message.decode().rstrip()
+                    )
                 elif isinstance(message, str):
                     self.processline(
-                        ':' +
-                        self.conf.getNick(
-                            self.network) +
-                        '!~' +
-                        self.conf.getNick(
-                            self.network) +
-                        '@fakehost.here ' +
-                        message.rstrip())
+                        ":"
+                        + self.conf.getNick(self.network)
+                        + "!~"
+                        + self.conf.getNick(self.network)
+                        + "@fakehost.here "
+                        + message.rstrip()
+                    )
 
     def pong(self, response):
         """
         Keepalive heartbeat for IRC protocol. Until someone changes the IRC spec, don't modify this.
         """
-        self.send(('PONG ' + response + '\n').encode())
+        self.send(("PONG " + response + "\n").encode())
 
     def bare_send(self, line):
-        self.send((line + '\n').encode())
+        self.send((line + "\n").encode())
 
     def processline(self, line):
         """
@@ -468,11 +489,8 @@ class Bot(threading.Thread):
         self.recent_lines.appendleft(line)
         if self.DEBUG:
             if os.name == "posix":  # because windows doesn't like the color codes.
-                self.debug_print(
-                    util.bcolors.OKBLUE +
-                    "<< " +
-                    util.bcolors.ENDC +
-                    line)
+                self.debug_print(util.bcolors.OKBLUE +
+                                 "<< " + util.bcolors.ENDC + line)
             else:
                 self.debug_print("<< " + ": " + line)
 
@@ -485,7 +503,9 @@ class Bot(threading.Thread):
             pass
         else:
             if first_word in self.command_function_map:
-                self.command_function_map[first_word](self, parse_line(line).message, channel)
+                self.command_function_map[first_word](
+                    self, parse_line(line).message, channel
+                )
 
         try:
             for e in self.events_list:
@@ -499,13 +519,14 @@ class Bot(threading.Thread):
             else:
                 # patch contributed by github.com/thekanbo
                 if self.JOINED is False and (
-                        message_number == "376" or message_number == "422"):
+                    message_number == "376" or message_number == "422"
+                ):
                     # wait until we receive end of MOTD before joining, or
                     # until the server tells us the MOTD doesn't exist
                     if not self.chan_list:
                         self.chan_list = self.conf.getChannels(self.network)
                     for c in self.chan_list:
-                        self.send(('JOIN ' + c + ' \n').encode())
+                        self.send(("JOIN " + c + " \n").encode())
                     self.JOINED = True
 
                 line_array = line.split()
@@ -543,8 +564,8 @@ class Bot(threading.Thread):
             self.PORT = int(self.conf.getPort(self.network))
         except AttributeError:
             self.PORT = 6667
-        self.IDENT = 'mypy'
-        self.REALNAME = 's1ash'
+        self.IDENT = "mypy"
+        self.REALNAME = "s1ash"
         if not self.OWNER:
             self.OWNER = self.conf.getOwner(self.network)
 
@@ -553,102 +574,129 @@ class Bot(threading.Thread):
         while not self.CONNECTED:
             try:
                 if self.DEBUG:
-                    self.debug_print(util.bcolors.YELLOW +
-                                     ">>" +
-                                     util.bcolors.ENDC +
-                                     " attempting to connect to " +
-                                     self.network +
-                                     ":" +
-                                     str(self.PORT))
                     self.debug_print(
-                        util.bcolors.GREEN +
-                        ">>" +
-                        util.bcolors.ENDC +
-                        " owner: " +
-                        self.OWNER)
-# low level socket TCP/IP connection
+                        util.bcolors.YELLOW
+                        + ">>"
+                        + util.bcolors.ENDC
+                        + " attempting to connect to "
+                        + self.network
+                        + ":"
+                        + str(self.PORT)
+                    )
+                    self.debug_print(
+                        util.bcolors.GREEN
+                        + ">>"
+                        + util.bcolors.ENDC
+                        + " owner: "
+                        + self.OWNER
+                    )
+                # low level socket TCP/IP connection
                 # force them into one argument
                 self.s.connect((self.HOST, self.PORT))
                 self.CONNECTED = True
                 self.logger.write(
-                    Logger.INFO,
-                    "Connected to " +
-                    self.network,
-                    self.NICK)
+                    Logger.INFO, "Connected to " + self.network, self.NICK
+                )
                 if self.DEBUG:
-                    self.debug_print(util.bcolors.YELLOW +
-                                     ">> " +
-                                     util.bcolors.ENDC +
-                                     "connected to " +
-                                     self.network +
-                                     ":" +
-                                     str(self.PORT))
+                    self.debug_print(
+                        util.bcolors.YELLOW
+                        + ">> "
+                        + util.bcolors.ENDC
+                        + "connected to "
+                        + self.network
+                        + ":"
+                        + str(self.PORT)
+                    )
             except BaseException:
                 if self.DEBUG:
-                    self.debug_print(util.bcolors.FAIL +
-                                     ">> " +
-                                     util.bcolors.ENDC +
-                                     "Could not connect to " +
-                                     self.HOST +
-                                     " at " +
-                                     str(self.PORT) +
-                                     "! Retrying... ")
-                self.logger.write(Logger.CRITICAL, "Could not connect to " +
-                                  self.HOST + " at " + str(self.PORT) + "! Retrying...")
+                    self.debug_print(
+                        util.bcolors.FAIL
+                        + ">> "
+                        + util.bcolors.ENDC
+                        + "Could not connect to "
+                        + self.HOST
+                        + " at "
+                        + str(self.PORT)
+                        + "! Retrying... "
+                    )
+                self.logger.write(
+                    Logger.CRITICAL,
+                    "Could not connect to "
+                    + self.HOST
+                    + " at "
+                    + str(self.PORT)
+                    + "! Retrying...",
+                )
                 time.sleep(1)
 
                 self.worker()
 
             time.sleep(1)
-        # core IRC protocol stuff
-            self.s.send(('NICK ' + self.NICK + '\n').encode())
-
-            if self.DEBUG:
-                self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC +
-                                 self.network + ': NICK ' + self.NICK + '\\n')
-
-            self.s.send(
-                ('USER ' +
-                 self.IDENT +
-                 ' 8 ' +
-                 ' bla : ' +
-                 self.REALNAME +
-                 '\n').encode())  # yeah, don't delete this line
+            # core IRC protocol stuff
+            self.s.send(("NICK " + self.NICK + "\n").encode())
 
             if self.DEBUG:
                 self.debug_print(
-                    util.bcolors.YELLOW +
-                    ">> " +
-                    util.bcolors.ENDC +
-                    self.network +
-                    ": USER " +
-                    self.IDENT +
-                    ' 8 ' +
-                    ' bla : ' +
-                    self.REALNAME +
-                    '\\n')
+                    util.bcolors.YELLOW
+                    + ">> "
+                    + util.bcolors.ENDC
+                    + self.network
+                    + ": NICK "
+                    + self.NICK
+                    + "\\n"
+                )
+
+            self.s.send(
+                (
+                    "USER " + self.IDENT + " 8 " + " bla : " + self.REALNAME + "\n"
+                ).encode()
+            )  # yeah, don't delete this line
+
+            if self.DEBUG:
+                self.debug_print(
+                    util.bcolors.YELLOW
+                    + ">> "
+                    + util.bcolors.ENDC
+                    + self.network
+                    + ": USER "
+                    + self.IDENT
+                    + " 8 "
+                    + " bla : "
+                    + self.REALNAME
+                    + "\\n"
+                )
 
             time.sleep(3)  # allow services to catch up
 
             try:
                 self.s.send(
-                    ('PRIVMSG nickserv identify ' +
-                     self.conf.getIRCPass(
-                         self.network) +
-                        '\n').encode())  # we're registered!
-                if self.DEBUG:
-                    self.debug_print(util.bcolors.YELLOW + ">> " + util.bcolors.ENDC + self.network +
-                                     ': PRIVMSG nickserv identify ' + self.conf.getIRCPass(self.network) + '\\n')
-            except AttributeError:
-                # we're registered!
-                self.s.send(('PRIVMSG nickserv identify 12345 \n').encode())
+                    (
+                        "PRIVMSG nickserv identify "
+                        + self.conf.getIRCPass(self.network)
+                        + "\n"
+                    ).encode()
+                )  # we're registered!
                 if self.DEBUG:
                     self.debug_print(
-                        util.bcolors.YELLOW +
-                        ">> " +
-                        util.bcolors.ENDC +
-                        self.network +
-                        ': PRIVMSG nickserv identify 12345 \\n')
+                        util.bcolors.YELLOW
+                        + ">> "
+                        + util.bcolors.ENDC
+                        + self.network
+                        + ": PRIVMSG nickserv identify "
+                        + self.conf.getIRCPass(self.network)
+                        + "\\n"
+                    )
+            except AttributeError:
+                # we're registered!
+                self.s.send(("PRIVMSG nickserv identify 12345 \n").encode())
+                if self.DEBUG:
+                    self.debug_print(
+                        util.bcolors.YELLOW
+                        + ">> "
+                        + util.bcolors.ENDC
+                        + self.network
+                        + ": PRIVMSG nickserv identify 12345 \\n"
+                    )
 
         self.s.setblocking(1)
 
@@ -656,10 +704,10 @@ class Bot(threading.Thread):
 
         timeout = 0
 
-# does not require a definition -- it will be invoked specifically when
-# the bot notices it has been disconnected
+        # does not require a definition -- it will be invoked specifically when
+        # the bot notices it has been disconnected
         disconnect_event = Event("__.disconnection__")
-#   if we're only running a test of connecting, and don't want to loop forever
+        #   if we're only running a test of connecting, and don't want to loop forever
         if mock:
             return
         # infinite loop to keep parsing lines
@@ -677,14 +725,15 @@ class Bot(threading.Thread):
                     disconnect_event.notifySubscribers("null")
                     self.logger.write(
                         Logger.CRITICAL, "Disconnected!", self.NICK)
-# so that we rejoin all our channels upon reconnecting to the server
+                    # so that we rejoin all our channels upon reconnecting to the server
                     self.JOINED = False
                     self.CONNECTED = False
 
                     global RETRY_COUNTER
                     if RETRY_COUNTER > 10:
                         self.debug_print(
-                            "Failed to reconnect after 10 tries. Giving up...")
+                            "Failed to reconnect after 10 tries. Giving up..."
+                        )
                         sys.exit(1)
 
                     RETRY_COUNTER += 1
@@ -695,7 +744,7 @@ class Bot(threading.Thread):
                 if ready[0]:
                     try:
                         read = read + \
-                            self.s.recv(1024).decode('utf8', 'ignore')
+                            self.s.recv(1024).decode("utf8", "ignore")
                     except UnicodeDecodeError as e:
                         self.debug_print(
                             "Unicode decode error; " + e.__str__())
@@ -711,7 +760,7 @@ class Bot(threading.Thread):
                         self.CONNECTED = False
                         self.worker()
 
-                    lines = read.split('\n')
+                    lines = read.split("\n")
 
                     # Important: all lines from irc are terminated with '\n'. lines.pop() will get you any "to be continued"
                     # line that couldn't fit in the socket buffer. It is stored
@@ -742,17 +791,28 @@ class Bot(threading.Thread):
         """
 
         if not error:
-            print((str(datetime.datetime.now()) + ": " +
-                  self.getName() + ": " + line.strip('\n').rstrip().lstrip()))
+            print(
+                (
+                    str(datetime.datetime.now())
+                    + ": "
+                    + self.getName()
+                    + ": "
+                    + line.strip("\n").rstrip().lstrip()
+                )
+            )
         else:
-            print((str(datetime.datetime.now()) +
-                   ": " +
-                   self.getName() +
-                   ": " +
-                   util.bcolors.FAIL +
-                   ">> " +
-                   util.bcolors.ENDC +
-                   line.strip('\n').rstrip().lstrip()))
+            print(
+                (
+                    str(datetime.datetime.now())
+                    + ": "
+                    + self.getName()
+                    + ": "
+                    + util.bcolors.FAIL
+                    + ">> "
+                    + util.bcolors.ENDC
+                    + line.strip("\n").rstrip().lstrip()
+                )
+            )
 
     def run(self):
         """

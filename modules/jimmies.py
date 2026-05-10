@@ -1,4 +1,4 @@
-#Jimmies module created by Bonekin#
+# Jimmies module created by Bonekin#
 from __future__ import print_function
 
 from event import Event

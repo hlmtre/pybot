@@ -1,4 +1,4 @@
-#Part module, removes bot from specified channel#
+# Part module, removes bot from specified channel#
 
 import sys
 from event import Event
