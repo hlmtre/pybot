@@ -1,4 +1,4 @@
-##Created by hlmtre, just pybot giving a friendly hello##
+# Created by hlmtre, just pybot giving a friendly hello #
 
 import sys
 from event import Event

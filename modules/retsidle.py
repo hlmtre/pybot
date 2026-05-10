@@ -38,7 +38,7 @@ class Retsidle(BaseModule):
         retse.subscribe(self)
         self.cmd = ".retsidle"
         self.help = "How long has rets been idle?"
-        self.rets_current_nick = "rets|audrey"
+        self.rets_current_nick = "rets"
 
         self.bot.register_event(retse, self)
 
@@ -49,10 +49,11 @@ class Retsidle(BaseModule):
             try:
                 if int(util.parse_line(line).message_number) == 317:
                     idle_time = int(line.split()[4])
+                    since = datetime.datetime.now() - datetime.timedelta(seconds=idle_time)
+                    self.say(event.channel, self.rets_current_nick +
+                             " has been idle since " + since.strftime("%Y-%m-%d %H:%M:%S"))
+                    return
+                else:
+                    self.say(event.channel, self.rets_current_nick + " does not appear to be in " + self.channel)
             except BaseException:
                 pass
-
-        # print(idle_time)
-        since = datetime.datetime.now() - datetime.timedelta(seconds=idle_time)
-        self.say(event.channel, self.rets_current_nick +
-                 " has been idle since " + since.strftime("%Y-%m-%d %H:%M:%S"))
