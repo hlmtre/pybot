@@ -5,7 +5,7 @@ from util import commands
 import version
 
 
-@commands(".platform", ".platypus")
+@commands(".platform", ".platypus", ".version")
 def platform_info(bot, message, channel):
     unique_modules = set()
     # because the bot doesn't necessarily hold onto modules themselves, just events, iterate over the events, and then all their subscribers.

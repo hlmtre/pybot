@@ -1,5 +1,4 @@
 from util import commands
-from util import parse_line
 import sys
 from logger import Logger
 
@@ -7,8 +6,7 @@ from logger import Logger
 @commands(".snippet", ".snippets")
 def reload(bot, message, channel):
     logger = bot.logger
-    parsed = parse_line(message)
-    if parsed.startswith(".snippets reload"):
+    if message.startswith(".snippets reload"):
         try:
             bot.load_snippets()
             bot.set_snippets()

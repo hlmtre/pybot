@@ -2,7 +2,6 @@ import sys
 from util import commands
 from util import parse_line
 from logger import Logger
-import imp
 
 
 @commands(".reflect")
@@ -17,7 +16,7 @@ def reflect_reload(bot, message, channel):
         for m in recomposed.split()[2:]:
             if m in sys.modules:
                 try:
-                    imp.reload(sys.modules[m])
+                    bot.load_source(sys.modules[m])
                     bot.brain.notice(channel, 'reloaded ' + m)
                     logger.write(
                         Logger.INFO,
